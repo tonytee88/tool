@@ -3,7 +3,7 @@ from flask import Flask, render_template, url_for, request, redirect, flash
 from utils2 import convertDataToDict
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '35467854332fgrbn567443tf43g3g4t654u56y3'
+app.config['SECRET_KEY'] = '35467854332fgrbn56741241321321443tf43g3g4t654u56y3'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///clientapi.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 

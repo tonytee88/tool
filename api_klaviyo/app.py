@@ -2,8 +2,8 @@ from apiRequests import flows
 import requests
 import csv
 
-mscp = "pk_c104b4a7bb7f04ce41474ba802748f8946"
-ske = "pk_d993312d635a4e55781a7595e1dfcea06b"
+mscp = "pk_c1a68d42dcbba5ea418db3ec6a02fd61ca"
+ske = "pk_d39ca1c35ccc14e83e19355ab574d8dab2"
 
 csvheader = ["type","id"]
 

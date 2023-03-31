@@ -14,7 +14,7 @@ from flask_sqlalchemy import SQLAlchemy, session
 #chrome://net-internals/#sockets
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '35467854332fgrbn567443tf43g3g4t654u56y3'
+app.config['SECRET_KEY'] = '35467854332fgrbn567443tf43g3g1424t654u56y436331113'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///clientapi.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -34,7 +34,7 @@ def findApi(clientName):
         return (requestedApi.api)
         
 #client1 = {
-#"MDI": "pk_26a95ab6e08e3b1c0c4aebdeb7d71b0b95",
+#"MDI": "pk_d61c54e0fcc68b34c7a0fc1dd6321f4c15", #MDI
 #"BOP": "123",
 #"SKE": "345"
 #}
