@@ -1,0 +1,249 @@
+:root {
+    --primary-color: #6ECCAF;
+    --secondary-color: #ADE792;
+    --background-color: #F3ECB0;
+    --read: #6ECCAF;
+    --not-read: #f09393;
+    --border-color: #ccc692;
+    --main-text-color: #344D67;
+    --secondary-text-color: #2b435c;
+    --icon-filter: invert(28%) sepia(17%) saturate(1047%) hue-rotate(170deg) brightness(96%) contrast(95%);
+}
+
+body {
+    margin: 0;
+    font-family:'Courier New', Courier, monospace;
+    background-color: var(--background-color);
+    color: var(--main-text-color);
+    font-size: 18px;
+    position: relative;
+    min-height: 100vh;
+}
+
+button,
+input {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+}
+
+/* ----------MAIN CONTENT---------- */
+
+.book-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 300px);
+    grid-auto-rows: 1fr;
+    gap: 50px;
+    justify-content: center;
+}
+
+.book-card {
+    background-color: var(--secondary-color);
+    width: 260px;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 30px 20px;
+    color: var(--secondary-text-color);
+}
+
+.book-card,
+.add-book-btn {
+    border-radius: 25px;
+    box-shadow: 2px 2px 5px var(--border-color);
+}
+
+.book-info div {
+    padding-bottom: 20px;
+}
+
+.book-info,
+.button-container {
+    text-align: center;
+}
+
+.button-container div {
+    padding-top: 10px;
+}
+
+
+.button-container button {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 0px;
+    width: 260px;
+}
+
+.button-container div {
+    padding-top: 10px;
+}
+
+.button-container button {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 0px;
+    width: 260px;
+}
+
+.has-read {
+    background-color: var(--read);
+}
+
+.has-read:hover {
+    background-color: rgb(110, 204, 175, .70);
+    cursor: pointer;
+    transition: .2s;
+}
+
+.not-read,
+.remove-btn {
+    background-color: var(--background-color);
+}
+
+.not-read:hover,
+.remove-btn:hover {
+    background-color: rgb(243, 236, 176, .70);
+    cursor: pointer;
+    transition: .2s;
+}
+
+/* ----------ADD BOOK BUTTON---------- */
+
+.add-book-btn {
+    border: none;
+    padding: 0;
+    background-color: var(--primary-color);
+    min-height: 280px;
+}
+
+.add-book-btn:hover {
+    background-color: rgb(110, 204, 175, .70);
+    cursor: pointer;
+    transition: .2s;
+}
+
+.add-book-btn:active {
+    background-color: var(--primary-color);
+    transition: .2s;
+}
+
+.add-book-btn div {
+    font-size: 30px;
+    font-weight: bold;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.add-book-btn img {
+    width: 100px;
+    filter: var(--icon-filter);
+}
+
+/* ----------POP UP FORM---------- */
+
+.form-popup {
+    display:none;
+    position: relative;
+    z-index: 10;
+}
+
+.blocker {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(0, 0, 0, .5);
+    content: '';
+}
+
+.form-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 30px;
+    text-align: center;
+    background-color: var(--primary-color);
+    font-size: 18px;
+    border-radius: 20px;
+    color: var(--secondary-text-color);
+}
+
+.close-btn,
+.form-title {
+    color: var(--main-text-color);
+}
+
+.close-container {
+    text-align: end;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.close-btn {
+    padding: 0;
+    border: none;
+    cursor: pointer;
+    background-color: var(--primary-color);
+}
+
+.close-icon {
+    width: 30px;
+    filter: var(--icon-filter);
+}
+
+.form-title {
+    padding-bottom: 20px;
+    padding-top: -20px;
+}
+
+.form-div {
+    padding-bottom: 15px;
+}
+
+.form-title {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.text-input,
+.number-input {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+}
+
+.text-input:focus,
+.number-input:focus {
+    outline: none;
+}
+
+.checkbox-container {
+    padding-top: 5px;
+    padding-bottom: 20px;
+}
+
+.checkbox-input {
+    height: 20px;
+    width: 20px;
+    margin: 0;
+    vertical-align: middle;
+}
+
+#submit-btn {
+    border: none;
+    background-color: var(--background-color);
+    border-radius: 10px;
+    padding: 10px 0px;
+    width: 251px;
+}
+
+#submit-btn:hover {
+    background-color: rgb(243, 236, 176, .70);
+    cursor: pointer;
+    transition: .2s;
+}

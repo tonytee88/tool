@@ -1,0 +1,23 @@
+
+TEMPLATE
+Agis comme un email marketer et prépare un email avec un sujet et un preview text. 
+
+Le sujet : lancement de la nouvelle collection Jamie Kay. 
+
+Voici plus d'info:
+- Hook : Le lancement que tout le monde attendait - nouvelle collection Printemps-été 2023
+- Lien pour avoir plus de contexte : https://belugaboutique.com/collections/jamie-kay
+- Garde le sujet et l'aperçu court pour être optimisé pour le mobile (45 caractères max pour chacun)
+- Ce sont des vêtements pour enfant, SVP adapte les arguments en conséquence.
+- La clientèle est québécois, évite les anglicismes ou les expression française (européenne)
+- Va direct au but, c'est un email de "Flash Sale", pas besoin d'introduction ni de mot de fin
+
+Voici le contenu :
+- inclue un H1 et un texte de 150 caractères qui ajoute de l'urgence et qui explique pourquoi les gens devraient cliquer rapidement
+- Inclue 1 CTA (bouton) après le H1 (max 20 caractères)
+- Utilise un maximum de 100 caractères par argument pour faire 3 arguments de ventes qui touchent les émotions et qui touche notre clientèle cible : les parents. Mettre l'emphase sur les bénéfices avec le méthode : fonctionnalité, avantages et bénéfices
+- Inclue 1 CTA (max 20 caractères)
+- Inclue aussi un deuxième H1 qui annonce des tuiles produits de la collection, on va ajouter des images de produits! 
+- Et ajoute un CTA (max 20 caractères) pour mettre après les tuiles produits : invite les gens à découvrir le reste de la collection ou d'autres produits
+
+----
