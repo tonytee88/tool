@@ -3,7 +3,7 @@ const msgId = "01GW2E4H1E5E5R58ZTZRMY6DRK"
 
 const options = {
     method: 'GET',
-    headers: {
+    headers: {trh
       accept: 'application/json',
       revision: '2023-02-22',
       Authorization: `Klaviyo-API-Key ${tonyApiKey}`,
