@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body {
+        font-family: Arial, sans-serif
+
+      }
+      
+    </style>
+    <?!= include('Stylesheet') ?>
+  </head>
+  <body>
+    <div id="pageBG">
+      <div id="topContainer">
+        <div id="statusMessage"></div>
+      </div>
+      <div id="midContainer">
+        <div class="container">
+        
+          <h1>Tag List</h1>
+          <div id="tableContainer">
+            <button class="option-button" onclick="loadTags()">Load Tags</button>
+            <div id="tagList"></div>
+            <div id="refreshContainer">
+              <button class="option-button" id="refresh" type="submit">Refresh</button>
+            </div>
+            <div id="updateContainer">
+              <button class="option-button" class="option-button" id="update" type="submit">Update my document!</button>
+            </div>
+          </div>
+
+          <form action="" id="gptRequest">
+          <h1>GPT Request</h1>
+          <input type="text" id="subject" class="form-control" placeholder="Enter your subject..." value="Cake Flash Sale">
+          <input type="text" id="lang" class="form-control" placeholder="Enter the language" value="English">
+          <button class="option-button" type="submit">GO!</button>
+          </form>
+        </div>
+      </div>
+      <div id="bottomContainer">
+
+        <div id="optionsContainer">
+        <div id="optionsHoverBottom" class="optionsHover"></div>  
+      
+
+
+        <?!= include('javascript') ?>
+      
+      </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -11,12 +11,7 @@ body {
     font-size: 2.8em;
     color: #ffffff;
   }
-  
-  div {
-    width: 500px;
-    margin: auto;
-  }
-  
+
   .form-control { 
     background-color: #eaeaea;
     padding: 20px; 
@@ -76,4 +71,34 @@ body {
   
   :-ms-input-placeholder {  
      color: #ecf0f1;  
+  }
+
+  .container {
+    width: 100vw;
+    height: 100vh;
+    display:flex;
+    justify-content: center;
+    align-items:first baseline;
+    padding-top: 100px;
+    flex-direction: column;
+  }
+
+  .form-qa {
+    width: 600px;
+    background-color: white;
+    padding : 30px;
+    border-radius: 12px;
+    border-color:black;
+    flex:1;
+  }
+
+  .text {
+    font-size: 1em;
+    color: #000000;
+    font-size:18px;
+
+  }
+
+  .textContainer {
+    flex:1;
   }

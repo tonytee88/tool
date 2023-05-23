@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+    </style>
+    <script>
+      // Fetch and inject the external JavaScript file
+      google.script.run.withSuccessHandler(function(scriptContent) {
+        var script = document.createElement('script');
+        script.innerHTML = scriptContent;
+        document.head.appendChild(script);
+      }).fetchExternalScript();
+    </script>
+  </head>
+  <body>
+    <form id="myform">
+      <label for="subject">Subject:</label><br>
+      <input type="text" id="subject" name="subject"><br>
+      <label for="lang">Language:</label><br>
+      <input type="text" id="lang" name="lang">
+      <button id="submitButton" onclick="handleSubmit(event)">submit</button>
+    </form>
+    <h1>My Sidebar</h1>
+    <button id="myButton" onclick="callScriptFunction()">Click me</button>
+    <div id="output"></div>
+</html>
