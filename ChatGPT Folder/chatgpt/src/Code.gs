@@ -1,19 +1,20 @@
 function onOpen() {
   DocumentApp.getUi() // Or DocumentApp or SlidesApp or FormApp.
-      .createMenu('createPlaceHolders')
-      .addItem('Process Tags', 'processTagsInMenu')
+      .createMenu('Load SideBar')
       .addItem('Show Sidebar', 'setupSideBar')
       .addToUi();
+
 }
 
 function setupSideBar() {
   var html = HtmlService.createTemplateFromFile('index');
   // Evaluate the HTML template
   var sidebar = html.evaluate();
-  sidebar.setTitle('Sections to Sheets');
+  sidebar.setTitle('ChatGPT Super Tool');
   DocumentApp.getUi().showSidebar(sidebar);
 }
- 
+
+
 // Creates an import or include function so files can be added
 // inside the main index.
 function include(filename){
@@ -24,7 +25,7 @@ function include(filename){
 // ----------------------------------------------------------------------------------------------------------------------------------------
 
 
-function getGPTResponse(prompt, promptElements, optionsTotal, lang){
+function getGPTResponse(prompt, promptElements, optionsTotal, lang, info){
   var apiKey = getApiKey();
   var exampleObj ={
     "email subject line": {
@@ -36,8 +37,8 @@ function getGPTResponse(prompt, promptElements, optionsTotal, lang){
     }
   };
 
-  var content = "Act as a professional ad copywriter in the email marketing specialization. Here's the subject: " + prompt + ". Write copy for all the provided elements. Here's the Javascript Array with elements to write about: " + promptElements + ". Provide creative, engaging, and conversational copy in a new nested Javascript Object within an object.Please use the same exact name keys as the provided array " +promptElements+". For example, if promptElements[0] = 'email subject line', please generate " + optionsTotal + " copies for 'email subject line' (using the same words and capitalization) and store them under 'option[i]' in a nested JavaScript object format. Each element should have its own object key-value pairs with the required number of options. Your response should only contain the Javascript Object. For example: " + exampleObj;
-  
+  var content = "Step 1: Act as a professional ad copywriter in the email marketing specialization. Here's the subject: " + prompt + ". Write copy for all the provided elements. Here's the Javascript Array with elements to write about: " + promptElements + ". You will also be provided with extra info to clarify the subject or give you specific requirements for the copy. The extra info is optional. If it's not empty, please take it into consideration. Here's the info: " +info +". Provide creative, engaging, and conversational copy in a new nested Javascript Object within an object. Please use the same exact name keys as the provided array " + promptElements + ". For example, if promptElements[0] = 'email subject line', please generate " + optionsTotal + " copies for 'email subject line' (using the same words and capitalization) and store them under 'option[i]' in a nested JavaScript object format. Each element should have its own object key-value pairs with the required number of options. Your response should only contain the Javascript Object. For example: " + exampleObj + ".\n\nStep 2: For all the following steps, we will review your nested JavaScript object as the response. When asked to review and improve your copy, always put it back in the nested JavaScript object at the end. The nested JavaScript object should be your only response in the end.\n\nStep 3: Review each tag copy and pay attention to word repetition. For each section, avoid repeating the same information more than once as it provides a poor user experience. Ensure that the copy between tag elements is coherent and connected by maintaining a consistent tone, establishing a clear theme, and using a storytelling approach. Rewrite the copy for any repetitive elements.\n\nStep 4: Are the copies for each element short, engaging, and catchy? Remember that this is an email, and the content should be easily readable on mobile devices. If necessary, rewrite the copy for any elements that are too lengthy.\n\nStep 5: Revise the subject line and preheader text to make them excellent and compelling. Craft subject lines and preheader text that are attention-grabbing, compelling, and irresistible. Use powerful and impactful words to create a sense of urgency, curiosity, or value. Continuously refine the copy until it becomes the greatest and most compelling subject line and preheader text possible.\n\nStep 5: Act as a veteran Conversion Rate Optimization Expert and revise the email copy. Ensure that it generates a high number of clicks and frames the readers' mindset to click, shop, and convert. Maximize the conversion rate by optimizing the tag copies.\n\nStep 6: Maintain a consistent tone throughout the copy, whether it's friendly, conversational, or persuasive. Ensure that the tone remains consistent and cohesive. Review and rewrite the targeted tag elements as needed.\n\nStep 7: Use the established and clear theme from Step 1. Identify the main theme or message of the email and ensure that it is reflected in all tag elements. Consistency in theme helps reinforce the central idea and makes the email more impactful. Review and rewrite the targeted tag elements as needed.\n\nStep 8: Use a storytelling approach. Frame the copy within a narrative or storytelling framework. Connect the different tag elements by weaving a coherent story or progression that flows smoothly from one element to another. This approach maintains engagement and coherence. Review and rewrite the targeted tag elements as needed.";
+
   
     // configure the API request to OpenAI
 

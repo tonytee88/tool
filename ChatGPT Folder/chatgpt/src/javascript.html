@@ -1,8 +1,5 @@
 <script>
 
-
-
-
 window.addEventListener('load', function() {
   console.log('Page is loaded');
 });
@@ -390,6 +387,13 @@ gptRequest.addEventListener("submit", (e) => {
     return lang;
   }
 
+  function getInfo() {
+    var infoInput = document.getElementById("info");
+    var info = infoInput.value;
+    console.log("Info:", info);
+    return info;
+  }
+
   // Grab the prompt elements
   function getPromptElements() {
     var promptElements = [];
@@ -415,7 +419,8 @@ gptRequest.addEventListener("submit", (e) => {
   }
 
   var prompt = getSubject();
-    var lang = getLang();
+  var lang = getLang();
+  var info = getInfo();
   var promptElements = getPromptElements();
  
 
@@ -437,7 +442,7 @@ gptRequest.addEventListener("submit", (e) => {
       console.log("Error:", error);
       reject(error);
     })
-    .getGPTResponse(prompt, promptElements, optionsTotal, lang);
+    .getGPTResponse(prompt, promptElements, optionsTotal, lang, info);
 })
   .then((result) => {
     statusMessage.textContent = "Translating with ChatGPT...";
