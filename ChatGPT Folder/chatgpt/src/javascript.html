@@ -23,53 +23,14 @@ var globalApiResponse = {
   }
 };
 
-  // const loginForm = document.getElementById("loginForm");
-
-  // loginForm.addEventListener("submit", (e) => {
-  //   e.preventDefault();
-    
-  //   // Get the status message element
-  //   var statusMessage = document.getElementById("statusMessage");
-  //   // Set the message to indicate the running state
-  //   statusMessage.textContent = "Grabbing all the {tags}...";
-
-  //   let subject = document.getElementById("subject");
-  //   let lang = document.getElementById("lang");
-  //   console.log("ok for steps to get " + subject.value + " and " + lang.value);
-
-  //   new Promise((resolve, reject) => {
-  //   google.script.run.withSuccessHandler(resolve).getPromptElements();
-  // }).then((promptElements) => {
-
-  //     //console.log("Prompt Elements :" + promptElements)
-
-  //     statusMessage.textContent = "Talking to ChatGPT...";
-
-  //     return new Promise((resolve, reject) => {
-  
-  //     google.script.run
-  //     .withSuccessHandler((result) => {
-  //       console.log("Success:", result);
-  //       resolve(result);
-  //     }).withFailureHandler((error) => {
-  //       console.log("Error:", error);
-  //       reject(error);
-  //     }).getAIReponse(subject.value,promptElements);
-  //   });
-  // }).then(() => {
-  //     statusMessage.textContent = "Script completed.";
-  //     }).catch((error) => {
-  //       // Handle any errors that occur during script execution
-  //       console.error(error);
-  //       statusMessage.textContent = "Script encountered an error.";
-  //     });
-  // });
-
 function loadTags() {
   google.script.run.withSuccessHandler(processTags).getTags();
 }
 
 function processTags(tags) {
+  var topContainer = document.getElementById("topContainer");
+  topContainer.setAttribute("gpt-request-status", "generate-copy");
+
   var tagList = document.getElementById('tagList');
   tagList.innerHTML = ''; // Clear existing content
 
@@ -105,8 +66,6 @@ function processTags(tags) {
     tagsWithDelimitersCell.textContent = tag;
     tagsWithDelimitersCell.className = 'text-content-cell ';
     tagsWithDelimitersCell.id = tag.replace(/\s+/g, '-').replace('{', '').replace('}', '');
-    tagsWithDelimitersCell.setAttribute('data-state', 'unlocked');
-
 
     // Set the initial data-option attribute
     tagsWithDelimitersCell.setAttribute('data-option', '1');
@@ -178,7 +137,6 @@ function processTags(tags) {
       var tagsWithDelimitersCellId = buttonId.replace('button_', ''); // Remove the 'button_' prefix
       var tagsWithDelimitersCell = document.getElementById(tagsWithDelimitersCellId);
       var test183 = parseInt(tagsWithDelimitersCell.getAttribute('data-option'));
-      console.log("test183: " + test183);
       
       showPreviousOption(tagsWithDelimitersCell, tagsWithDelimitersCellId);
     });
@@ -189,7 +147,6 @@ function processTags(tags) {
       var tagsWithDelimitersCellId = buttonId.replace('button_', ''); // Remove the 'button_' prefix
       tagsWithDelimitersCellId = tagsWithDelimitersCellId.replace('_next', ''); // Remove the '_next' suffix
       var tagsWithDelimitersCell = document.getElementById(tagsWithDelimitersCellId);
-      console.log("name: " + tagsWithDelimitersCellId);
       showNextOption(tagsWithDelimitersCell, tagsWithDelimitersCellId);
     });
     backButton.addEventListener('click', function() {
@@ -211,76 +168,99 @@ function processTags(tags) {
 
   });
 
-   
-
-  
   // Append the table to the tag list element
   tagList.appendChild(table);
 
   //end of table generating code
-  
- 
+   
+  const handleUpdateButtonClick = document.getElementById("update");
 
-  // const handleRefreshButtonClick = document.getElementById("refresh");
+  handleUpdateButtonClick.addEventListener("click", function() {
+    var cells = document.getElementsByClassName("title-content-cell");
+    var finalObjectResult = {};
 
-  // refresh.addEventListener("click", (e) => {
-  //   e.preventDefault();
-  //   optionsCount++;
-  //   console.log(optionsCount);
-  //   console.log(globalApiResponse);
-  //   (function handleRefreshButtonClick() {
-  //   var textContentCells = document.getElementsByClassName("text-content-cell");
-  //   var titleContentCells = document.getElementsByClassName("title-content-cell");
+    for (var i = 0; i < cells.length; i++) {
+      var cell = cells[i];
+      var cellText = cell.innerText.trim();
+      var nextRow = cell.parentNode.nextElementSibling;
+      var nextCell = nextRow ? nextRow.children[cell.cellIndex] : null;
 
-  //   for (var i = 0; i < textContentCells.length; i++) {
-  //     var cell = textContentCells[i];
-  //     var state = cell.getAttribute("data-state");
-  //     var tag = cell.getAttribute("data-tag");
-  //     var tagName = titleContentCells[i].textContent;
-  //     var generatedCopyRefreshed = globalApiResponse[tagName]["option" + optionsCount];
-  //     console.log("option" + optionsCount);
-  //     console.log("generated copy for each button:"+generatedCopyRefreshed);
-  //     if (state === "unlocked") { //(state === "unlocked" && tag)
-  //       cell.textContent = generatedCopyRefreshed;
-  //     }
-  //   }
-  //   })();
-  //   });
-
-    const handleUpdateButtonClick = document.getElementById("update");
-
-    handleUpdateButtonClick.addEventListener("click", function() {
-      var cells = document.getElementsByClassName("title-content-cell");
-      var finalObjectResult = {};
-
-      for (var i = 0; i < cells.length; i++) {
-        var cell = cells[i];
-        var cellText = cell.innerText.trim();
-        var nextRow = cell.parentNode.nextElementSibling;
-        var nextCell = nextRow ? nextRow.children[cell.cellIndex] : null;
-        console.log("UPDATE RESULT1:", cellText, nextCell);
-
-        if (nextCell !== null && nextCell.classList.contains("text-content-cell")) {
-          var key = "{" + cellText + "}";
-          var value = nextCell.innerText.trim();
-          finalObjectResult[key] = value;
-          console.log("UPDATE RESULT, value:", finalObjectResult[key]);
-        }
+      if (nextCell !== null && nextCell.classList.contains("text-content-cell")) {
+        var key = "{" + cellText + "}";
+        var value = nextCell.innerText.trim();
+        finalObjectResult[key] = value;
+      }
     }
     // Call a function in your Code.gs file to update the document with finalObjectResult
-    google. script.run.updateDocument(finalObjectResult);
+    google.script.run.updateDocument(finalObjectResult);
+
+
+    //end of updatedocument
+    //create elements for design phase
+    
+        //Change gpt-request-status
+    var topContainer = document.getElementById("topContainer");
+    topContainer.setAttribute("gpt-request-status", "generate-design-tips");
+
+    // Get the text content of the required divs
+    try {
+      var heroBannerTitle = document.getElementById("hero-banner-title").textContent.trim();
+      var heroBannerSubtitle = document.getElementById("hero-banner-text").textContent.trim();
+      var heroBannerCTA = document.getElementById("hero-banner-cta").textContent.trim();
+
+      // If an error occurs within the try block, the catch block will handle it
+    } catch (error) {
+      // Code to handle the error
+      console.error('An error occurred:', error.message);
+      var statusMessage = document.getElementById("statusMessage");
+      // Set the message to indicate the running state
+      statusMessage.textContent = "Make sure your tags include : 'hero banner title', 'hero banner text' and 'hero banner cta'";
+    }
+
+    // Clear the content of div with id="tableContainer"
+    var tableContainer = document.getElementById("tableContainer");
+    tableContainer.innerHTML = "";
+
+    // Generate a new table with 4 rows
+    var newTable = document.createElement("table");
+
+    var row1 = document.createElement("tr");
+    var cell1 = document.createElement("td");
+    cell1.textContent = "Hero Banner Title: " + heroBannerTitle;
+    row1.appendChild(cell1);
+    newTable.appendChild(row1);
+
+    var row2 = document.createElement("tr");
+    var cell2 = document.createElement("td");
+    cell2.textContent = "Hero Banner Text: " + heroBannerSubtitle;
+    row2.appendChild(cell2);
+    newTable.appendChild(row2);
+    
+    var row3 = document.createElement("tr");
+    var cell3 = document.createElement("td");
+    cell3.textContent = "Hero Banner CTA: " +heroBannerCTA;
+    row3.appendChild(cell3);
+    newTable.appendChild(row3);
+
+    tableContainer.appendChild(newTable);
+
+    // Find the textarea with class "large-input"
+    var textarea = document.querySelector(".large-input");
+    textarea.value = "What is the design focus?"; // Change the text
+
+    //Scroll back to the top for best UX
+    document.documentElement.scrollTop = 0; // For modern browsers
+    document.body.scrollTop = 0; // For older browsers
+
+    // Add an animation to the textarea
+    textarea.classList.add("textarea-animation");
+    setTimeout(function() {
+      textarea.classList.remove("textarea-animation");
+    }, 1000);
+
   });
+
 }
-
-
-  // refresh.addEventListener("click", function () {
-  // //optionsCount++;
-  // if (optionsCount === optionsTotal) {
-  //   refresh.textContent = "Options exceeded";
-  //   refresh.disabled = true;
-  // }
-  // handleButtonWait("refresh");
-  // });
 
 //END OF PROCESS TAG FUNCTION
 //----------------------------------------------------------------------------------------------------------------
@@ -300,22 +280,15 @@ function showOptionsOnHover(tag, optionsCount) {
     for (var optionCount = 1; optionCount <= optionsTotal; optionCount++) {
 
       var optionText = optionCount + " - " + responseForOptionsHover[tag]["option" + optionCount];
-
       var optionElement = document.createElement('div');
       optionElement.textContent = optionText;
-    
-      optionElementGeneratedContainer.appendChild(optionElement);
+          optionElementGeneratedContainer.appendChild(optionElement);
     }
 
-    //var contentHeight = window.getComputedStyle(optionElementGeneratedContainer).getPropertyValue("height");
-    //console.log(contentHeight);
-    //optionElementGeneratedContainer.style.height = contentHeight + 'px';
   }
 }
 
 function showPreviousOption(tagsWithDelimitersCell,tagsWithDelimitersCellId) {
-  console.log("test297: " + globalApiResponse);
-  console.log("test298: " + tagsWithDelimitersCellId);
   var optionsCount = parseInt(tagsWithDelimitersCell.getAttribute('data-option'));
   var previousOptionIndex = optionsCount === 1 ? optionsTotal : optionsCount - 1;
   var tag = tagsWithDelimitersCellId.replace(/-/g, ' ');
@@ -346,51 +319,59 @@ var exampleObj = {
 
 function updateTextContentCells(response, optionsCount) {
 
+  var topContainer = document.getElementById("topContainer");
+  var gptRequestStatus = topContainer.getAttribute("gpt-request-status");
+
+  if (gptRequestStatus === "generate-copy") {
+
   var titleContentCells = document.getElementsByClassName("title-content-cell");
   var textContentCells = document.getElementsByClassName("text-content-cell");
+  
+  var heroBannerTitle = document.getElementById("hero-banner-title").textContent.trim();
+  var heroBannerText = document.getElementById("hero-banner-text").textContent.trim();
+  var heroBannerCTA = document.getElementById("hero-banner-cta").textContent.trim();
 
   for (var i = 0; i < titleContentCells.length; i++) {
     var tag = titleContentCells[i].textContent;
-    console.log("Tag:", tag);
-    console.log("Response:"+response);
-    console.log("titlecontentcells length: "+titleContentCells.length);
     if (response.hasOwnProperty(tag)) {
       var generatedCopy = response[tag]["option" + optionsCount];
-      console.log("Generated Copy:", generatedCopy);
       textContentCells[i].textContent = generatedCopy;
+      console.log("Tag:", tag);
+      console.log("Generated Copy:", generatedCopy);
+      console.log("Response:", response);
     } else {
       console.log("Tag not found in response:", tag);
     }
   }
 
   return response;
+} else {
+  console.log("haha");
+  }
 }
+
 
 const gptRequest = document.getElementById("gptRequest");
 
 gptRequest.addEventListener("submit", (e) => {
   e.preventDefault();
-  console.log("form works");
 
   // Get the subject in form
   function getSubject() {
     var subjectInput = document.getElementById("subject");
     var prompt = subjectInput.value;
-    console.log(prompt);
     return prompt;
   }
 
   function getLang() {
     var langInput = document.getElementById("lang");
     var lang = langInput.value;
-    console.log("Lang:", lang);
     return lang;
   }
 
   function getInfo() {
     var infoInput = document.getElementById("info");
     var info = infoInput.value;
-    console.log("Info:", info);
     return info;
   }
 
@@ -410,7 +391,6 @@ gptRequest.addEventListener("submit", (e) => {
       if (matches) {
         for (var i = 0; i < matches.length; i++) {
           var tag = matches[i].replace('{', '').replace('}', '');
-          //console.log("Tag:", tag); // Log each tag for debugging
           promptElements.push(tag);
         }
       }
@@ -422,6 +402,10 @@ gptRequest.addEventListener("submit", (e) => {
   var lang = getLang();
   var info = getInfo();
   var promptElements = getPromptElements();
+  var subject = getSubject();
+  var heroBannerTitle;
+  var heroBannerText;
+  var heroBannerCTA;
  
 
   // Make the API call
@@ -432,17 +416,39 @@ gptRequest.addEventListener("submit", (e) => {
   console.log("ok prompt: " + prompt + " and ok prompt elements: " + promptElements) + "and ok lang: " + lang;
 
   new Promise((resolve, reject) => {
-  google.script.run
-    .withSuccessHandler((result) => {
-      console.log("Success:", result);
-      globalApiResponse = result;
-      resolve(result);
-    })
-    .withFailureHandler((error) => {
-      console.log("Error:", error);
-      reject(error);
-    })
-    .getGPTResponse(prompt, promptElements, optionsTotal, lang, info);
+  // Add your condition based on gpt-request-status here
+  var topContainer = document.getElementById("topContainer");
+  var gptRequestStatus = topContainer.getAttribute("gpt-request-status");
+  console.log("subject: ", subject, "herobannertitle: ", heroBannerTitle, "info: ", info);
+
+  if (gptRequestStatus === "generate-copy") {
+    // Run getGPTResponse
+    google.script.run
+      .withSuccessHandler((result) => {
+        console.log("Success:", result);
+        globalApiResponse = result;
+        resolve(result);
+      })
+      .withFailureHandler((error) => {
+        console.log("Error:", error);
+        reject(error);
+      })
+      .getGPTResponse(prompt, promptElements, optionsTotal, lang, info);
+
+  } else {
+    // Run getGPTDesignResponse
+    google.script.run
+      .withSuccessHandler((result) => {
+        console.log("Success:", result);
+        globalApiResponse = result;
+        resolve(result);
+      })
+      .withFailureHandler((error) => {
+        console.log("Error:", error);
+        reject(error);
+      })
+      .getGPTDesignResponse(heroBannerTitle, heroBannerText, heroBannerCTA, subject, info);
+  }
 })
   .then((result) => {
     statusMessage.textContent = "Translating with ChatGPT...";
@@ -468,7 +474,6 @@ gptRequest.addEventListener("submit", (e) => {
   })
   .then((result) => {
     statusMessage.textContent = "Negociation with Open AI servers...";
-    console.log("Response:", result);
     // Handle the API response
     return new Promise((resolve, reject) => {
       updateTextContentCells(result, optionsCount);
@@ -485,47 +490,47 @@ gptRequest.addEventListener("submit", (e) => {
   .catch((error) => {
     console.error("Error:", error);
     statusMessage.textContent = "Script encountered an error.";
-  })
+  });
+
 });
 
-// button handling automatically via evenlisteners
-function handleButtonToggle(button) {
-  var cell = button.parentNode.nextElementSibling;
-  var state = cell.getAttribute("data-state");
+function addCommentToTableCell() {
+  var doc = DocumentApp.getActiveDocument();
+  var body = doc.getBody();
+  var tableCell = body.findElement(DocumentApp.ElementType.TABLE_CELL).getElement();
+  var divId = 'hero-banner-title';
 
-  if (state === "locked") {
-    cell.setAttribute("data-state", "unlocked");
-    button.textContent = '❌';
-    button.classList.remove("locked");
-    button.classList.add("unlocked");
-    console.log("State changed to unlocked");
-  } else {
-    cell.setAttribute("data-state", "locked");
-    button.textContent = '✅';
-    button.classList.remove("unlocked");
-    button.classList.add("locked");
-    console.log("State changed to locked");
+  var divElement = tableCell.findElement(DocumentApp.ElementType.DIV).getElement();
+  if (divElement.getAttribute("id") === divId) {
+    var cellText = tableCell.asText();
+    var cellStartOffset = cellText.getText().indexOf(divElement.getText());
+    var cellEndOffset = cellStartOffset + divElement.getText().length - 1;
+    
+    var comment = cellText.insertComment(cellStartOffset, cellEndOffset, 'This is a sample comment.');
+    comment.setAuthor('Your Name');  // Set the author of the comment
   }
 }
 
-
-
-//Handles button colors automatically via eventlistener
-  function handleButtonWait(buttonId) {
-  var button = document.getElementById(buttonId);
-  var originalColor = button.classList.contains("default-gray")
-    ? "default-gray"
-    : "dark-gray";
-
-  button.classList.add("white");
-  button.disabled = true;
-
-  setTimeout(function () {
-    button.classList.remove("white");
-    button.disabled = false;
-    button.classList.add(originalColor);
-  }, 3000);
+function getTopContainerStatus() {
+  var topContainerStatus = ""; // Initialize the status
+  
+  // Use HtmlService to access the HTML content
+  var html = HtmlService.createHtmlOutputFromFile('index').getContent();
+  
+  // Use DOM methods to parse and manipulate the HTML content
+  var document = XmlService.parse(html);
+  var root = document.getRootElement();
+  var topContainerElement = root.getChild('div', { 'id': 'topContainer' });
+  
+  if (topContainerElement) {
+    var statusAttribute = topContainerElement.getAttribute('gpt-request-status');
+    if (statusAttribute) {
+      topContainerStatus = statusAttribute.getValue();
+    }
   }
+  
+  return topContainerStatus;
+}
 
 
 
