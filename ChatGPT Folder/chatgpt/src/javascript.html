@@ -6,22 +6,150 @@ window.addEventListener('load', function() {
 
 var optionsCount = 1;
 const optionsTotal = 3;
+const designOptions = 3; // Number of design options
+
 var globalApiResponse = {
-  "email subject line": {
+  "hero banner title": {
     "option1": "Ride in style with our Bike Flash Sale!",
     "option2": "Unbeatable deals on bikes this week only!",
-    "option3": "Get ready to bike your heart out with our Flash Sale!",
-    "option4": "Bike enthusiasts rejoice! Our Flash Sale is here!",
-    "option5": "Find your perfect ride at our Bike Flash Sale!"
+    "option3": "Get ready to bike your heart out with our Flash Sale!"
   },
-  "email preview text": {
+  "hero banner text": {
     "option1": "Don't miss out on the bike sale event of the year!",
     "option2": "Get your hands on the finest bikes at the most amazing prices!",
-    "option3": "Upgrade your ride at our epic Flash Sale! Hurry, limited time only!",
-    "option4": "Be the first to grab the deal of a lifetime on your dream bike!",
-    "option5": "Join the Flash Sale frenzy and save big on bikes!"
+    "option3": "Upgrade your ride at our epic Flash Sale! Hurry, limited time only!"
+  },
+  "hero banner cta": {
+    "option1": "Don't miss out on the bike sale event of the year!",
+    "option2": "Get your hands on the finest bikes at the most amazing prices!",
+    "option3": "Upgrade your ride at our epic Flash Sale! Hurry, limited time only!"
   }
+
 };
+
+var heroBannerTitle;
+var heroBannerText;
+var heroBannerCTA;
+var designTips;
+
+const qaButtonClick = document.getElementById("qaButton");
+
+qaButtonClick.addEventListener("click", function() {
+
+  var topContainer = document.getElementById("topContainer");
+  topContainer.setAttribute("gpt-request-status", "generate-design-tips");
+
+  heroBannerTitle = globalApiResponse["hero banner title"]["option" + optionsCount];
+  heroBannerSubtitle = globalApiResponse["hero banner text"]["option" + optionsCount];
+  heroBannerCTA = globalApiResponse["hero banner cta"]["option" + optionsCount];
+
+  var tableContainer = document.getElementById("tableContainer");
+    tableContainer.innerHTML = "";
+
+    // Generate a new table with 4 rows
+    for (var i = 1; i <= designOptions; i++) {
+    // Create a new table for each design option
+    var newTable = document.createElement("table");
+    newTable.id = 'designTable' + i;
+
+    // Create the first row with two divs
+    var row1 = document.createElement("tr");
+
+    var cell1 = document.createElement("td");
+    var div1 = document.createElement("div");
+    div1.textContent = "Option " + i;
+    // Apply CSS styles to div1
+
+    var cell2 = document.createElement("td");
+    var div2 = document.createElement("div");
+
+    // Create a button element
+    var deleteButton = document.createElement("button");
+    deleteButton.id = 'deleteDesignIdea' + i;
+    deleteButton.innerHTML = "&#128465"; // Unicode character for trash can
+    deleteButton.style.fontSize = "12px"; // Set the font size to make the button small
+
+    // Apply CSS styles to the button
+    //deleteButton.style.boxShadow = "0 0 5px rgba(0, 0, 0, 0.3)";
+    deleteButton.style.transition = "box-shadow 0.3s ease-in-out";
+
+    // Add event listeners for hover and click animations
+    deleteButton.addEventListener("mouseover", function() {
+      this.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.5)";
+    });
+
+    deleteButton.addEventListener("mouseout", function() {
+      this.style.boxShadow = "0 0 5px rgba(0, 0, 0, 0.3)";
+    });
+
+    deleteButton.addEventListener("click", createDeleteTableHandler(i)); // Call a separate function to handle the deletion
+
+    // Append the button to the second div
+    div2.appendChild(deleteButton);
+
+    cell1.appendChild(div1);
+    cell2.appendChild(div2);
+    row1.appendChild(cell1);
+    row1.appendChild(cell2);
+
+    newTable.appendChild(row1);
+    // Create the second row with the response from the API call
+    var row2 = document.createElement("tr");
+    var cell3 = document.createElement("td");
+    cell3.colSpan = 2;
+    cell3.id = "cell3_option" + i;
+    cell3.className = "cell3_option";
+    //var response = getGPTDesignResponse(lang, heroBannerTitle, heroBannerText, heroBannerCTA, subject, info);
+    //cell3.textContent = "Response: " + JSON.stringify(response.result);
+    
+    row2.appendChild(cell3);
+    newTable.appendChild(row2);
+
+    // Append the new table to the table container
+    var tableContainer = document.getElementById("tableContainer");
+    tableContainer.appendChild(newTable);
+  }
+
+    var addButton = document.createElement("button");
+    addButton.id = "addDesignTips";
+    addButton.className = "option-button";
+    addButton.textContent = "Add Design Tip";
+
+    tableContainer.appendChild(addButton);
+
+
+    // Find the textarea with class "large-input"
+    var textarea = document.querySelector(".large-input");
+    textarea.value = "Focus on the sale"; // Change the text
+
+    //Scroll back to the top for best UX
+    document.documentElement.scrollTop = 0; // For modern browsers
+    document.body.scrollTop = 0; // For older browsers
+
+    // Add an animation to the textarea
+    textarea.classList.add("textarea-animation");
+    setTimeout(function() {
+      textarea.classList.remove("textarea-animation");
+    }, 1000);
+
+    const handleAddDesignTipsButtonClick = document.getElementById("addDesignTips");
+
+    handleAddDesignTipsButtonClick.addEventListener("click", function() {
+    var designTips = document.getElementsByClassName("cell3_option");
+    var designTipsText = [];
+
+    for (var i = 0; i < designTips.length; i++) {
+      var designTip = designTips[i];
+      var textContent = designTip.textContent.trim(); // Trim the text content
+      designTipsText.push(textContent);
+    }
+
+    console.log(designTipsText);
+    google.script.run.addDesignTips(designTipsText);
+  });
+
+
+});
 
 function loadTags() {
   google.script.run.withSuccessHandler(processTags).getTags();
@@ -204,9 +332,9 @@ function processTags(tags) {
 
     // Get the text content of the required divs
     try {
-      var heroBannerTitle = document.getElementById("hero-banner-title").textContent.trim();
-      var heroBannerSubtitle = document.getElementById("hero-banner-text").textContent.trim();
-      var heroBannerCTA = document.getElementById("hero-banner-cta").textContent.trim();
+      heroBannerTitle = document.getElementById("hero-banner-title").textContent.trim();
+      heroBannerSubtitle = document.getElementById("hero-banner-text").textContent.trim();
+      heroBannerCTA = document.getElementById("hero-banner-cta").textContent.trim();
 
       // If an error occurs within the try block, the catch block will handle it
     } catch (error) {
@@ -222,31 +350,89 @@ function processTags(tags) {
     tableContainer.innerHTML = "";
 
     // Generate a new table with 4 rows
+    for (var i = 1; i <= designOptions; i++) {
+    // Create a new table for each design option
     var newTable = document.createElement("table");
+    newTable.id = 'designTable' + i;
 
+    // Create the first row with two divs
     var row1 = document.createElement("tr");
+
     var cell1 = document.createElement("td");
-    cell1.textContent = "Hero Banner Title: " + heroBannerTitle;
-    row1.appendChild(cell1);
-    newTable.appendChild(row1);
+    var div1 = document.createElement("div");
+    div1.textContent = "Option " + i;
+    // Apply CSS styles to div1
 
-    var row2 = document.createElement("tr");
     var cell2 = document.createElement("td");
-    cell2.textContent = "Hero Banner Text: " + heroBannerSubtitle;
-    row2.appendChild(cell2);
-    newTable.appendChild(row2);
-    
-    var row3 = document.createElement("tr");
-    var cell3 = document.createElement("td");
-    cell3.textContent = "Hero Banner CTA: " +heroBannerCTA;
-    row3.appendChild(cell3);
-    newTable.appendChild(row3);
+    var div2 = document.createElement("div");
 
+    // Create a button element
+    var deleteButton = document.createElement("button");
+    deleteButton.id = 'deleteDesignIdea' + i;
+    deleteButton.innerHTML = "&#128465"; // Unicode character for trash can
+    deleteButton.style.fontSize = "12px"; // Set the font size to make the button small
+
+    // Apply CSS styles to the button
+    //deleteButton.style.boxShadow = "0 0 5px rgba(0, 0, 0, 0.3)";
+    deleteButton.style.transition = "box-shadow 0.3s ease-in-out";
+
+    // Add event listeners for hover and click animations
+    deleteButton.addEventListener("mouseover", function() {
+      this.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.5)";
+    });
+
+    deleteButton.addEventListener("mouseout", function() {
+      this.style.boxShadow = "0 0 5px rgba(0, 0, 0, 0.3)";
+    });
+
+    deleteButton.addEventListener("click", createDeleteTableHandler(i)); // Call a separate function to handle the deletion
+
+    // Append the button to the second div
+    div2.appendChild(deleteButton);
+
+    cell1.appendChild(div1);
+    cell2.appendChild(div2);
+    row1.appendChild(cell1);
+    row1.appendChild(cell2);
+
+    newTable.appendChild(row1);
+    // Create the second row with the response from the API call
+    var row2 = document.createElement("tr");
+    var cell3 = document.createElement("td");
+    cell3.colSpan = 2;
+    cell3.id = "cell3_option" + i;
+    cell3.className = "cell3_option";
+    //var response = getGPTDesignResponse(lang, heroBannerTitle, heroBannerText, heroBannerCTA, subject, info);
+    //cell3.textContent = "Response: " + JSON.stringify(response.result);
+    
+    row2.appendChild(cell3);
+    newTable.appendChild(row2);
+
+    // Append the new table to the table container
+    var tableContainer = document.getElementById("tableContainer");
     tableContainer.appendChild(newTable);
+
+  }
+    var addButton = document.createElement("button");
+    addButton.id = "addDesignTips";
+    addButton.className = "option-button";
+    addButton.textContent = "Add Design Tip";
+
+    tableContainer.appendChild(addButton);
+ 
+
+
+
+
+
+
+
+
+
 
     // Find the textarea with class "large-input"
     var textarea = document.querySelector(".large-input");
-    textarea.value = "What is the design focus?"; // Change the text
+    textarea.value = "Focus on the sale"; // Change the text
 
     //Scroll back to the top for best UX
     document.documentElement.scrollTop = 0; // For modern browsers
@@ -258,8 +444,23 @@ function processTags(tags) {
       textarea.classList.remove("textarea-animation");
     }, 1000);
 
-  });
+    const handleAddDesignTipsButtonClick = document.getElementById("addDesignTips");
 
+    handleAddDesignTipsButtonClick.addEventListener("click", function() {
+    var designTips = document.getElementsByClassName("cell3_option");
+    var designTipsText = [];
+
+    for (var i = 0; i < designTips.length; i++) {
+      var designTip = designTips[i];
+      var textContent = designTip.textContent.trim(); // Trim the text content
+      designTipsText.push(textContent);
+    }
+
+    console.log(designTipsText);
+    google.script.run.addDesignTips(designTipsText);
+  });
+  
+});
 }
 
 //END OF PROCESS TAG FUNCTION
@@ -327,18 +528,11 @@ function updateTextContentCells(response, optionsCount) {
   var titleContentCells = document.getElementsByClassName("title-content-cell");
   var textContentCells = document.getElementsByClassName("text-content-cell");
   
-  var heroBannerTitle = document.getElementById("hero-banner-title").textContent.trim();
-  var heroBannerText = document.getElementById("hero-banner-text").textContent.trim();
-  var heroBannerCTA = document.getElementById("hero-banner-cta").textContent.trim();
-
   for (var i = 0; i < titleContentCells.length; i++) {
     var tag = titleContentCells[i].textContent;
     if (response.hasOwnProperty(tag)) {
       var generatedCopy = response[tag]["option" + optionsCount];
       textContentCells[i].textContent = generatedCopy;
-      console.log("Tag:", tag);
-      console.log("Generated Copy:", generatedCopy);
-      console.log("Response:", response);
     } else {
       console.log("Tag not found in response:", tag);
     }
@@ -346,9 +540,38 @@ function updateTextContentCells(response, optionsCount) {
 
   return response;
 } else {
-  console.log("haha");
+  // var cell3_option = document.getElementsByClassName("cell3_option");
+
+  // for (var i = 1; i <= designOptions; i++) {
+  // var generatedDesignOption = response["Option" + i];
+  // var generatedDesignOption1 = response["Option" + i]["Description"];
+  // console.log(generatedDesignOption);
+  // cell3_option[i - 1].textContent = generatedDesignOption;
+  for (var i = 1; i <= designOptions; i++) {
+  var optionKey = "Option" + i;
+  if (response.hasOwnProperty(optionKey)) {
+    var backgroundText = response[optionKey]["Background"];
+    var descriptionText = response[optionKey]["Description"];
+    var designElementText = response[optionKey]["DesignElement"];
+    
+    // Get the div element with the corresponding unique id
+    var divId = "cell3_option" + i;
+    var divElement = document.getElementById(divId);
+    
+    // Check if the div element exists
+    if (divElement) {
+      // Update the inner HTML of the div with the text content
+      divElement.innerHTML = `
+        <p>Background: ${backgroundText}</p>
+        <p>Description: ${descriptionText}</p>
+        <p>Design Element: ${designElementText}</p>
+      `;
+    }
   }
-}
+  }  
+  }
+};
+
 
 
 const gptRequest = document.getElementById("gptRequest");
@@ -403,10 +626,6 @@ gptRequest.addEventListener("submit", (e) => {
   var info = getInfo();
   var promptElements = getPromptElements();
   var subject = getSubject();
-  var heroBannerTitle;
-  var heroBannerText;
-  var heroBannerCTA;
- 
 
   // Make the API call
   var statusMessage = document.getElementById("statusMessage");
@@ -447,7 +666,7 @@ gptRequest.addEventListener("submit", (e) => {
         console.log("Error:", error);
         reject(error);
       })
-      .getGPTDesignResponse(heroBannerTitle, heroBannerText, heroBannerCTA, subject, info);
+      .getGPTDesignResponse(lang, heroBannerTitle, heroBannerText, heroBannerCTA, subject, info);
   }
 })
   .then((result) => {
@@ -494,23 +713,6 @@ gptRequest.addEventListener("submit", (e) => {
 
 });
 
-function addCommentToTableCell() {
-  var doc = DocumentApp.getActiveDocument();
-  var body = doc.getBody();
-  var tableCell = body.findElement(DocumentApp.ElementType.TABLE_CELL).getElement();
-  var divId = 'hero-banner-title';
-
-  var divElement = tableCell.findElement(DocumentApp.ElementType.DIV).getElement();
-  if (divElement.getAttribute("id") === divId) {
-    var cellText = tableCell.asText();
-    var cellStartOffset = cellText.getText().indexOf(divElement.getText());
-    var cellEndOffset = cellStartOffset + divElement.getText().length - 1;
-    
-    var comment = cellText.insertComment(cellStartOffset, cellEndOffset, 'This is a sample comment.');
-    comment.setAuthor('Your Name');  // Set the author of the comment
-  }
-}
-
 function getTopContainerStatus() {
   var topContainerStatus = ""; // Initialize the status
   
@@ -531,7 +733,15 @@ function getTopContainerStatus() {
   
   return topContainerStatus;
 }
-
+function createDeleteTableHandler(index) {
+  return function() {
+    var designTableId = 'designTable' + index; // Get the corresponding table id to be deleted
+    var designTable = document.getElementById(designTableId);
+    if (designTable) {
+      designTable.remove(); // Delete the table
+    }
+  };
+}
 
 
 </script>

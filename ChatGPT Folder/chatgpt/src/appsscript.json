@@ -1,6 +1,13 @@
 {
   "timeZone": "America/Toronto",
   "dependencies": {
+    "enabledAdvancedServices": [
+      {
+        "userSymbol": "Drive",
+        "version": "v2",
+        "serviceId": "drive"
+      }
+    ]
   },
   "webapp": {
     "access": "MYSELF",
@@ -14,5 +21,4 @@
     "https://www.googleapis.com/auth/script.scriptapp"
   ],
   "runtimeVersion": "V8"
-
-}
+} 

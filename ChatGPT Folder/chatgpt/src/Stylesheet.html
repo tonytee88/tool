@@ -39,7 +39,7 @@
   /*background: linear-gradient(to bottom, #ffffff, #f1f1f1);*/
   z-index: 999; /* Added higher z-index to ensure it appears on top */
   height: 144px;
-  display: block;
+  display: none;
   }
 
 
@@ -87,12 +87,18 @@
   }
   
   /* Table Styles */
-  #mainTable {
+  #mainTable, #designTable1, #designTable2, #designTable3 {
     width: 100%;
     border-collapse: collapse;
     margin: 0;
   }
   
+  .cell3_option {
+    border: 1px solid #000;
+    padding: 10px;
+
+  } 
+
    #mainTable th,
   #mainTable td {
     border: 1px solid #000;
@@ -175,6 +181,9 @@ textarea.large-input {
   100% { font-size: inherit; }
 }
 
+#addDesignTips {
+  margin-top : 12px;
+}
 
 </style>
  
