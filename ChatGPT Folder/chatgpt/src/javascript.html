@@ -32,6 +32,37 @@ var heroBannerText;
 var heroBannerCTA;
 var designTips;
 
+
+const testFunctionClick = document.getElementById("testFunction");
+
+testFunctionClick.addEventListener("click", function() {
+  new Promise(function(resolve, reject) {
+    google.script.run
+      .withSuccessHandler((result) => {
+        console.log("Success:", result);
+        resolve(result);
+      })
+      .withFailureHandler((error) => {
+        console.log("Error:", error);
+        reject(error);
+      })
+      .getGPTResponseSuper("Benjamin's first Olympic Season", "email subject line, email preview text, hero banner title, hero banner text, hero banner cta, descriptive bloc title, descriptive bloc text, descriptive bloc cta", 3, "English", "20% off early bird price, valid from June 22nd to June 25th only.");
+  })
+    .then(function(result) {
+      // Handle the resolved result here
+      console.log("Promise resolved:", result);
+    })
+    .catch(function(error) {
+      // Handle the rejected error here
+      console.log("Promise rejected:", error);
+    });
+});
+
+
+
+
+
+
 const qaButtonClick = document.getElementById("qaButton");
 
 qaButtonClick.addEventListener("click", function() {
@@ -151,9 +182,180 @@ qaButtonClick.addEventListener("click", function() {
 
 });
 
-function loadTags() {
-  google.script.run.withSuccessHandler(processTags).getTags();
-}
+//function loadTags() {
+//  google.script.run.withSuccessHandler(processTags).getTags();
+//}
+
+// Step 1
+document.getElementById("loadTags").addEventListener("click", function() {
+    var chosenDiv = document.getElementById("chosenContainer");
+    var elementButtons = chosenDiv.getElementsByClassName("element-button");
+    var tags = [];
+    
+    // Convert HTMLCollection to array using spread operator
+    var buttonArray = [...elementButtons];
+
+    buttonArray.forEach(function(button) {
+      tags.push(button.textContent);
+    });
+    console.log(tags);
+    // Step 2
+    processTags(tags);
+  
+    // Step 3
+    // var updateContainer = document.getElementById("updateContainer");
+    // var createBriefButton = document.getElementById("createBrief");
+
+    // if (!createBriefButton) {
+    //   createBriefButton = document.createElement("button");
+    //   createBriefButton.id = "createBrief";
+    //   createBriefButton.classList.add("option-button");
+    //   createBriefButton.textContent = "Create the Brief";
+    //   updateContainer.appendChild(createBriefButton);
+    // }
+    // Step 4
+    // Initialize elementsArray as an empty array
+    //createBriefButton.addEventListener("click", function() {
+    var elementsArray = [];
+
+    for (var i = 0; i < elementButtons.length; i++) {
+      var category = "category " + (i + 1);
+      var value = elementButtons[i].textContent;
+      var elementName = elementButtons[i].textContent;
+
+      // Special handling for "email subject line" and "email preview text"
+      if (value === "Email Subject Line" || value === "Email Preview Text") {
+        value = "Email Misc";
+      } else {
+        // Get the category name by extracting the characters before the first space
+        var firstSpaceIndex = value.indexOf(' ');
+        if (firstSpaceIndex !== -1) {
+          value = value.substring(0, firstSpaceIndex);
+        } else {
+          value = "Other";  // Default category if no space is found
+        }
+      }
+
+      // Check if the category already exists in the elementsArray
+      var categoryExists = false;
+      for (var j = 0; j < elementsArray.length; j++) {
+        if (elementsArray[j][0] === value) {
+          // Add the element to the existing category
+          elementsArray[j].push([elementName, "{" + elementName + "}"]);
+          categoryExists = true;
+          break;
+        }
+      }
+
+      if (!categoryExists) {
+        // Add a new category with the element
+        elementsArray.push([value, [elementName, "{" + elementName + "}"]]);
+      }
+    }
+
+    // Create the table via Code.gs
+    google.script.run.withSuccessHandler(function(statusLog) {
+      console.log("Tables created successfully! Status: " + statusLog);
+    }).createTables(elementsArray);
+  //})
+
+  //   var elementsArray = [];
+  // createBriefButton.addEventListener("click", function() {
+  // var addedCategories = new Set();
+
+  // // Group elements by categories
+  // tags.forEach(function(tag) {
+  //   var category = getCategory(tag);
+  //   var elementName = getElementName(tag);
+
+  //   if (tag === "Email Subject Line" || tag === "Email Preview Text") {
+  //     // Special handling for "email subject line" and "email preview text"
+  //     var specialCategory = "Email Misc";
+  //     if (!addedCategories.has(specialCategory)) {
+  //       elementsArray.push({category: specialCategory, elements: {}});
+  //       addedCategories.add(specialCategory);
+  //     }
+  //     elementsArray.find(obj => obj.category === specialCategory).elements[elementName] = "{" + elementName + "}";
+  //   } else {
+  //     // Check if category exists in the elementsArray
+  //     if (!addedCategories.has(category)) {
+  //       elementsArray.push({category: category, elements: {}});
+  //       addedCategories.add(category);
+  //     }
+  //     // Add the element to the category in the elementsArray
+  //     elementsArray.find(obj => obj.category === category).elements[elementName] = "{" + elementName + "}";
+  //   }
+  // });
+
+  // console.log(JSON.stringify(elementsArray));
+
+
+
+  //   // Dictate the order of the elements for table creation
+  //   var chosenDiv = document.getElementById("chosenContainer");
+  //   var elementButtons = chosenDiv.getElementsByClassName("element-button");
+  //   var addedCategories = new Set();  // Set to store added categories
+
+  //   var elementsOrder = {};  // Initialize the elementsOrder object
+
+  //   console.log(elementButtons.length);  // Add this line
+
+  //   var categoryCounter = 1;  // Initialize a separate counter for the categories
+
+  //   for (var i = 0; i < elementButtons.length; i++) {
+  //     var key = "category " + categoryCounter;  // Use the separate counter here
+  //     var value = elementButtons[i].textContent;
+      
+  //     // Special handling for "email subject line" and "email preview text"
+  //     if (value === "Email Subject Line" || value === "Email Preview Text") {
+  //       value = "Email Misc";
+  //     } else {
+  //       // Get the category name by extracting the characters before the first space
+  //       var firstSpaceIndex = value.indexOf(' ');
+  //       if (firstSpaceIndex !== -1) {
+  //         value = value.substring(0, firstSpaceIndex);
+  //       } else {
+  //         value = "Other";  // Default category if no space is found
+  //       }
+  //     }
+      
+  //     // Check if the category has already been added
+  //     if (!addedCategories.has(value)) {
+  //       elementsOrder[key] = value;
+  //       addedCategories.add(value);  // Add the category to the set of added categories
+  //       categoryCounter++;  // Only increase the category counter if a new category is added
+  //     }
+  //   }
+
+  //   console.log(elementsOrder);  // Add this line
+
+  //   // Create the table via Code.gs
+  //   google.script.run.withSuccessHandler(function(statusLog) {
+  //     console.log("Tables created successfully! Status: " + statusLog);
+  //   }).createTables(elementsArray, elementsOrder);
+
+
+  //   });
+
+
+
+    function getCategory(tag) {
+      var firstSpaceIndex = tag.indexOf(' ');
+      if (firstSpaceIndex !== -1) {
+        return tag.substring(0, firstSpaceIndex);
+      } else {
+        // Return a default category if no space is found in the tag
+        return "Other";
+      }
+    }
+
+    function getElementName(tag) {
+        return tag.trim(); // Remove leading and trailing whitespace
+      }
+    
+      
+  });
+
 
 function processTags(tags) {
   var topContainer = document.getElementById("topContainer");
@@ -332,9 +534,9 @@ function processTags(tags) {
 
     // Get the text content of the required divs
     try {
-      heroBannerTitle = document.getElementById("hero-banner-title").textContent.trim();
-      heroBannerSubtitle = document.getElementById("hero-banner-text").textContent.trim();
-      heroBannerCTA = document.getElementById("hero-banner-cta").textContent.trim();
+      heroBannerTitle = document.getElementById("HeroBanner-Title").textContent.trim();
+      heroBannerSubtitle = document.getElementById("HeroBanner-Text").textContent.trim();
+      heroBannerCTA = document.getElementById("HeroBanner-CTA").textContent.trim();
 
       // If an error occurs within the try block, the catch block will handle it
     } catch (error) {
@@ -422,16 +624,8 @@ function processTags(tags) {
  
 
 
-
-
-
-
-
-
-
-
-    // Find the textarea with class "large-input"
-    var textarea = document.querySelector(".large-input");
+   // Find the textarea with class "large-input"
+   var textarea = document.querySelector(".large-input");
     textarea.value = "Focus on the sale"; // Change the text
 
     //Scroll back to the top for best UX
@@ -460,7 +654,74 @@ function processTags(tags) {
     google.script.run.addDesignTips(designTipsText);
   });
   
-});
+
+  });
+
+    const handleUpdateBilingualButtonClick = document.getElementById("updateBilingual");
+
+    handleUpdateBilingualButtonClick.addEventListener("click", function() {
+    var cells = document.getElementsByClassName("title-content-cell");
+    var finalObjectResult = {};
+
+    for (var i = 0; i < cells.length; i++) {
+      var cell = cells[i];
+      var cellText = cell.innerText.trim();
+      var nextRow = cell.parentNode.nextElementSibling;
+      var nextCell = nextRow ? nextRow.children[cell.cellIndex] : null;
+
+      if (nextCell !== null && nextCell.classList.contains("text-content-cell")) {
+        var key = "{" + cellText + "}";
+        var value = nextCell.innerText.trim();
+        finalObjectResult[key] = value;
+      }
+    }
+    // Call a function in your Code.gs file to update the document with finalObjectResult
+    google.script.run.updateDocument(finalObjectResult);
+
+
+    //end of updatedocument
+
+    //start of gpt request for French :
+    
+    // load the tags, clean up the stuff and create tables
+    new Promise((resolve) => {
+        (function() {
+            // Get the button element
+            const loadTagsButton = document.getElementById("loadTags");
+
+            // Create a new 'click' event
+            const event = new Event('click');
+
+            // Dispatch the event
+            loadTagsButton.dispatchEvent(event);
+
+            // simulate async operation
+            setTimeout(resolve, 1000);  // Adjust this delay as needed
+        })();
+    }).then(() => {
+        // run gptrequest with French
+        (function() {
+            // Get the form element
+            const gptRequest = document.getElementById("gptRequest");
+            const lang = document.getElementById("lang");
+            lang.value = "Français (Québec)";
+
+            // Create a new 'submit' event
+            const event = new Event('submit');
+
+            // Dispatch the event
+            gptRequest.dispatchEvent(event);
+        })();
+    });
+
+    
+    //create elements for design phase
+    
+        //Change gpt-request-status
+    //add the code to change and prepare design stuff, see same script a bit above
+  })
+
+
 }
 
 //END OF PROCESS TAG FUNCTION
@@ -601,25 +862,35 @@ gptRequest.addEventListener("submit", (e) => {
   // Grab the prompt elements
   function getPromptElements() {
     var promptElements = [];
-    var searchPattern = /\{([^}]+)\}/g;
     var inputs = document.querySelectorAll("#mainTable td.text-content-cell");
 
-       inputs.forEach(function (input) {
-      var tagText = input.textContent;
-      //console.log("Tag Text:", tagText); // Log the tag text for debugging
-
-      var matches = tagText.match(searchPattern);
-      //console.log("Matches:", matches); // Log the matches for debugging
-
-      if (matches) {
-        for (var i = 0; i < matches.length; i++) {
-          var tag = matches[i].replace('{', '').replace('}', '');
-          promptElements.push(tag);
-        }
-      }
+    inputs.forEach(function (input) {
+      var tagText = input.textContent.trim();
+      promptElements.push(tagText);
     });
+
     return promptElements;
   }
+  //   var promptElements = [];
+  //   var searchPattern = /\{([^}]+)\}/g;
+  //   var inputs = document.querySelectorAll("#mainTable td.text-content-cell");
+
+  //      inputs.forEach(function (input) {
+  //     var tagText = input.textContent;
+  //     //console.log("Tag Text:", tagText); // Log the tag text for debugging
+
+  //     var matches = tagText.match(searchPattern);
+  //     //console.log("Matches:", matches); // Log the matches for debugging
+
+  //     if (matches) {
+  //       for (var i = 0; i < matches.length; i++) {
+  //         var tag = matches[i].replace('{', '').replace('}', '');
+  //         promptElements.push(tag);
+  //       }
+  //     }
+  //   });
+  //   return promptElements;
+  // }
 
   var prompt = getSubject();
   var lang = getLang();
@@ -643,24 +914,25 @@ gptRequest.addEventListener("submit", (e) => {
   if (gptRequestStatus === "generate-copy") {
     // Run getGPTResponse
     google.script.run
-      .withSuccessHandler((result) => {
-        console.log("Success:", result);
-        globalApiResponse = result;
-        resolve(result);
-      })
-      .withFailureHandler((error) => {
-        console.log("Error:", error);
-        reject(error);
-      })
-      .getGPTResponse(prompt, promptElements, optionsTotal, lang, info);
+    .withSuccessHandler((response) => {
+      console.log("Success:", response.result);  // Only logs the 'result' part of the response
+      console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
+      globalApiResponse = response.result;  // Only use the 'result' part of the response
+      resolve(response.result);  // Only resolve the 'result' part of the response
+    })
+    .withFailureHandler((error) => {
+      console.log("Error:", error);
+      reject(error);
+    })
+    .getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info);
+
 
   } else {
     // Run getGPTDesignResponse
     google.script.run
-      .withSuccessHandler((result) => {
-        console.log("Success:", result);
-        globalApiResponse = result;
-        resolve(result);
+      .withSuccessHandler((response) => {
+        console.log("Success:", response.result);
+        resolve(response.result);
       })
       .withFailureHandler((error) => {
         console.log("Error:", error);
@@ -677,17 +949,19 @@ gptRequest.addEventListener("submit", (e) => {
     } else {
       // Proceed with requestTranslation
       return new Promise((resolve, reject) => {
+        console.log("Success:", result);
         google.script.run
-          .withSuccessHandler((result) => {
-            console.log("Success:", result);
-            globalApiResponse = result;
-            resolve(result);
+          .withSuccessHandler((response) => {
+            console.log("Success:", response.result);
+            console.log("Success:", response.statusLog);
+            globalApiResponse = response.result;
+            resolve(response.result);
           })
           .withFailureHandler((error) => {
             console.log("Error:", error);
             reject(error);
           })
-          .requestTranslation(result, lang);
+          .requestTranslation1(result, lang);
       });
     }
   })
@@ -741,6 +1015,120 @@ function createDeleteTableHandler(index) {
       designTable.remove(); // Delete the table
     }
   };
+}
+//-------
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Function to move an element button between sections
+  function moveElementButton(button, fromSection, toSection) {
+    fromSection.removeChild(button);
+    toSection.appendChild(button);
+  }
+
+  // Add event listeners to element buttons
+  var chosenSection = document.getElementById('chosenContainer');
+  var recommendedSection = document.getElementById('recommendedSection');
+  var elementButtons = document.getElementsByClassName('element-button');
+
+for (let i = 0; i < elementButtons.length; i++) {
+  elementButtons[i].addEventListener('click', function() {
+    if (chosenSection.contains(this)) {
+      // Move from chosen to recommended
+      moveElementButton(this, chosenSection, recommendedSection);
+    } else if (recommendedSection.contains(this)) {
+      // Move from recommended to chosen
+      moveElementButton(this, recommendedSection, chosenSection);
+    }
+  });
+}
+
+  // Add event listener to "Add" button
+  var addElementButton = document.getElementById('addElementButton');
+  var otherElementInput = document.getElementById('otherElementInput');
+  var chosenElementButtons = chosenSection.querySelector('.element-buttons');
+
+  addElementButton.addEventListener('click', function() {
+  var elementText = otherElementInput.value.trim();
+
+  if (elementText !== '') {
+    // Create new element button
+
+    //Title
+    newElementButtonTitleText = elementText + " Title";
+    var newElementButtonTitle = document.createElement('button');
+    newElementButtonTitle.className = 'element-button';
+    newElementButtonTitle.textContent = newElementButtonTitleText;
+
+    //Text
+    newElementButtonTextText = elementText + " Text";
+    var newElementButtonText = document.createElement('button');
+    newElementButtonText.className = 'element-button';
+    newElementButtonText.textContent = newElementButtonTextText;
+
+    //CTA
+    newElementButtonCTAText = elementText + " CTA";
+    var newElementButtonCTA = document.createElement('button');
+    newElementButtonCTA.className = 'element-button';
+    newElementButtonCTA.textContent = newElementButtonCTAText;
+
+    // Add listener Title
+    newElementButtonTitle.addEventListener('click', function() {
+    if (chosenSection.contains(this)) {
+      // Move from chosen to recommended
+      moveElementButton(this, chosenSection, recommendedSection);
+    } else if (recommendedSection.contains(this)) {
+      // Move from recommended to chosen
+      moveElementButton(this, recommendedSection, chosenSection);
+    }
+  });
+    // Add listener Text
+       newElementButtonText.addEventListener('click', function() {
+    if (chosenSection.contains(this)) {
+      // Move from chosen to recommended
+      moveElementButton(this, chosenSection, recommendedSection);
+    } else if (recommendedSection.contains(this)) {
+      // Move from recommended to chosen
+      moveElementButton(this, recommendedSection, chosenSection);
+    }
+  });
+       // Add listener CTA
+       newElementButtonCTA.addEventListener('click', function() {
+    if (chosenSection.contains(this)) {
+      // Move from chosen to recommended
+      moveElementButton(this, chosenSection, recommendedSection);
+    } else if (recommendedSection.contains(this)) {
+      // Move from recommended to chosen
+      moveElementButton(this, recommendedSection, chosenSection);
+    }
+  });
+
+
+    // Add the new button to the chosen section
+    chosenSection.appendChild(newElementButtonTitle);
+    chosenSection.appendChild(newElementButtonText);
+    chosenSection.appendChild(newElementButtonCTA);
+
+    // Clear input field
+    otherElementInput.value = '';
+  }
+});
+
+});
+
+var inputField = document.getElementById("otherElementInput");
+
+inputField.addEventListener("keypress", function(event) {
+  if (event.key === "Enter") {
+    event.preventDefault(); // Prevent the default form submission
+    // Add your submit logic here
+    // For example, you can call a function to handle the form submission
+    simulateAddElementButtonClick();
+  }
+});
+
+function simulateAddElementButtonClick() {
+  var addElementButton = document.getElementById("addElementButton");
+  addElementButton.click(); // Simulate a click event on the addElementButton
 }
 
 

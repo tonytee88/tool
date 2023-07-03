@@ -18,24 +18,58 @@
       </div>
       <div id="midContainer">
         <div class="container">
-        
+          <div class="section" id="chosenContainer">
+            <div class="label" id="chosen">Chosen Elements:</div>
+            <div class="note">The order of the elements displayed here will be the order used to create the brief tables</div>
+            <button class="element-button">Email Subject Line</button>
+            <button class="element-button">Email Preview Text</button>
+            <button class="element-button">HeroBanner Title</button>
+            <button class="element-button">HeroBanner Text</button>
+            <button class="element-button">HeroBanner CTA</button>
+
+            <div class="element-buttons" id="chosenSection"></div>
+          </div>
+          <div class="section">
+            <div class="label">Recommended Elements:</div>
+            <div class="element-buttons" id="recommendedSection">
+              <button class="element-button">DescriptiveBlock Title</button>
+              <button class="element-button">DescriptiveBlock Text</button>
+              <button class="element-button">DescriptiveBlock CTA</button>
+              <button class="element-button">ProductBlock Title</button>
+              <button class="element-button">ProductBlock Text</button>
+              <button class="element-button">ProductBlock CTA</button>
+            </div>
+          </div>
+          <div class="section">
+            <div class="label">Other Elements:</div>
+            <div class="note">The characters BEFORE the first SPACE will be the category of the elements, be mindful.</div>
+            <div id="otherSection"></div>
+            <div class="input-field">
+              <form action="">
+              <input type="text" id="otherElementInput" class="form-control">
+              <button id="addElementButton"type="submit">Add</button>
+            </form>
+            </div>
+          </div> 
           <h1>Tag List</h1>
           <div id="tableContainer">
-            <button class="option-button" onclick="loadTags()">Load Tags</button>
+            <button class="option-button" id="loadTags">Load Tags</button>
             <div id="tagList"></div>
             <div id="updateContainer">
-              <button class="option-button" class="option-button" id="update" type="submit">Update my document!</button>
+              <button class="option-button" id="update" type="submit">Update my document!</button>
+              <button class="option-button" id="updateBilingual">Update & FR</button>
             </div>
           </div>
 
           <form action="" id="gptRequest">
           <h1>GPT Request</h1>
-          <input type="text" id="subject" class="form-control" placeholder="Enter your subject..." value="Bike Flash Sale">
+          <input type="text" id="subject" class="form-control" placeholder="Enter your subject..." value="Host Unforgettable Summer Gatherings in a Freshly Painted Home - Get 3 Free Quotes Now!">
           <input type="text" id="lang" class="form-control" placeholder="Enter the language" value="English">
-          <textarea id="info" class="form-control large-input" placeholder="Enter more info"></textarea>
+          <textarea id="info" class="form-control large-input" placeholder="Please include copy options..."></textarea>
           <button class="option-button" type="submit">GO!</button>
           </form>
           <button class="option-button" id="qaButton">QA magic</button>
+          <button class="option-button" id="testFunction">Test Function1</button>
         </div>
       </div>
       <div id="bottomContainer">
