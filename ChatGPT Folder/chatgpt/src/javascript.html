@@ -526,9 +526,11 @@ function processTags(tags) {
 
 
     //end of updatedocument
+    // function "bidon" to isolate design phase -- remove "function bidon() {} to enable design phase"
+    function bidon() {
     //create elements for design phase
     
-        //Change gpt-request-status
+    //Change gpt-request-status
     var topContainer = document.getElementById("topContainer");
     topContainer.setAttribute("gpt-request-status", "generate-design-tips");
 
@@ -654,7 +656,8 @@ function processTags(tags) {
     google.script.run.addDesignTips(designTipsText);
   });
   
-
+  }
+  //end of function bidon()
   });
 
     const handleUpdateBilingualButtonClick = document.getElementById("updateBilingual");

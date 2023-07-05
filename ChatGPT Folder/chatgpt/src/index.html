@@ -26,18 +26,18 @@
             <button class="element-button">HeroBanner Title</button>
             <button class="element-button">HeroBanner Text</button>
             <button class="element-button">HeroBanner CTA</button>
-
+            <button class="element-button">DescriptiveBlock Title</button>
+            <button class="element-button">DescriptiveBlock Text</button>
+            <button class="element-button">DescriptiveBlock CTA</button>
+            <button class="element-button">ProductBlock Title</button>
+            <button class="element-button">ProductBlock Text</button>
+            <button class="element-button">ProductBlock CTA</button>
             <div class="element-buttons" id="chosenSection"></div>
           </div>
           <div class="section">
             <div class="label">Recommended Elements:</div>
             <div class="element-buttons" id="recommendedSection">
-              <button class="element-button">DescriptiveBlock Title</button>
-              <button class="element-button">DescriptiveBlock Text</button>
-              <button class="element-button">DescriptiveBlock CTA</button>
-              <button class="element-button">ProductBlock Title</button>
-              <button class="element-button">ProductBlock Text</button>
-              <button class="element-button">ProductBlock CTA</button>
+    
             </div>
           </div>
           <div class="section">
@@ -63,13 +63,26 @@
 
           <form action="" id="gptRequest">
           <h1>GPT Request</h1>
-          <input type="text" id="subject" class="form-control" placeholder="Enter your subject..." value="Host Unforgettable Summer Gatherings in a Freshly Painted Home - Get 3 Free Quotes Now!">
+          <div id="clientDiv">
+          <label for="client">Pick a client:</label>
+          <select id="clients" name="clients">
+            <option value="ONT">ONT</option>
+            <option value="ALP">ALP</option>
+            <option value="MAUI">MAUI</option>
+            <option value="CLD">CLD</option>
+          </select>
+          </div>
+          <input type="text" id="subject" class="form-control" placeholder="Enter your subject..." value="Bike Flash Sale">
           <input type="text" id="lang" class="form-control" placeholder="Enter the language" value="English">
-          <textarea id="info" class="form-control large-input" placeholder="Please include copy options..."></textarea>
-          <button class="option-button" type="submit">GO!</button>
+          <textarea id="info" class="form-control large-input" placeholder="Add details to the prompt here"></textarea>
+          <button id="goButton" class="option-button" type="submit">GO!</button>
           </form>
           <button class="option-button" id="qaButton">QA magic</button>
           <button class="option-button" id="testFunction">Test Function1</button>
+          <form action="" id="clientTraits">
+          <textarea id="traits" class="form-control large-input" placeholder="How can I improve this copy and all futur copies?"></textarea>
+          <button class="option-button" type="submit">Feed the BRAIN</button>
+          </form>
         </div>
       </div>
       <div id="bottomContainer">
