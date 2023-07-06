@@ -883,27 +883,6 @@ function requestTranslation(dataToTranslate, lang){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function createTables(elementsArray) {
   var document = DocumentApp.getActiveDocument();
   var body = document.getBody();
@@ -957,6 +936,196 @@ function createTables(elementsArray) {
 
 
 
+
+
+
+// MONGODB
+
+function getMongoApiKey() {
+  var scriptProperties = PropertiesService.getScriptProperties();
+  var apiKey = scriptProperties.getProperty('mongodb');
+  return apiKey;
+}
+
+function findAllDataFromMongoDB() {
+  const apiKey = getMongoApiKey();
+  var statusLog = "Start of mongo api call..."
+  const url = 'https://us-east-1.aws.data.mongodb-api.com/app/data-gkvfy/endpoint/data/v1/action/find';
+  const data = JSON.stringify({
+    "collection": "clientsCollection",
+    "database": "clientsDB",
+    "dataSource": "Cluster0",
+    "filter": {},
+    "limit": 50,
+    "projection": {
+      "_id": 1,
+      "name": 1
+    }
+  });
+
+  const config = {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Request-Headers': '*',
+      'api-key': apiKey
+    },
+    payload: data
+  };
+
+  const response = UrlFetchApp.fetch(url, config);
+  const responseData = JSON.parse(response.getContentText());
+
+  statusLog += "responseData:" + responseData;
+  // Process the response data as needed
+
+  return {result: responseData, statusLog: statusLog};
+}
+
+function findOneDataFromMongoDB(clientName) {
+  const apiKey = getMongoApiKey();
+  var statusLog = "Start of mongo api call...\n";
+  const url = 'https://us-east-1.aws.data.mongodb-api.com/app/data-gkvfy/endpoint/data/v1/action/findOne';
+  
+  const data = JSON.stringify({
+    "collection": "clientsCollection",
+    "database": "clientsDB",
+    "dataSource": "Cluster0",
+    "filter": {
+      "name": clientName
+    },
+    "projection": {
+      "_id": 1,
+      "name": 1
+    }
+  });
+  statusLog += "Data:" + data +"\n";
+  const config = {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Request-Headers': '*',
+      'api-key': apiKey
+    },
+    payload: data
+  };
+
+  const response = UrlFetchApp.fetch(url, config);
+  const responseData = JSON.parse(response.getContentText());
+
+  statusLog += "responseData:" + responseData +"\n";
+  // Process the response data as needed
+
+  return {result: responseData, statusLog: statusLog};
+}
+
+
+function createDataFromMongoDB(clientName) {
+  const apiKey = getMongoApiKey();
+  var statusLog = "Start of mongo api call..."
+  const url = 'https://us-east-1.aws.data.mongodb-api.com/app/data-gkvfy/endpoint/data/v1/action/insertOne';
+  const data = JSON.stringify({
+    "collection": "clientsCollection",
+    "database": "clientsDB",
+    "dataSource": "Cluster0",
+    "document": {
+      // Add the fields and values for the document you want to insert
+      "name": clientName,
+      "age": 30,
+      // ...
+    }
+  });
+
+  const config = {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Request-Headers': '*',
+      'api-key': apiKey
+    },
+    payload: data
+  };
+
+  const response = UrlFetchApp.fetch(url, config);
+  const responseData = JSON.parse(response.getContentText());
+
+  statusLog += "responseData:" + responseData;
+  // Process the response data as needed
+
+  return {result: responseData, statusLog: statusLog};
+}
+
+function updateDataFromMongoDB(clientName) {
+  const apiKey = getMongoApiKey();
+  var statusLog = "Start of mongo api call...\n"
+  const url = 'https://us-east-1.aws.data.mongodb-api.com/app/data-gkvfy/endpoint/data/v1/action/updateOne';
+  const data = JSON.stringify({
+    "collection": "clientsCollection",
+    "database": "clientsDB",
+    "dataSource": "Cluster0",
+    "filter": {
+      // Add the filter criteria to identify the document(s) to update
+      "name": clientName
+    },
+    "update": {
+      // Add the fields and values to update in the document
+      "name": "test",
+      // ...
+    }
+  });
+  statusLog += "Data:" + data + "\n";
+  const config = {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Request-Headers': '*',
+      'api-key': apiKey
+    },
+    payload: data
+  };
+
+  const response = UrlFetchApp.fetch(url, config);
+  const responseData = JSON.parse(response.getContentText());
+
+  statusLog += "responseData:" + responseData;
+  // Process the response data as needed
+
+  return {result: responseData, statusLog: statusLog};
+}
+
+function deleteDataFromMongoDB(clientName) {
+  const apiKey = getMongoApiKey();
+  var statusLog = "Start of mongo api call...\n"
+  const url = 'https://us-east-1.aws.data.mongodb-api.com/app/data-gkvfy/endpoint/data/v1/action/deleteOne';
+  const data = JSON.stringify({
+    "collection": "clientsCollection",
+    "database": "clientsDB",
+    "dataSource": "Cluster0",
+    "filter": {
+      // Add the filter criteria to identify the document(s) to delete
+      "name": clientName
+    }
+  });
+  statusLog += "Data:" + data + "\n";
+
+  const config = {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Request-Headers': '*',
+      'api-key': apiKey
+    },
+    payload: data
+  };
+
+  const response = UrlFetchApp.fetch(url, config);
+  const responseData = JSON.parse(response.getContentText());
+
+  statusLog += "responseData:" + responseData;
+  // Process the response data as needed
+
+  return {result: responseData, statusLog: statusLog};
+}
 
 
 

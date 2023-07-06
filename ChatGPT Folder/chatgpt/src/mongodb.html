@@ -1,0 +1,115 @@
+<script>
+
+var clientName = document.getElementById("clients").value;
+
+// findAllData
+function findAllData() {
+    google.script.run
+  .withSuccessHandler(response => {
+    console.log("Success:", response.result); 
+    console.log("statusLog:", response.statusLog); 
+  })
+  .withFailureHandler(error => {
+    console.log("Error:", error);
+  })
+  .findAllDataFromMongoDB();
+
+}
+
+const handleFindAllMongoClick = document.getElementById("findAllMongo");
+
+handleFindAllMongoClick.addEventListener("click", function() {
+    findAllData()
+});
+
+// findOneData
+function findOneData(clientName) {
+    console.log(clientName);
+    google.script.run
+  .withSuccessHandler(response => {
+    console.log("Success:", response.result); 
+    console.log("statusLog:", response.statusLog); 
+  })
+  .withFailureHandler(error => {
+    console.log("Error:", error);
+  })
+  .findOneDataFromMongoDB(clientName);
+
+}
+
+const handleFindOneMongoClick = document.getElementById("findOneMongo");
+
+handleFindOneMongoClick.addEventListener("click", function() {
+    var clientName = document.getElementById("clients").value;
+    findOneData(clientName)
+});
+
+
+// updateData
+function updateData(clientName) {
+    google.script.run
+  .withSuccessHandler(response => {
+    console.log("Success:", response.result); 
+    console.log("statusLog:", response.statusLog); 
+  })
+  .withFailureHandler(error => {
+    console.log("Error:", error);
+  })
+  .updateDataFromMongoDB(clientName);
+
+}
+
+const handleUpdateMongoClick = document.getElementById("updateMongo");
+
+handleUpdateMongoClick.addEventListener("click", function() {
+    var clientName = document.getElementById("clients").value;
+    updateData(clientName)
+});
+
+// createData
+function createData(clientName) {
+    google.script.run
+  .withSuccessHandler(response => {
+    console.log("Success:", response.result); 
+    console.log("statusLog:", response.statusLog); 
+  })
+  .withFailureHandler(error => {
+    console.log("Error:", error);
+  })
+  .createDataFromMongoDB(clientName);
+
+}
+
+const handleCreateMongoClick = document.getElementById("createMongo");
+
+handleCreateMongoClick.addEventListener("click", function() {
+    var clientName = document.getElementById("clients").value;
+    console.log(clientName);
+    createData(clientName)
+});
+
+// deleteData
+function deleteData(clientName) {
+    google.script.run
+  .withSuccessHandler(response => {
+    console.log("Success:", response.result); 
+    console.log("statusLog:", response.statusLog); 
+  })
+  .withFailureHandler(error => {
+    console.log("Error:", error);
+  })
+  .deleteDataFromMongoDB(clientName);
+
+}
+
+const handleDeleteMongoClick = document.getElementById("deleteMongo");
+
+handleDeleteMongoClick.addEventListener("click", function() {
+    var clientName = document.getElementById("clients").value;
+    console.log(clientName);
+    deleteData(clientName)
+});
+
+
+
+</script>

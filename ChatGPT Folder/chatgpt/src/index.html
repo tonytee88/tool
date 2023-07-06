@@ -81,8 +81,13 @@
           <button class="option-button" id="testFunction">Test Function1</button>
           <form action="" id="clientTraits">
           <textarea id="traits" class="form-control large-input" placeholder="How can I improve this copy and all futur copies?"></textarea>
-          <button class="option-button" type="submit">Feed the BRAIN</button>
+          <button class="option-button spacedButtons" type="submit">Feed the BRAIN</button>
           </form>
+          <button class="option-button spacedButtons" id="findOneMongo" type="submit">Find One Mongo</button>
+          <button class="option-button spacedButtons" id="findAllMongo" type="submit">Find All Mongo</button>
+          <button class="option-button spacedButtons" id="createMongo" type="submit">Create Mongo</button>
+          <button class="option-button spacedButtons" id="updateMongo" type="submit">Update Mongo</button>
+          <button class="option-button spacedButtons" id="deleteMongo" type="submit">Delete Mongo</button>
         </div>
       </div>
       <div id="bottomContainer">
@@ -91,7 +96,7 @@
         <div id="optionsHoverBottom" class="optionsHover"></div>  
       
 
-
+        <?!= include('mongodb') ?>
         <?!= include('javascript') ?>
       
       </div>
