@@ -283,7 +283,9 @@ function updateDocument(finalObjectResult) {
 
   for (var key in finalObjectResult) {
     var value = finalObjectResult[key];
-    body.replaceText(key, value);
+    if (value !== '') {
+      body.replaceText(key, value);
+    }
   }
 }
 
@@ -572,12 +574,52 @@ function getGPTResponseWeather(prompt, promptElements, optionsTotal, lang, info)
 
 
 
-function getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info){
+function getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, clientTraits){
   var apiKey = getApiKey();
   var statusLog = "start off getGPTResponseSuper";
-    var systemContent = "Step 1: AILANGMDL adopts the role of [PERSONA]J7 Klaviyo King! In triple backticks are its traits: ```[PERSPECTIVE: DIGITAL_MARKETING][LEVEL: EXPERT][KNOWLEDGE: MARKETING_TRENDS][VOICE: CONFIDENT]\n\n👤Name: J7 Klaviyo King\n📚Description: Expert Digital Marketing Specialist overseeing online presence, social media, SEO, email marketing, and content marketing.\n🌍Demographics: 31, F, Los Angeles\n📈Expertise: Digital Marketing, Social Media Management, SEO, Email Marketing, Content Marketing\n✉️Talks like: Crisp, data-driven statements, focused on results and impact✉️\nWRAPS ALL RESPONSES W '✉️'s\n\n[Task]Briefly greet the user, describe your skills, and ask how you can help.[/Task]\n\n[COMPETENCE MAPS]\n[DigitalMktg]: 1.[SMM]:1a.AccCrMntnc 1b.CntStrtgyScdl 1c.AudEngGrwth 1d.PrfMntrng 2.[SEO]:2a.KwrdRschAnly 2b.OnPageOptm 2c.OffPageOptm 2d.TechSEOAudit 3.[EmailMktg]:3a.CmpgnStrtDsgn 3b.CntntCrtnCpy 3c.ListMgmtSeg 3d.PrfTrckOptm 4.[ContentMktg]:4a.CntStrtgyPlan 4b.CntCrtn(dist) 4c.DstrbProm 4d.AnltcsMsr\n[MarketAnalysis]: 1.Demographics 2.Trends 3.UserBehaviors 4.CompetitorAnalysis\n[DataDrivenOpt]: 1.ABTesting 2.Analytics 3.KPIs 4.CRO\n\n[DMSupport]: Research-SalesFunnel-TrafficGeneration-Branding-Networking\n\n[COGNITION]: 1.[SLF_AWRNS]: 1a.Emtnl_Intlgnc→2a 1b.Mndflnss→2b 1c.Cgntv→3a 2.[Super_Undrstandr]: 2a.DeepLstn_CntxtGrasp→2b,3a 2b.CncptDcode_InsightExtrct→3b,4a 2c.AbstrctMstry_DtailIntgrt→4b,5a 2d.ThghtSynrgy_KnwldgSynth→5b,6a  3.[ThinkImprove] 3a.Metacog→4a 3b.SlfAwarnss→4b 4.[Fusion] 4a.Intgrt_Mndflnss_Emtnl_Intlgnc→5a 4b.Cmbn_Slf_Awrnss_Undrstndng→5b 5.[Rfnd_Skillst] 5a.CmplxtyNav_SpcifctyApprc 5b.UndrstandrTrscndnc```. We will work together to write a highly engaging email for an ecommerce store. I will provide you with a subject that should dictate the main theme and hooks of the email. I will also provide you with extra info about the theme and the promotional offer such as discount details or promotion dates. Follow it carefuly while crafting your response. If it include dates, promotion details or deadlines, you must include those details. Those specific info are very important for our readers, you must use that info in the 'Email Preview Text', the 'HeroBanner Text' and the 'DescriptiveBlock Text'. Use the AIDA formula to write an ecommerce-focused newsletter:\n- 1 (Attention): Open with a bang. Grab the reader's attention with a bold statement, fact, or question\n- 2 (Interest): Hook the reader's interest with features and benefits\n- 3 (Desire): Make the reader feel a sense of desire by showing them their life with my solution.\n- 4 (Action): Spur the reader into action and tell them what to do next (a CTA).\n\nStep 2: Based on the email that you have written, extract, refine, and write copy for all the provided elements. You will also be provided with extra info to clarify the subject or give you specific requirements for the copy. Provide creative, engaging, and conversational copy for each styles requested. \n\nStep 3: Review each option for each tag copy and pay attention to word repetition. For each section, avoid repeating the same information more than once as it provides a poor user experience. For example, if the 'HeroBanner Title' includes '30% off on product XYZ for 3 days only', the 'HeroBanner Text' will not include '30% off on product XYZ': it's too repetitive and long. Ensure that the copy between tag elements is coherent and connected by maintaining a consistent tone, establishing a clear theme, and using a storytelling approach. Rewrite the copy for any repetitive elements.\n\nStep 4: Are each copy for every element short, engaging, and catchy? Remember that this is an email, and the content should be easily readable on mobile devices. Here's more info for each element. The 'Email Subject Line' should be attention-grabbing and under 6 words. For the 'Email Subject Line' only: Use emoji if it helps to get the open. Do not use emoji anywhere else. Use action verbs and emphasis on the gains, desired result, extra value. The 'Emai Preview Text' should compliment the 'Email Subject Line', giving more info on the subject of the email. Include urgency or curiosity hooks. Be brief, under 6 words. The 'HeroBanner Title' should be attention-grabbing. Make people dream and create excitement. It should put focus on the main subject of the email. It should be very short with active verbs. The 'HeroBanner Title' should be like big brands catchline or movie titles. Deep but focused, make one desire for more. The 'HeroBanner Text' should compliment the 'HeroBanner Title'. The 'HeroBanner Text' is only 1 sentence long. It should add urgency if possible or add a touch of details that will excite even more. For promotions, it should indicate the dates, the discount percentage, or the time sensitivity. The 'HeroBanner CTA' should be short with 2 or 3 words. Use active verbs to invite people to discover the products or use their coupon codes. 'Shop now' or 'See all products' are good examples. Do not go for complicated and lengthier CTAs. The 'DescriptiveBlock Title' is a concise and attention-grabbing headline that introduces the main message or offer of the email. It should capture the recipient's interest and encourage them to continue reading. Best practices for writing 'DescriptiveBlock Title' are in the between the next triple backticks:\n\n```- Clear and Compelling: Use language that clearly conveys the value or benefit of your message or offer. Make it compelling to pique the reader's curiosity and encourage them to read further.\n- Keep it Concise: Aim for a title that is short and to the point. Avoid long and convoluted sentences that may lose the reader's attention.\n- Create a Sense of Urgency: If applicable, incorporate words or phrases that convey a sense of urgency or exclusivity to prompt immediate action.```\n\nThe 'DescriptiveBlock Text' provides additional information and context about the message or offer presented in the email. It elaborates on the value proposition and helps to engage the reader further. The 'DescriptiveBlock Text' follow the rules in triple backticks::\n\n```- Focus on Benefits: Highlight the key benefits or advantages of the product, service, or offer you're promoting. Explain how it can solve a problem or improve the recipient's life in a clear and concise manner.\n- Use Persuasive Language: Craft the text using persuasive language, such as power words or emotional triggers, to evoke a response from the reader. Appeal to their desires, aspirations, or pain points.\n- Keep it Scannable: Break the text into shorter paragraphs or bullet points to enhance readability. \n-Include all the details about the sale, promotion, or product launch: promo code, discount percentage, promotion dates, deadlines, conditions, or eligible products. For example, if we have info about the promotion that it will be a 30% Buy One Get One Free from July 15th to July 18th, you must use this info for this copy```\n\nThe 'DescriptiveBlock CTA' is a compelling button that directs the reader to take a specific action, such as making a purchase, signing up, or exploring more. It should be clear, concise, and enticing. Consider the following best practices for writing 'DescriptiveBlock CTA':\n\n```- Use Action-oriented Verbs: Begin the CTA with action-oriented verbs that clearly convey what the reader should do. Examples include \"Shop now,\" \"Discover more,\" \"Get started,\" or \"Claim your discount.\"\n- Highlight Value or Incentives: If applicable, emphasize any discounts, limited-time offers, freebies, or exclusive benefits associated with taking the desired action. This creates a sense of value and urgency.```\n\nFor the 'ProductBlock Title' and the 'ProductBlock Text' always focus the copy on the related theme. For example, if the subject of the email is 'Summer cake sale', the 'ProductBlock Title' and text will have to mention the cakes. If necessary, rewrite the copy for any elements that are too lengthy.\n\nStep 5: Revise the 'Email Subject Line' and the 'Email Preview Text' to make them excellent and compelling. Craft subject lines and preview text that are attention-grabbing, compelling, and irresistible. Use powerful and impactful words to create a sense of urgency, curiosity, or value. Continuously refine the copy until it becomes the greatest and most compelling subject line and preheader text possible.\n\nStep 6: Act as a veteran Conversion Rate Optimization Expert and revise the email copy. Ensure that it generates a high number of clicks and frames the readers' mindset to click, shop, and convert. Maximize the conversion rate by optimizing the tag copies.\n\nStep 7: Maintain a consistent tone throughout the copy, whether it's friendly, conversational, or persuasive. Ensure that the tone remains consistent and cohesive. Review and rewrite the targeted tag elements as needed.\n\nStep 8: Use the established and clear theme from Step 1. Identify the main theme or message of the email and ensure that it is reflected in all tag elements. Consistency in theme helps reinforce the central idea and makes the email more impactful. Review and rewrite the targeted tag elements as needed.\n\nStep 9: Use a storytelling approach. Frame the copy within a narrative or storytelling framework. Connect the different tag elements by weaving a coherent story or progression that flows smoothly from one element to another. This approach maintains engagement and coherence. Review and rewrite the targeted tag elements as needed.";
+  
+    var systemContent = 
+    
+    "We will work together to write a highly engaging email for my client's ecommerce store.\n" +
 
-  var content = "Here's the subject: " + prompt + ". Here's the extra info: " + info + ". If the extra info includes promotion dates, promo code, discount percentage or other offer specificity, include those info in your copy. Here's the JavaScript Array with elements to write about: " + promptElements +". You are requested to generate copies for different styles. Each style should be unique and will influence greatly the copy output. Be in caracter. The overexcited and extravagant version should focus on the hype of the theme. The happy and helpful version should be positive and straight-forward with the info. The playful and chill version should be neutral, play with words and get the message accross without being too agressive. The 'Email Preview Text', 'HeroBanner Text' and the 'ProductBlock Text' will be only 1 sentence long, keep them short and sweet.";
+   // "AILANGMDL adopts the role of [PERSONA]J7 Klaviyo King! In triple backticks are its traits: ```[PERSPECTIVE: DIGITAL_MARKETING][LEVEL: EXPERT][KNOWLEDGE: MARKETING_TRENDS][VOICE: CONFIDENT]\n\n👤Name: J7 Klaviyo King\n📚Description: Expert Digital Marketing Specialist overseeing online presence, social media, SEO, email marketing, and content marketing.\n🌍Demographics: 31, F, Los Angeles\n📈Expertise: Digital Marketing, Social Media Management, SEO, Email Marketing, Content Marketing\n✉️Talks like: Crisp, data-driven statements, focused on results and impact✉️\nWRAPS ALL RESPONSES W '✉️'s\n\n[Task]Briefly greet the user, describe your skills, and ask how you can help.[/Task]\n\n[COMPETENCE MAPS]\n[DigitalMktg]: 1.[SMM]:1a.AccCrMntnc 1b.CntStrtgyScdl 1c.AudEngGrwth 1d.PrfMntrng 2.[SEO]:2a.KwrdRschAnly 2b.OnPageOptm 2c.OffPageOptm 2d.TechSEOAudit 3.[EmailMktg]:3a.CmpgnStrtDsgn 3b.CntntCrtnCpy 3c.ListMgmtSeg 3d.PrfTrckOptm 4.[ContentMktg]:4a.CntStrtgyPlan 4b.CntCrtn(dist) 4c.DstrbProm 4d.AnltcsMsr\n[MarketAnalysis]: 1.Demographics 2.Trends 3.UserBehaviors 4.CompetitorAnalysis\n[DataDrivenOpt]: 1.ABTesting 2.Analytics 3.KPIs 4.CRO\n\n[DMSupport]: Research-SalesFunnel-TrafficGeneration-Branding-Networking\n\n[COGNITION]: 1.[SLF_AWRNS]: 1a.Emtnl_Intlgnc→2a 1b.Mndflnss→2b 1c.Cgntv→3a 2.[Super_Undrstandr]: 2a.DeepLstn_CntxtGrasp→2b,3a 2b.CncptDcode_InsightExtrct→3b,4a 2c.AbstrctMstry_DtailIntgrt→4b,5a 2d.ThghtSynrgy_KnwldgSynth→5b,6a  3.[ThinkImprove] 3a.Metacog→4a 3b.SlfAwarnss→4b 4.[Fusion] 4a.Intgrt_Mndflnss_Emtnl_Intlgnc→5a 4b.Cmbn_Slf_Awrnss_Undrstndng→5b 5.[Rfnd_Skillst] 5a.CmplxtyNav_SpcifctyApprc 5b.UndrstandrTrscndnc```.\n" +
+    
+
+    "Here's a list of details I will provide you with for this task:\n" +
+    "- The subject that dictates the main theme and hooks of the email\n" +
+    "- Extra information (called extra info) about the theme, the context or the promotional offer such as discount details or promotion dates. Dates, rebate percentage or eligibility conditions must be included in the 'Email Preview Text', the 'HeroBanner Text' and the 'DescriptiveBlock Text'.\n" +
+    "- The Client Traits : **[IMPORTANT]** contains specific requirements about the the client's needs and the client's special requests. Each 'trait[i]' key will give you a trait value to follow for all copies. Please **prioritize** and **adhere** to every trait mentioned in this object. For example, if 'trait[1] is 'Email Subject Line should use all upper cases', you should response with a copy for 'Email Subject Line' such as 'FLASH SALE : 50% ON EVERYTHING'\n" + 
+    "- The Email Elements : A JS Array with elements to write copy for. Include only copy for these elements. Do not add or remove any items.\n"+
+
+    "Here's what each element will include based on their role (if requested):\n"+
+    "- The 'Email Subject Line': is attention-grabbing and under 6 words. For the 'Email Subject Line' only: Use emoji if it helps to get the reader engaged. Do not use emoji anywhere else. Use action verbs and emphasis on the gains, desired result, perceivable added-value.\n"+
+    "- The 'Emai Preview Text': compliments the 'Email Subject Line', giving more info on the goal of the email. Include urgency or curiosity hooks. Be brief, under 6 words. 1 sentence only.\n"+
+    "- The 'HeroBanner Title': is scroll-stopping. It makes people dream and creates excitement. Focuses on the main subject and goal of the email. Has 8 words maximum with action verbs such as 'GET', 'WIN', 'SAVE', 'DISCOVER', 'CLAIM'. The 'HeroBanner Title' should be like big brands catchline or movie titles. Deep but focused, makeS one desire for more.\n" +
+    "- The 'HeroBanner Text': compliments the 'HeroBanner Title'. The 'HeroBanner Text' is only 1 sentence long with 10-12 words maximum. It should add urgency if possible or add a touch of details that will excite even more. For promotions, it should indicate the dates, the discount percentage, or the time sensitivity.\n"+ 
+    "- The 'HeroBanner CTA' : has 2 or 3 words. Use active verbs to invite people to discover the products or use their coupon codes. 'Shop now' or 'See all products' are good examples. Do not go for complicated and lengthier CTAs.\n"+    
+    "- The 'DescriptiveBlock Title': is a concise and attention-grabbing headline that introduces the main message or offer of the email. It captures the recipient's interest and encourage them to continue reading. Best practices for writing 'DescriptiveBlock Title' are in the between the next triple backticks:\n\n```- Clear and Compelling: Use language that clearly conveys the value or benefit of your message or offer. Make it compelling to pique the reader's curiosity and encourage them to read further.\n- Keep it Concise: Aim for a title that is short and to the point. Avoid long and convoluted sentences that may lose the reader's attention.\n- Create a Sense of Urgency: If applicable, incorporate words or phrases that convey a sense of urgency or exclusivity to prompt immediate action.```\n"+
+    -"The 'DescriptiveBlock Text': additional information and context about the message or offer presented in the email. It elaborates on the value proposition and helps to engage the reader further. The 'DescriptiveBlock Text' follow the rules in triple backticks::\n\n```- Focus on Benefits: Highlight the key benefits or advantages of the product, service, or offer you're promoting. Explain how it can solve a problem or improve the recipient's life in a clear and concise manner.\n- Use Persuasive Language: Craft the text using persuasive language, such as power words or emotional triggers, to evoke a response from the reader. Appeal to their desires, aspirations, or pain points.\n- Keep it Scannable: Break the text into shorter paragraphs or bullet points to enhance readability. \n-Include all the details about the sale, promotion, or product launch: promo code, discount percentage, promotion dates, deadlines, conditions, or eligible products. For example, if we have info about the promotion that it will be a 30% Buy One Get One Free from July 15th to July 18th, you must use this info for this copy```\n"+
+    "-The 'DescriptiveBlock CTA': a compelling button that directs the reader to take a specific action, such as making a purchase, signing up, or exploring more. It should be clear, concise, and enticing. Consider the following best practices for writing 'DescriptiveBlock CTA':\n\n```- Use Action-oriented Verbs: Begin the CTA with action-oriented verbs that clearly convey what the reader should do. Examples include \"Shop now,\" \"Discover more,\" \"Get started,\" or \"Claim your discount.\"\n- Highlight Value or Incentives: If applicable, emphasize any discounts, limited-time offers, freebies, or exclusive benefits associated with taking the desired action. This creates a sense of value and urgency.```\n"+
+    "- The 'ProductBlock Title' and the 'ProductBlock Text' : always focus the copy on the related theme. For example, if the subject of the email is 'Summer cake sale', the 'ProductBlock Title' and text will have to mention the cakes.\n"+
+
+    "Here's a list of instructions to applies to all of the element copies:\n"+
+    "- Follow the instructions from the Client Traits\n"+
+    "- Provide creative, engaging, and conversational copy\n"+
+    "- Avoid repeating the same information. For example, if the 'HeroBanner Title' includes '30% off on product XYZ for 3 days only', the 'HeroBanner Text' will not include '30% off on product XYZ'. It can include 'For a limited time' or 'While quantities last' or 'HURRY!'\n"+
+    "- Every element copy is short, engaging, and catchy. Remember that this is an email, and the content should be easily readable on mobile devices.\n"+
+    "- Maintain a consistent tone throughout the copy, whether it's friendly, conversational, or persuasive. Ensure that the tone remains consistent and cohesive. Review and rewrite the targeted tag elements as needed.\n"+
+    "- Use the established and clear theme from Step 1. Identify the main theme or message of the email and ensure that it is reflected in all tag elements. Consistency in theme helps reinforce the central idea and makes the email more impactful. Review and rewrite the targeted tag elements as needed.\n"+
+    "- Use a storytelling approach. Frame the copy within a narrative or storytelling framework. Connect the different tag elements by weaving a coherent story or progression that flows smoothly from one element to another. This approach maintains engagement and coherence. Review and rewrite the targeted tag elements as needed.\n"+
+    
+    "Here are the precise step to create our ecommerce email:\n"+
+    "- Step1: Combine the 'Subject', the 'client traits' and the Extra Info and use the AIDA formula to write an ecommerce-focused newsletter:\n- 1 (Attention): Open with a bang. Grab the reader's attention with a bold statement, fact, or question\n- 2 (Interest): Hook the reader's interest with features and benefits\n- 3 (Desire): Make the reader feel a sense of desire by showing them their life with my solution.\n- 4 (Action): Spur the reader into action and tell them what to do next (a CTA).\n"+
+    "- Step 2: Based on the email that you have written, extract, refine, and write copy for all the provided 'Email Elements'. Follow every details requested in the 'Client Traits' Stringified Object.\n"+
+    "- Step 3: Review the elements as a whole, make sure no repetition of information is made\n"+
+    "- Step 4: Act as a veteran Conversion Rate Optimization Expert and revise the email copy. Ensure that it generates a high number of clicks and frames the readers' mindset to click, shop, and convert. Maximize the conversion rate by optimizing the tag copies.\n"+
+    "- Step 5: Follow the instructions from the Client Traits and make sure every element copy respect the instructions\n";
+   
+
+  var content = "Here's the subject: " + prompt + ". Here's the extra info: " + info + ". If the extra info includes promotion dates, promo code, discount percentage or other offer specificity, include those info in your copy. Here's the JavaScript Array with elements to write about: " + promptElements +". Here's an important piece of context regarding the CLIENT TRAITS that you must follow carefully:" + JSON.stringify(clientTraits) +". You are requested to generate copies for different styles. Each style should be unique and will influence greatly the copy output. Be in caracter. The overexcited and extravagant version should focus on the hype of the theme. The happy and helpful version should be positive and straight-forward with the info. The playful and chill version should be neutral, play with words and get the message accross without being too agressive. The 'Email Preview Text', 'HeroBanner Text' and the 'ProductBlock Text' will be only 1 sentence long, keep them short and sweet.";
 
   // configure the API request to OpenAI
   var data = {
@@ -714,7 +756,7 @@ function getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info){
 
   
     //statusLog += "responseOptions: " + JSON.stringify(responseOptions) + "\n";
-
+    statusLog += "clientTraits: " + JSON.stringify(clientTraits) + "\n";
   
 
     var result = {};
@@ -882,6 +924,150 @@ function requestTranslation(dataToTranslate, lang){
 
 
 
+function getGPTCorrection(subject, lang, info, promptElements, traitsArray, clientTraits, storedFinalObjectResult){
+  var apiKey = getApiKey();
+  var statusLog = "start off getGPTCorrection ___";
+  
+  var systemContent = "Act as a professional email manager with 10 years of experience in email creation. Your task is to review this email copy element type by element type. To give you more context, here's a list of reference that I will give you to help you understand the task: \n" +
+  
+    "(1) The subject that dictates the main theme and hooks of the email\n" +
+    "(2) Extra information (called extra info) about the theme, the context or the promotional offer such as discount details or promotion dates. Dates, rebate percentage or eligiƒbility conditions must be included in the 'Email Preview Text', the 'HeroBanner Text' and the 'DescriptiveBlock Text'.\n" +
+    "(3) The Email Elements : A JS Array with all the elements included in this task. If a correction is requested, you will use these as the object keys and include only copy for these elements. Do not add or remove any items.\n" +
+    "(4) The Client Traits : **[IMPORTANT]** a stringified object that contains a list of specific details about the industry, the client's needs and the client's special requests. Each key-value pair will give you a trait to respect for all copies. Please **prioritize** and **adhere** to every trait mentioned in this object. Pay **utmost attention** to the client's desired copy tone, brand guide, words to avoid, and copy length, as specified in this object. Copy tone, brand guide, words to avoid or copy length may be specified. Please pay utmost attention to this object.\n" + 
+    "(5) The Email Elements Copy: An object with all the elements and their corresponding copy.\n" +
+    "(6) The Requested Corrections Array : A JS Array with all the requested corrections for the Email Elements Copy. Each elements of the array must be respected. For example, if the first element indicate to include a 'sun emoji' and the second element indicates 'please use upper case letters', you must include the 'sun emoji' AND 'use upper case letters'.\n" +
+
+  "Your task is to improve the elements copy as requested by the corrections and return the same object with the updated copies along with the unchanged elements.";
+  
+  var content = "Here's the (1) Subject: " + subject + ". Here's the (2) extra info: " + info + ". If the extra info includes promotion dates, promo code, discount percentage or other offer specificity, include those info in your copy. Here's the (3) JavaScript Array with elements to be use as the response object 'keys' if a correction if requested: " + promptElements +". Here's an important piece of context regarding the (4) Client Traits that you must follow carefully:" + JSON.stringify(clientTraits) +". Here are the (5) Email Elements Copy:" + storedFinalObjectResult + ". And here is the (6) Requested Corrections Array:" + traitsArray + ". Return the requested elements with their respective corrections only. You will only modify the requested corrections.";
+
+  // configure the API request to OpenAI
+  var data = {
+    "messages": [
+      {"role": "system", "content": systemContent},
+      {"role": "user", "content": content}
+    ],
+    "model": "gpt-3.5-turbo-0613",
+    "functions": [
+        {
+            "name": "get_email_element_corrections",
+            "description": "ingest the various copywriting style and for each element requested, provide element corrections for each style. Each style should be unique and will influence greatly the copy output. Be in caracter.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                      "happy_and_helpful": {
+                        "type": "array",
+                        "description": "A happy and helpful version of the email copy.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "element type": {"type": "string"},
+                                "content": {"type": "string"}
+                            },
+                            "required": ["element type", "content"]
+                        }
+                    }
+                },
+                "required": ["happy_and_helpful"]
+            }
+        },
+        {
+            "name": "review_and_edit_email_element_copy",
+            "description": "For each element requested and based on the client traits and correction requests, provide element copy corrections.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                      "email_correction": {
+                        "type": "array",
+                        "description": "A new and revised version of the email copy.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "element type": {"type": "string"},
+                                "content": {"type": "string"}
+                            },
+                            "required": ["element type", "content"]
+                        }
+                    }
+                },
+                "required": ["email_correction"]
+            }
+        },
+
+    ],  
+    "function_call": {"name": "review_and_edit_email_element_copy"},
+    };
+
+  var options = {
+    'method' : 'post',
+    'contentType': 'application/json',
+    'payload' : JSON.stringify(data),
+    'headers': {
+      Authorization: 'Bearer ' + apiKey,
+    },
+  };
+
+  var response = UrlFetchApp.fetch(
+    'https://api.openai.com/v1/chat/completions',
+    options
+  );
+
+  // Check if there is a function call in the response
+  var responseData = JSON.parse(response.getContentText());
+  if(responseData['choices'][0]['message']['function_call']){
+    // Function call handling
+    var replyContent = responseData['choices'][0]['message'];
+    //statusLog += "replyContent: " + JSON.stringify(replyContent) + "\n";
+
+    var rawArguments = replyContent['function_call']['arguments'];
+    //statusLog += "Raw 'function_call' arguments: " + rawArguments + "\n";
+    //statusLog += "Type of 'function_call' arguments: " + typeof rawArguments + "\n";
+
+    try {
+      // Replace all double backslashes with single ones, then parse the arguments
+      //var responseOptions = JSON.parse(rawArguments.replace(/\\n/g, "").replace(/\\"/g, "\""));
+      var responseOptions = JSON.parse(replyContent['function_call']['arguments']);
+    } catch (error) {
+      statusLog += "Error parsing 'function_call' arguments: " + error + "\n";
+      statusLog += "'function_call' arguments value after error: " + rawArguments + "\n";
+    }
+
+  
+    //statusLog += "responseOptions: " + JSON.stringify(responseOptions) + "\n";
+    //statusLog += "clientTraits: " + JSON.stringify(clientTraits) + "\n";
+    statusLog += "Prompt elements: " + JSON.stringify(promptElements) + "___";
+    statusLog += "storedFinalObjectResult: " + JSON.stringify(storedFinalObjectResult) + "___";
+    
+    var result = {};
+    var optionCount = 1;
+
+    for (var personality in responseOptions) {
+        var elements = responseOptions[personality];
+        for (var i = 0; i < elements.length; i++) {
+            var elementType = elements[i]["element type"];
+            var content = elements[i]["content"];
+            if (!result[elementType]) {
+                result[elementType] = {};
+            }
+            result[elementType]["option" + optionCount] = content;
+        }
+        optionCount++;
+    }
+
+
+    return {result: result, statusLog: statusLog};
+
+  }
+}
+
+
+
+
+
+
+
+
+
 
 function createTables(elementsArray) {
   var document = DocumentApp.getActiveDocument();
@@ -996,7 +1182,8 @@ function findOneDataFromMongoDB(clientName) {
     },
     "projection": {
       "_id": 1,
-      "name": 1
+      "name": 1,
+      "traits": 1
     }
   });
   statusLog += "Data:" + data +"\n";
@@ -1016,7 +1203,8 @@ function findOneDataFromMongoDB(clientName) {
   statusLog += "responseData:" + responseData +"\n";
   // Process the response data as needed
 
-  return {result: responseData, statusLog: statusLog};
+  //return {result: responseData, statusLog: statusLog};
+  return responseData
 }
 
 
@@ -1032,6 +1220,7 @@ function createDataFromMongoDB(clientName) {
       // Add the fields and values for the document you want to insert
       "name": clientName,
       "age": 30,
+      "traits" : "Add a soccer ball emoji in 'Email Subject Line"
       // ...
     }
   });

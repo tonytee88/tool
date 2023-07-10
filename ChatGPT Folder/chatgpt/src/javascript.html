@@ -7,6 +7,8 @@ window.addEventListener('load', function() {
 var optionsCount = 1;
 const optionsTotal = 3;
 const designOptions = 3; // Number of design options
+var storedFinalObjectResult = {};
+var promptElements = [];
 
 var globalApiResponse = {
   "hero banner title": {
@@ -33,158 +35,85 @@ var heroBannerCTA;
 var designTips;
 
 
-const testFunctionClick = document.getElementById("testFunction");
+// const testFunctionClick = document.getElementById("testFunction");
 
-testFunctionClick.addEventListener("click", function() {
-  new Promise(function(resolve, reject) {
-    google.script.run
-      .withSuccessHandler((result) => {
-        console.log("Success:", result);
-        resolve(result);
-      })
-      .withFailureHandler((error) => {
-        console.log("Error:", error);
-        reject(error);
-      })
-      .getGPTResponseSuper("Benjamin's first Olympic Season", "email subject line, email preview text, hero banner title, hero banner text, hero banner cta, descriptive bloc title, descriptive bloc text, descriptive bloc cta", 3, "English", "20% off early bird price, valid from June 22nd to June 25th only.");
-  })
-    .then(function(result) {
-      // Handle the resolved result here
-      console.log("Promise resolved:", result);
-    })
-    .catch(function(error) {
-      // Handle the rejected error here
-      console.log("Promise rejected:", error);
-    });
-});
-
-
-
-
-
+// testFunctionClick.addEventListener("click", function() {
+//   new Promise(function(resolve, reject) {
+//     google.script.run
+//       .withSuccessHandler((result) => {
+//         console.log("Success:", result);
+//         resolve(result);
+//       })
+//       .withFailureHandler((error) => {
+//         console.log("Error:", error);
+//         reject(error);
+//       })
+//       .getGPTResponseSuper("Benjamin's first Olympic Season", "email subject line, email preview text, hero banner title, hero banner text, hero banner cta, descriptive bloc title, descriptive bloc text, descriptive bloc cta", 3, "English", "20% off early bird price, valid from June 22nd to June 25th only.");
+//   })
+//     .then(function(result) {
+//       // Handle the resolved result here
+//       console.log("Promise resolved:", result);
+//     })
+//     .catch(function(error) {
+//       // Handle the rejected error here
+//       console.log("Promise rejected:", error);
+//     });
+// });
 
 const qaButtonClick = document.getElementById("qaButton");
 
 qaButtonClick.addEventListener("click", function() {
 
-  var topContainer = document.getElementById("topContainer");
-  topContainer.setAttribute("gpt-request-status", "generate-design-tips");
+  new Promise((resolve) => {
+        (function() {
+            // Get the button element
+            const loadTagsButton = document.getElementById("loadTags");
 
-  heroBannerTitle = globalApiResponse["hero banner title"]["option" + optionsCount];
-  heroBannerSubtitle = globalApiResponse["hero banner text"]["option" + optionsCount];
-  heroBannerCTA = globalApiResponse["hero banner cta"]["option" + optionsCount];
+            // Create a new 'click' event
+            const event = new Event('click');
 
-  var tableContainer = document.getElementById("tableContainer");
-    tableContainer.innerHTML = "";
+            // Dispatch the event
+            loadTagsButton.dispatchEvent(event);
 
-    // Generate a new table with 4 rows
-    for (var i = 1; i <= designOptions; i++) {
-    // Create a new table for each design option
-    var newTable = document.createElement("table");
-    newTable.id = 'designTable' + i;
+            // simulate async operation
+            setTimeout(resolve, 1000);  // Adjust this delay as needed
+        })();
+    }).then(() => {
+        (function() {
+            // Get the form element
+            const gptRequest = document.getElementById("gptRequest");
 
-    // Create the first row with two divs
-    var row1 = document.createElement("tr");
+            // Create a new 'submit' event
+            const event = new Event('submit');
 
-    var cell1 = document.createElement("td");
-    var div1 = document.createElement("div");
-    div1.textContent = "Option " + i;
-    // Apply CSS styles to div1
+            // Dispatch the event
+            gptRequest.dispatchEvent(event);
+        })();
+    })
+    // .then(() => {
+    //   return new Promise((resolve) => {
+    //     // Wait until the desired condition is met
+    //     const checkCondition = () => {
+    //       const divElement = document.querySelector("#Email-Subject-Line");
+    //       if (divElement && divElement.innerText !== "Email Subject Line") {
+    //         resolve();
+    //       } else {
+    //         console.log("not yet, rechecking...");
+    //         setTimeout(checkCondition, 5000);  // Check again after a delay
+    //       }
+    //     };
 
-    var cell2 = document.createElement("td");
-    var div2 = document.createElement("div");
+    //     checkCondition();
+    //   });
+    // })
+    // .then(() => {
+    //   // Step 6: Wait for the condition to be met
 
-    // Create a button element
-    var deleteButton = document.createElement("button");
-    deleteButton.id = 'deleteDesignIdea' + i;
-    deleteButton.innerHTML = "&#128465"; // Unicode character for trash can
-    deleteButton.style.fontSize = "12px"; // Set the font size to make the button small
+    //   var sUpdate = document.getElementById("update");
+    //   sUpdate.click();
+    // });
 
-    // Apply CSS styles to the button
-    //deleteButton.style.boxShadow = "0 0 5px rgba(0, 0, 0, 0.3)";
-    deleteButton.style.transition = "box-shadow 0.3s ease-in-out";
-
-    // Add event listeners for hover and click animations
-    deleteButton.addEventListener("mouseover", function() {
-      this.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.5)";
-    });
-
-    deleteButton.addEventListener("mouseout", function() {
-      this.style.boxShadow = "0 0 5px rgba(0, 0, 0, 0.3)";
-    });
-
-    deleteButton.addEventListener("click", createDeleteTableHandler(i)); // Call a separate function to handle the deletion
-
-    // Append the button to the second div
-    div2.appendChild(deleteButton);
-
-    cell1.appendChild(div1);
-    cell2.appendChild(div2);
-    row1.appendChild(cell1);
-    row1.appendChild(cell2);
-
-    newTable.appendChild(row1);
-    // Create the second row with the response from the API call
-    var row2 = document.createElement("tr");
-    var cell3 = document.createElement("td");
-    cell3.colSpan = 2;
-    cell3.id = "cell3_option" + i;
-    cell3.className = "cell3_option";
-    //var response = getGPTDesignResponse(lang, heroBannerTitle, heroBannerText, heroBannerCTA, subject, info);
-    //cell3.textContent = "Response: " + JSON.stringify(response.result);
-    
-    row2.appendChild(cell3);
-    newTable.appendChild(row2);
-
-    // Append the new table to the table container
-    var tableContainer = document.getElementById("tableContainer");
-    tableContainer.appendChild(newTable);
-  }
-
-    var addButton = document.createElement("button");
-    addButton.id = "addDesignTips";
-    addButton.className = "option-button";
-    addButton.textContent = "Add Design Tip";
-
-    tableContainer.appendChild(addButton);
-
-
-    // Find the textarea with class "large-input"
-    var textarea = document.querySelector(".large-input");
-    textarea.value = "Focus on the sale"; // Change the text
-
-    //Scroll back to the top for best UX
-    document.documentElement.scrollTop = 0; // For modern browsers
-    document.body.scrollTop = 0; // For older browsers
-
-    // Add an animation to the textarea
-    textarea.classList.add("textarea-animation");
-    setTimeout(function() {
-      textarea.classList.remove("textarea-animation");
-    }, 1000);
-
-    const handleAddDesignTipsButtonClick = document.getElementById("addDesignTips");
-
-    handleAddDesignTipsButtonClick.addEventListener("click", function() {
-    var designTips = document.getElementsByClassName("cell3_option");
-    var designTipsText = [];
-
-    for (var i = 0; i < designTips.length; i++) {
-      var designTip = designTips[i];
-      var textContent = designTip.textContent.trim(); // Trim the text content
-      designTipsText.push(textContent);
-    }
-
-    console.log(designTipsText);
-    google.script.run.addDesignTips(designTipsText);
-  });
-
-
-});
-
-//function loadTags() {
-//  google.script.run.withSuccessHandler(processTags).getTags();
-//}
+})
 
 // Step 1
 document.getElementById("loadTags").addEventListener("click", function() {
@@ -339,22 +268,42 @@ document.getElementById("loadTags").addEventListener("click", function() {
 
 
 
-    function getCategory(tag) {
-      var firstSpaceIndex = tag.indexOf(' ');
-      if (firstSpaceIndex !== -1) {
-        return tag.substring(0, firstSpaceIndex);
-      } else {
-        // Return a default category if no space is found in the tag
-        return "Other";
+function getCategory(tag) {
+    var firstSpaceIndex = tag.indexOf(' ');
+    if (firstSpaceIndex !== -1) {
+      return tag.substring(0, firstSpaceIndex);
+    } else {
+      // Return a default category if no space is found in the tag
+      return "Other";
+    }
+  }
+
+  function getElementName(tag) {
+      return tag.trim(); // Remove leading and trailing whitespace
+    }
+  
+    
+});
+
+function updateStoredFinalObjectResult() {
+  var cells = document.getElementsByClassName("title-content-cell");
+    var finalObjectResult = {};
+
+    for (var i = 0; i < cells.length; i++) {
+      var cell = cells[i];
+      var cellText = cell.innerText.trim();
+      var nextRow = cell.parentNode.nextElementSibling;
+      var nextCell = nextRow ? nextRow.children[cell.cellIndex] : null;
+
+      if (nextCell !== null && nextCell.classList.contains("text-content-cell")) {
+        var key = "{" + cellText + "}";
+        var value = nextCell.innerText.trim();
+        finalObjectResult[key] = value;
       }
     }
-
-    function getElementName(tag) {
-        return tag.trim(); // Remove leading and trailing whitespace
-      }
-    
-      
-  });
+    storedFinalObjectResult = finalObjectResult;
+  return finalObjectResult
+  };
 
 
 function processTags(tags) {
@@ -506,24 +455,28 @@ function processTags(tags) {
   const handleUpdateButtonClick = document.getElementById("update");
 
   handleUpdateButtonClick.addEventListener("click", function() {
-    var cells = document.getElementsByClassName("title-content-cell");
-    var finalObjectResult = {};
 
-    for (var i = 0; i < cells.length; i++) {
-      var cell = cells[i];
-      var cellText = cell.innerText.trim();
-      var nextRow = cell.parentNode.nextElementSibling;
-      var nextCell = nextRow ? nextRow.children[cell.cellIndex] : null;
+    finalObjectResult = updateStoredFinalObjectResult();
+    // var cells = document.getElementsByClassName("title-content-cell");
+    // var finalObjectResult = {};
 
-      if (nextCell !== null && nextCell.classList.contains("text-content-cell")) {
-        var key = "{" + cellText + "}";
-        var value = nextCell.innerText.trim();
-        finalObjectResult[key] = value;
-      }
-    }
+    // for (var i = 0; i < cells.length; i++) {
+    //   var cell = cells[i];
+    //   var cellText = cell.innerText.trim();
+    //   var nextRow = cell.parentNode.nextElementSibling;
+    //   var nextCell = nextRow ? nextRow.children[cell.cellIndex] : null;
+
+    //   if (nextCell !== null && nextCell.classList.contains("text-content-cell")) {
+    //     var key = "{" + cellText + "}";
+    //     var value = nextCell.innerText.trim();
+    //     finalObjectResult[key] = value;
+    //   }
+    // }
+    // storedFinalObjectResult = finalObjectResult;
+
     // Call a function in your Code.gs file to update the document with finalObjectResult
     google.script.run.updateDocument(finalObjectResult);
-
+  });
 
     //end of updatedocument
     // function "bidon" to isolate design phase -- remove "function bidon() {} to enable design phase"
@@ -658,7 +611,7 @@ function processTags(tags) {
   
   }
   //end of function bidon()
-  });
+
 
     const handleUpdateBilingualButtonClick = document.getElementById("updateBilingual");
 
@@ -796,7 +749,11 @@ function updateTextContentCells(response, optionsCount) {
     var tag = titleContentCells[i].textContent;
     if (response.hasOwnProperty(tag)) {
       var generatedCopy = response[tag]["option" + optionsCount];
-      textContentCells[i].textContent = generatedCopy;
+        if (generatedCopy != '') {
+        textContentCells[i].textContent = generatedCopy;
+      } else {
+        console.log("Empty string");
+      }
     } else {
       console.log("Tag not found in response:", tag);
     }
@@ -836,44 +793,58 @@ function updateTextContentCells(response, optionsCount) {
   }
 };
 
+function extractTraits(response) {
+  if (response && response.document && response.document.traits) {
+    const traits = response.document.traits;
+    const traitArray = traits.split(',').map(trait => trait.trim());
+    
+    const clientTraits = {};
+    for (var i = 0; i < traitArray.length; i++) {
+      const key = 'trait' + (i + 1);
+      clientTraits[key] = i < traitArray.length ? traitArray[i] : '';
+    }
+  
+    return clientTraits;
+  } else {
+    return {};
+  }
+}
 
+function getSubject() {
+  var subjectInput = document.getElementById("subject");
+  var prompt = subjectInput.value;
+  return prompt;
+}
+
+function getLang() {
+  var langInput = document.getElementById("lang");
+  var lang = langInput.value;
+  return lang;
+}
+
+function getInfo() {
+  var infoInput = document.getElementById("info");
+  var info = infoInput.value;
+  return info;
+}
+
+function getPromptElements() {
+  var inputs = document.querySelectorAll("#mainTable td.text-content-cell");
+
+  inputs.forEach(function (input) {
+    var tagText = input.textContent.trim();
+    promptElements.push(tagText);
+  });
+
+  return promptElements;
+}
 
 const gptRequest = document.getElementById("gptRequest");
 
 gptRequest.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  // Get the subject in form
-  function getSubject() {
-    var subjectInput = document.getElementById("subject");
-    var prompt = subjectInput.value;
-    return prompt;
-  }
 
-  function getLang() {
-    var langInput = document.getElementById("lang");
-    var lang = langInput.value;
-    return lang;
-  }
-
-  function getInfo() {
-    var infoInput = document.getElementById("info");
-    var info = infoInput.value;
-    return info;
-  }
-
-  // Grab the prompt elements
-  function getPromptElements() {
-    var promptElements = [];
-    var inputs = document.querySelectorAll("#mainTable td.text-content-cell");
-
-    inputs.forEach(function (input) {
-      var tagText = input.textContent.trim();
-      promptElements.push(tagText);
-    });
-
-    return promptElements;
-  }
   //   var promptElements = [];
   //   var searchPattern = /\{([^}]+)\}/g;
   //   var inputs = document.querySelectorAll("#mainTable td.text-content-cell");
@@ -898,7 +869,7 @@ gptRequest.addEventListener("submit", (e) => {
   var prompt = getSubject();
   var lang = getLang();
   var info = getInfo();
-  var promptElements = getPromptElements();
+  promptElements = getPromptElements();
   var subject = getSubject();
 
   // Make the API call
@@ -915,21 +886,49 @@ gptRequest.addEventListener("submit", (e) => {
   console.log("subject: ", subject, "herobannertitle: ", heroBannerTitle, "info: ", info);
 
   if (gptRequestStatus === "generate-copy") {
+    clientTraits = "";
+  
+    // Find the right client traits
+    var clientName = document.getElementById("clients").value;
+    function findOneDataPromise(clientName) {
+      return new Promise((resolve, reject) => {
+        google.script.run
+          .withSuccessHandler(response => {
+            resolve(response);
+          })
+          .withFailureHandler(error => {
+            reject(error);
+          })
+          .findOneDataFromMongoDB(clientName);
+      });
+    }
+    var foundOneData = findOneDataPromise(clientName)
+    .then(response => {
+      //console.log("Success949:", response);
+      return response; // Return the response to use it further if needed
+    })
+    .then(foundOneData => {
+      clientTraits = extractTraits(foundOneData);
+      //console.log("clienttraits 953:" + JSON.stringify(clientTraits));
+      return clientTraits;
+    }).then(clientTraits => {
+
     // Run getGPTResponse
     google.script.run
     .withSuccessHandler((response) => {
       console.log("Success:", response.result);  // Only logs the 'result' part of the response
       console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
       globalApiResponse = response.result;  // Only use the 'result' part of the response
+      updateStoredFinalObjectResult()
       resolve(response.result);  // Only resolve the 'result' part of the response
     })
     .withFailureHandler((error) => {
       console.log("Error:", error);
       reject(error);
     })
-    .getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info);
-
-
+    .getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, clientTraits);
+   // });
+  });
   } else {
     // Run getGPTDesignResponse
     google.script.run

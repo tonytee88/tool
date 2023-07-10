@@ -10,7 +10,7 @@
       
     </style>
     <?!= include('Stylesheet') ?>
-  </head>
+    </head>
   <body>
     <div id="pageBG">
       <div id="topContainer">
@@ -67,12 +67,14 @@
           <label for="client">Pick a client:</label>
           <select id="clients" name="clients">
             <option value="ONT">ONT</option>
+            <option value="None">SELECT</option>
+            
             <option value="ALP">ALP</option>
             <option value="MAUI">MAUI</option>
             <option value="CLD">CLD</option>
           </select>
           </div>
-          <input type="text" id="subject" class="form-control" placeholder="Enter your subject..." value="Bike Flash Sale">
+          <input type="text" id="subject" class="form-control" placeholder="Enter your subject..." value="Telescope Flash Sale">
           <input type="text" id="lang" class="form-control" placeholder="Enter the language" value="English">
           <textarea id="info" class="form-control large-input" placeholder="Add details to the prompt here"></textarea>
           <button id="goButton" class="option-button" type="submit">GO!</button>
@@ -81,7 +83,7 @@
           <button class="option-button" id="testFunction">Test Function1</button>
           <form action="" id="clientTraits">
           <textarea id="traits" class="form-control large-input" placeholder="How can I improve this copy and all futur copies?"></textarea>
-          <button class="option-button spacedButtons" type="submit">Feed the BRAIN</button>
+          <button class="option-button spacedButtons" id="gptMagicButton" type="submit">GPT-Correction</button>
           </form>
           <button class="option-button spacedButtons" id="findOneMongo" type="submit">Find One Mongo</button>
           <button class="option-button spacedButtons" id="findAllMongo" type="submit">Find All Mongo</button>

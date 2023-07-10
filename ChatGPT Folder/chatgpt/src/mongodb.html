@@ -27,8 +27,7 @@ function findOneData(clientName) {
     console.log(clientName);
     google.script.run
   .withSuccessHandler(response => {
-    console.log("Success:", response.result); 
-    console.log("statusLog:", response.statusLog); 
+    console.log("Success:", response); 
   })
   .withFailureHandler(error => {
     console.log("Error:", error);
@@ -41,7 +40,7 @@ const handleFindOneMongoClick = document.getElementById("findOneMongo");
 
 handleFindOneMongoClick.addEventListener("click", function() {
     var clientName = document.getElementById("clients").value;
-    findOneData(clientName)
+    findOneData(clientName);
 });
 
 
@@ -85,7 +84,7 @@ const handleCreateMongoClick = document.getElementById("createMongo");
 handleCreateMongoClick.addEventListener("click", function() {
     var clientName = document.getElementById("clients").value;
     console.log(clientName);
-    createData(clientName)
+    createData(clientName);
 });
 
 // deleteData
@@ -109,6 +108,83 @@ handleDeleteMongoClick.addEventListener("click", function() {
     console.log(clientName);
     deleteData(clientName)
 });
+
+//grab the final result object (storedFinalObjectResult)
+
+//Add event listenner
+const handleGptMagicButtonClick = document.getElementById("gptMagicButton");
+const traitsArray = [];
+
+handleGptMagicButtonClick.addEventListener("click", function() {
+    // Make the API call
+    var statusMessage = document.getElementById("statusMessage");
+    var traits = document.getElementById("traits").value;
+    traitsArray.push(traits); // Add the 'traits' value to the array
+    var subject = getSubject();
+    var lang = getLang();
+    var info = getInfo();
+    // Set the message to indicate the running state
+    statusMessage.textContent = "Talking to ChatGPT...";
+    //make an api call to correct the object and return it
+    var clientName = document.getElementById("clients").value;
+    function findOneDataPromise(clientName) {
+      return new Promise((resolve, reject) => {
+        google.script.run
+          .withSuccessHandler(response => {
+            resolve(response);
+          })
+          .withFailureHandler(error => {
+            reject(error);
+          })
+          .findOneDataFromMongoDB(clientName);
+      });
+    }
+    var foundOneData = findOneDataPromise(clientName)
+    .then(response => {
+      //console.log("Success949:", response);
+      return response; // Return the response to use it further if needed
+    })
+    .then(foundOneData => {
+      clientTraits = extractTraits(foundOneData);
+      console.log("client traits extracted:" + JSON.stringify(clientTraits));
+      return clientTraits;
+    }).then(clientTraits => {
+
+    return new Promise((resolve, reject) => {
+        google.script.run
+        .withSuccessHandler((response) => {
+        console.log("Success:", response.result);  // Only logs the 'result' part of the response
+        console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
+        globalApiResponse = response.result;  // Only use the 'result' part of the response
+        updateStoredFinalObjectResult()
+        resolve(response.result);  // Only resolve the 'result' part of the response
+        })
+        .withFailureHandler((error) => {
+        console.log("Error:", error);
+        reject(error);
+        }).getGPTCorrection(subject, lang, info, promptElements, traitsArray, clientTraits, storedFinalObjectResult);
+    })
+    .then((result) => {
+            statusMessage.textContent = "Script completed.";
+            // Handle the API response
+            return new Promise((resolve, reject) => {
+            updateTextContentCells(result, optionsCount);
+            resolve(result);
+            })
+        .catch((error) => {
+            console.error("Error:", error);
+            statusMessage.textContent = "Script encountered an error.";
+        })
+    })
+    })
+});
+
+//make an api call to extract the user input and transform it into a "trait"
+
+//update the client traits
+
+//return the new object and update document (find old values and replace with new)
+
 
 
 
