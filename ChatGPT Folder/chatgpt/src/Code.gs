@@ -1060,6 +1060,87 @@ function getGPTCorrection(subject, lang, info, promptElements, traitsArray, clie
   }
 }
 
+function getGPTTraits(userInput, ClientTraits){
+  var apiKey = getApiKey();
+  var statusLog = "start of getGPTTraits ___";
+  
+  var systemContent = "Act as a professional account director that has front-faced marketing agency clients everyday for the last 25 years. You know how to read people and how to interpret their requests and demands. Your task is to takes their requests and queries and steamline them into general bullet points for your agency staff to work on their projects. The project includes 100% marketing copywritting (emails, ads, etc.) Be as general as possible to keep the list as open and flexible as possible. Here's what I will give you to help you extract the client's copywritting preferences and traits:\n" +
+  
+    "(1) The input for modifications on current projects : these will be very specific to the current projects, you must steamline and generalize the preference and general idea behind it. \n" +
+    "(2) The existing Client Traits object : this will give you a better idea of what they usual prefer and like.\n";
+  
+  var content = "Here's the (1) input: " + userInput + ". Here's the (2) Client Traits: " + ClientTraits;
+
+  // configure the API request to OpenAI
+  var data = {
+    "messages": [
+      {"role": "system", "content": systemContent},
+      {"role": "user", "content": content}
+    ],
+    "model": "gpt-3.5-turbo-0613",
+    "functions": [
+        {
+            "name": "get_copywriting_trait",
+            "description": "Extract copywritting traits and preferences from a given input.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                      "steamlined_and_helpful": {
+                        "type": "array",
+                        "description": "A streamlined and helpful rephrasing of an account copywritting traits and preferences.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "preference": {"type": "string"}
+                            },
+                            "required": ["preference"]
+                        }
+                    }
+                },
+                "required": ["steamlined_and_helpful"]
+            }
+        },
+    ],  
+    "function_call": {"name": "get_copywriting_trait"},
+    };
+
+  var options = {
+    'method' : 'post',
+    'contentType': 'application/json',
+    'payload' : JSON.stringify(data),
+    'headers': {
+      Authorization: 'Bearer ' + apiKey,
+    },
+  };
+
+  var response = UrlFetchApp.fetch(
+    'https://api.openai.com/v1/chat/completions',
+    options
+  );
+
+  // Check if there is a function call in the response
+  var responseData = JSON.parse(response.getContentText());
+  if(responseData['choices'][0]['message']['function_call']){
+    // Function call handling
+    var replyContent = responseData['choices'][0]['message'];
+    //statusLog += "replyContent: " + JSON.stringify(replyContent) + "\n";
+
+    var rawArguments = replyContent['function_call']['arguments'];
+    statusLog += "Raw 'function_call' arguments: " + rawArguments + "\n";
+    statusLog += "Type of 'function_call' arguments: " + typeof rawArguments + "\n";
+
+    var result = rawArguments;
+
+    return {result: result, statusLog: statusLog};
+
+  } else {
+    statusLog += "not a function call from api"
+    return {result: result, statusLog: statusLog};
+  }
+}
+
+
+
 
 
 
@@ -1244,7 +1325,7 @@ function createDataFromMongoDB(clientName) {
   return {result: responseData, statusLog: statusLog};
 }
 
-function updateDataFromMongoDB(clientName) {
+function updateDataFromMongoDB(clientName, traitsString) {
   const apiKey = getMongoApiKey();
   var statusLog = "Start of mongo api call...\n"
   const url = 'https://us-east-1.aws.data.mongodb-api.com/app/data-gkvfy/endpoint/data/v1/action/updateOne';
@@ -1258,7 +1339,8 @@ function updateDataFromMongoDB(clientName) {
     },
     "update": {
       // Add the fields and values to update in the document
-      "name": "test",
+      "name": clientName,
+      "traits": traitsString
       // ...
     }
   });

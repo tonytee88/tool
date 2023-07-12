@@ -793,6 +793,7 @@ function updateTextContentCells(response, optionsCount) {
   }
 };
 
+// extract the traits from a specific client from MongoDB
 function extractTraits(response) {
   if (response && response.document && response.document.traits) {
     const traits = response.document.traits;
@@ -809,6 +810,47 @@ function extractTraits(response) {
     return {};
   }
 }
+
+function combineTraits(preferenceObject, clientTraits2) {
+  // Get the first key name from the apiResponse object
+  let preferenceObjectParsed = JSON.parse(preferenceObject);
+
+  let firstKey = Object.keys(preferenceObjectParsed)[0];
+  let firstKeyValue = preferenceObjectParsed[firstKey];
+  console.log(firstKey);
+  console.log(firstKeyValue);
+  for(let i = 0; i < firstKeyValue.length; i++) {
+    traitsArray.push(firstKeyValue[i].preference);
+  }
+
+  for (let key in clientTraits2) {
+    if (clientTraits2.hasOwnProperty(key)) {
+      // Push each value into the traitsArray
+      traitsArray.push(clientTraits2[key]);
+    }
+  }
+  // Log the updated traitsArray
+  console.log(traitsArray);
+  traitsString = traitsArray.join(", ");
+  console.log(traitsString);
+  return traitsString
+  
+  // if (response && response.document && response.document.traits) {
+  //   const traits = response.document.traits;
+  //   const traitArray = traits.split(',').map(trait => trait.trim());
+    
+  //   const clientTraits = {};
+  //   for (var i = 0; i < traitArray.length; i++) {
+  //     const key = 'trait' + (i + 1);
+  //     clientTraits[key] = i < traitArray.length ? traitArray[i] : '';
+  //   }
+  
+  //   return clientTraits;
+  // } else {
+  //   return {};
+  // }
+}
+
 
 function getSubject() {
   var subjectInput = document.getElementById("subject");

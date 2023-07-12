@@ -114,15 +114,18 @@ handleDeleteMongoClick.addEventListener("click", function() {
 //Add event listenner
 const handleGptMagicButtonClick = document.getElementById("gptMagicButton");
 const traitsArray = [];
+var clientTraits2;
+var foundOneData;
 
 handleGptMagicButtonClick.addEventListener("click", function() {
     // Make the API call
     var statusMessage = document.getElementById("statusMessage");
     var traits = document.getElementById("traits").value;
-    traitsArray.push(traits); // Add the 'traits' value to the array
+    //traitsArray.push(traits); // push it later after having formatted the input
     var subject = getSubject();
     var lang = getLang();
     var info = getInfo();
+
     // Set the message to indicate the running state
     statusMessage.textContent = "Talking to ChatGPT...";
     //make an api call to correct the object and return it
@@ -139,22 +142,24 @@ handleGptMagicButtonClick.addEventListener("click", function() {
           .findOneDataFromMongoDB(clientName);
       });
     }
-    var foundOneData = findOneDataPromise(clientName)
+    foundOneData = findOneDataPromise(clientName)
     .then(response => {
       //console.log("Success949:", response);
+      foundOneData = response
+      console.log("foundOneData:" +JSON.stringify(foundOneData))
       return response; // Return the response to use it further if needed
     })
     .then(foundOneData => {
       clientTraits = extractTraits(foundOneData);
       console.log("client traits extracted:" + JSON.stringify(clientTraits));
+      clientTraits2 = clientTraits;
       return clientTraits;
     }).then(clientTraits => {
-
     return new Promise((resolve, reject) => {
         google.script.run
         .withSuccessHandler((response) => {
-        console.log("Success:", response.result);  // Only logs the 'result' part of the response
-        console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
+        //console.log("Success:", response.result);  // Only logs the 'result' part of the response
+        //console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
         globalApiResponse = response.result;  // Only use the 'result' part of the response
         updateStoredFinalObjectResult()
         resolve(response.result);  // Only resolve the 'result' part of the response
@@ -163,27 +168,54 @@ handleGptMagicButtonClick.addEventListener("click", function() {
         console.log("Error:", error);
         reject(error);
         }).getGPTCorrection(subject, lang, info, promptElements, traitsArray, clientTraits, storedFinalObjectResult);
-    })
+    }).then((result) => {
+        statusMessage.textContent = "Extracting client intel...";
+        // Handle the API response
+        return new Promise((resolve, reject) => {
+        updateTextContentCells(result, optionsCount);
+        resolve(result);  
+        })
+    }).then((result) => {
+        return new Promise((resolve, reject) => {
+        //console.log(traits);
+        //console.log(clientTraits2);
+        google.script.run
+        .withSuccessHandler((response) => {
+        //console.log("Success:", response.result);  // the response.result is an object with the preferences
+        //console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
+        resolve(response.result);  // Only resolve the 'result' part of the response
+        })
+        .withFailureHandler((error) => {
+        console.log("Error:", error);
+        reject(error);
+        }).getGPTTraits(traits, clientTraits2);
+        })
+    
     .then((result) => {
-            statusMessage.textContent = "Script completed.";
-            // Handle the API response
-            return new Promise((resolve, reject) => {
-            updateTextContentCells(result, optionsCount);
-            resolve(result);
-            })
-        .catch((error) => {
+        statusMessage.textContent = "Spoon feeding the Brain...";
+        return new Promise((resolve, reject) => {
+        //upate array with traits from input and from mongoDB
+        console.log(result);
+        traitsString = combineTraits(result, clientTraits2);
+        resolve(traitsString);  
+        })
+    })
+    .then((traitsString) => {
+        statusMessage.textContent = "Brain fed, script completed.";
+        console.log(traitsString);
+        return new Promise((resolve, reject) => {
+        //upate array with traits from input and from mongoDB
+        google.script.run.updateDataFromMongoDB(clientName, traitsString);
+        resolve(traitsString);  
+        })
+    })
+    .catch((error) => {
             console.error("Error:", error);
             statusMessage.textContent = "Script encountered an error.";
-        })
+    })
     })
     })
 });
-
-//make an api call to extract the user input and transform it into a "trait"
-
-//update the client traits
-
-//return the new object and update document (find old values and replace with new)
 
 
 
