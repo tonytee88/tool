@@ -113,9 +113,10 @@ handleDeleteMongoClick.addEventListener("click", function() {
 
 //Add event listenner
 const handleGptMagicButtonClick = document.getElementById("gptMagicButton");
-const traitsArray = [];
+var traitsArray = [];
 var clientTraits2;
 var foundOneData;
+var simplifiedTraitsArray = [];
 
 handleGptMagicButtonClick.addEventListener("click", function() {
     // Make the API call
@@ -146,12 +147,12 @@ handleGptMagicButtonClick.addEventListener("click", function() {
     .then(response => {
       //console.log("Success949:", response);
       foundOneData = response
-      console.log("foundOneData:" +JSON.stringify(foundOneData))
+      //console.log("foundOneData:" +JSON.stringify(foundOneData))
       return response; // Return the response to use it further if needed
     })
     .then(foundOneData => {
       clientTraits = extractTraits(foundOneData);
-      console.log("client traits extracted:" + JSON.stringify(clientTraits));
+      //console.log("client traits extracted:" + JSON.stringify(clientTraits));
       clientTraits2 = clientTraits;
       return clientTraits;
     }).then(clientTraits => {
@@ -195,14 +196,26 @@ handleGptMagicButtonClick.addEventListener("click", function() {
         statusMessage.textContent = "Spoon feeding the Brain...";
         return new Promise((resolve, reject) => {
         //upate array with traits from input and from mongoDB
-        console.log(result);
+        //console.log(result);
         traitsString = combineTraits(result, clientTraits2);
-        resolve(traitsString);  
+        
+        const checkCondition = () => {
+          const divElement = document.querySelector("#Email-Subject-Line");
+          if (traitsString) {
+            resolve(traitsString);
+          } else {
+            console.log("not yet, rechecking...");
+            setTimeout(checkCondition, 500);  // Check again after a delay
+          }
+        };
+
+        checkCondition();
+
         })
     })
     .then((traitsString) => {
         statusMessage.textContent = "Brain fed, script completed.";
-        console.log(traitsString);
+        //console.log(traitsString);
         return new Promise((resolve, reject) => {
         //upate array with traits from input and from mongoDB
         google.script.run.updateDataFromMongoDB(clientName, traitsString);
@@ -210,8 +223,8 @@ handleGptMagicButtonClick.addEventListener("click", function() {
         })
     })
     .catch((error) => {
-            console.error("Error:", error);
-            statusMessage.textContent = "Script encountered an error.";
+        console.error("Error:", error);
+        statusMessage.textContent = "Script encountered an error.";
     })
     })
     })

@@ -819,6 +819,7 @@ function combineTraits(preferenceObject, clientTraits2) {
   let firstKeyValue = preferenceObjectParsed[firstKey];
   console.log(firstKey);
   console.log(firstKeyValue);
+  traitsArray = [];
   for(let i = 0; i < firstKeyValue.length; i++) {
     traitsArray.push(firstKeyValue[i].preference);
   }
@@ -829,11 +830,44 @@ function combineTraits(preferenceObject, clientTraits2) {
       traitsArray.push(clientTraits2[key]);
     }
   }
-  // Log the updated traitsArray
+  // check if we have more than 10 traits
+  console.log(traitsArray.length);
   console.log(traitsArray);
-  traitsString = traitsArray.join(", ");
-  console.log(traitsString);
-  return traitsString
+
+  if (traitsArray.length > 5) {
+    new Promise((resolve, reject) => {
+        google.script.run
+        .withSuccessHandler((response) => {
+        console.log("Success:", response.result);  // Only logs the 'result' part of the response
+        //console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
+        resolve(response.result);  // Only resolve the 'result' part of the response
+        })
+        .withFailureHandler((error) => {
+        console.log("Error:", error);
+        reject(error);
+        }).cleanUpTraits(traitsArray);
+    }).then((result) => {
+        console.log(result);
+        let preferenceObjectParsed = JSON.parse(result);
+        let firstKey = Object.keys(preferenceObjectParsed)[0];
+        let firstKeyValue = preferenceObjectParsed[firstKey];
+        console.log("_____________:" + simplifiedTraitsArray.length + " "+ simplifiedTraitsArray);
+        simplifiedTraitsArray = [];
+        console.log("_____________:" + simplifiedTraitsArray.length + " "+ simplifiedTraitsArray);
+        for(let i = 0; i < firstKeyValue.length; i++) {
+          simplifiedTraitsArray.push(firstKeyValue[i]);
+        }
+        console.log(simplifiedTraitsArray);
+        return simplifiedTraitsArray
+      }).then((simplifiedTraitsArray) => {
+        traitsString = simplifiedTraitsArray.join(", ");
+        console.log(traitsString);
+        return traitsString
+      });
+  } else {
+    traitsString = traitsArray.join(", ");
+    return traitsString
+  }
   
   // if (response && response.document && response.document.traits) {
   //   const traits = response.document.traits;

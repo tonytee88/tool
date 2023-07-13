@@ -1140,6 +1140,85 @@ function getGPTTraits(userInput, ClientTraits){
 }
 
 
+function cleanUpTraits(traitsArray){
+  var apiKey = getApiKey();
+  var statusLog = "start of cleanUpTraits ___";
+  
+  var systemContent = "Act as a professional business analyst. We are profiling our clients and cleaning up our databases. You will be given a list of copywritting preferences that help our teams understand the client's needs faster when we need to create copy for marketing material. Each element will be separated by a coma in the provided Array. Your task is to synthetise the preferences to reduce element count. Here's a list of example to help you : \n" +
+  
+  "- Remove any preference that does not add anything to guide a copywritting task. For example, if one preference is 'Trampoline', it doesn't mean anything without context, you may remove it completely.\n" + 
+  "- Remove any preference or trait that is a repetition of another one. For example, if you have one preference that is 'focus on the benefits' and another one that is 'put emphasis on the benefits of the products', you may remove both and rephrase both in 1 single preference that wil lbe meaningful. \n";
+  
+  var content = "Here's the array that contains all the info about the client: " + traitsArray + ". Your ask is to analyse the preferences and regroup the ones that are similar to make a more concise preference trait. By grouping several preferences together, you will reduce the total number of preferences.";
+
+  // configure the API request to OpenAI
+  var data = {
+    "messages": [
+      {"role": "system", "content": systemContent},
+      {"role": "user", "content": content}
+    ],
+    "model": "gpt-3.5-turbo-0613",
+    "functions": [
+        {
+            "name": "synthetise_client_profile_preferences",
+            "description": "Extract and condense the client's traits and preference to be more clear and concise. Reduce repetition of the same concepts and requests. Reduce the total number of preferences.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                      "clear_and_concise": {
+                        "type": "array",
+                        "description": "A clear, concise but precise rephrasing of a client copywritting traits and preferences.",
+                        "items": {
+                            "type": "string",
+                            "properties": {
+                                "preference_list": {"type": "string"},
+                            },
+                            "required": ["preference_list"]
+                        }
+                    }
+                },
+                "required": ["clear_and_concise"]
+            }
+        },
+    ],  
+    "function_call": {"name": "synthetise_client_profile_preferences"},
+    };
+
+  var options = {
+    'method' : 'post',
+    'contentType': 'application/json',
+    'payload' : JSON.stringify(data),
+    'headers': {
+      Authorization: 'Bearer ' + apiKey,
+    },
+  };
+
+  var response = UrlFetchApp.fetch(
+    'https://api.openai.com/v1/chat/completions',
+    options
+  );
+
+  // Check if there is a function call in the response
+  var responseData = JSON.parse(response.getContentText());
+  if(responseData['choices'][0]['message']['function_call']){
+    // Function call handling
+    var replyContent = responseData['choices'][0]['message'];
+    //statusLog += "replyContent: " + JSON.stringify(replyContent) + "\n";
+
+    var rawArguments = replyContent['function_call']['arguments'];
+    statusLog += "Raw 'function_call' arguments: " + rawArguments + "\n";
+    statusLog += "Type of 'function_call' arguments: " + typeof rawArguments + "\n";
+
+    var result = rawArguments;
+
+    return {result: result, statusLog: statusLog};
+
+  } else {
+    statusLog += "not a function call from api"
+    return {result: result, statusLog: statusLog};
+  }
+}
+
 
 
 
