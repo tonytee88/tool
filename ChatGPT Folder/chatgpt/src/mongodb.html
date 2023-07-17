@@ -1,5 +1,6 @@
 <script>
-
+var clientTraits2;
+var foundOneData;
 var clientName = document.getElementById("clients").value;
 
 // findAllData
@@ -114,8 +115,6 @@ handleDeleteMongoClick.addEventListener("click", function() {
 //Add event listenner
 const handleGptMagicButtonClick = document.getElementById("gptMagicButton");
 var traitsArray = [];
-var clientTraits2;
-var foundOneData;
 var simplifiedTraitsArray = [];
 
 handleGptMagicButtonClick.addEventListener("click", function() {
@@ -198,19 +197,16 @@ handleGptMagicButtonClick.addEventListener("click", function() {
         //upate array with traits from input and from mongoDB
         //console.log(result);
         traitsString = combineTraits(result, clientTraits2);
-        
         const checkCondition = () => {
-          const divElement = document.querySelector("#Email-Subject-Line");
-          if (traitsString) {
-            resolve(traitsString);
-          } else {
-            console.log("not yet, rechecking...");
-            setTimeout(checkCondition, 500);  // Check again after a delay
-          }
+        const divElement = document.querySelector("#Email-Subject-Line");
+        if (traitsString) {
+        resolve(traitsString);
+        } else {
+        console.log("not yet, rechecking...");
+        setTimeout(checkCondition, 500);  // Check again after a delay
+        }
         };
-
         checkCondition();
-
         })
     })
     .then((traitsString) => {
@@ -228,6 +224,58 @@ handleGptMagicButtonClick.addEventListener("click", function() {
     })
     })
     })
+});
+
+const handleMongoDisplayClick = document.getElementById("mongoDisplayButton");
+
+handleMongoDisplayClick.addEventListener("click", function() {
+    // Make the API call
+    // var statusMessage = document.getElementById("statusMessage");
+    // var traits = document.getElementById("traits").value;
+    // traitsArray.push(traits); // push it later after having formatted the input
+    // var subject = getSubject();
+    // var lang = getLang();
+    // var info = getInfo();
+
+    // Set the message to indicate the running state
+    //statusMessage.textContent = "Talking to ChatGPT...";
+    //make an api call to correct the object and return it
+    var clientName = document.getElementById("clients").value;
+    function findOneDataPromise(clientName) {
+      return new Promise((resolve, reject) => {
+        google.script.run
+          .withSuccessHandler(response => {
+            resolve(response);
+          })
+          .withFailureHandler(error => {
+            reject(error);
+          })
+          .findOneDataFromMongoDB(clientName);
+      });
+    }
+    foundOneData = findOneDataPromise(clientName)
+    .then(response => {
+      //console.log("Success949:", response);
+      foundOneData = response
+      //console.log("foundOneData:" +JSON.stringify(foundOneData))
+      return response; // Return the response to use it further if needed
+    })
+    .then(foundOneData => {
+      clientTraits = extractTraits(foundOneData);
+      //console.log("client traits extracted:" + JSON.stringify(clientTraits));
+      clientTraits2 = clientTraits;
+      return clientTraits;
+    }).then(clientTraits => {
+  // Extract and display the traits in the desired format
+  const traitsList = document.getElementById("mongoDisplay");
+  traitsList.innerHTML = "";
+
+  for (const key in clientTraits) {
+    const listItem = document.createElement("li");
+    listItem.textContent = `${key}: ${clientTraits[key]}`;
+    traitsList.appendChild(listItem);
+  }
+})
 });
 
 

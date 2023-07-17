@@ -127,6 +127,8 @@ document.getElementById("loadTags").addEventListener("click", function() {
     buttonArray.forEach(function(button) {
       tags.push(button.textContent);
     });
+    setTimeout(() => {}, 1000)
+    buttonArray = [];
     console.log(tags);
     // Step 2
     processTags(tags);
@@ -321,6 +323,7 @@ function processTags(tags) {
   tags.forEach(function (tag) {
     // Create unique IDs for buttons and tagsWithDelimitersCell
     var buttonId = 'button_' + tag.replace(/\s+/g, '-').replace('{', '').replace('}', '');
+    var voteButtonId = 'voteButton_' + tag.replace(/\s+/g, '-').replace('{', '').replace('}', '');
     var tagsWithDelimitersCellId = 'tagsCell_' + tag.replace(/\s+/g, '-').replace('{', '').replace('}', '');
     
     // Create the first row
@@ -346,6 +349,38 @@ function processTags(tags) {
     tagsWithDelimitersCell.className = 'text-content-cell ';
     tagsWithDelimitersCell.id = tag.replace(/\s+/g, '-').replace('{', '').replace('}', '');
 
+    // Create the third row
+    var thirdRow = document.createElement('tr');
+
+    var emptyCell2 = document.createElement('td');
+    var voteButtonCell = document.createElement('td');
+    
+    var voteButtonContainer = document.createElement('div');
+    voteButtonContainer.className = 'vote-button-container';
+    voteButtonCell.appendChild(voteButtonContainer);
+
+    var upvoteButton = document.createElement('button');
+    upvoteButton.textContent = '⬆';
+    upvoteButton.className = 'upvote-button';
+    upvoteButton.style.border = 'none';
+    upvoteButton.id = voteButtonId + '_up'; // Set the unique ID
+
+    var downvoteButton = document.createElement('button');
+    downvoteButton.textContent = '⬇';
+    downvoteButton.className = 'downvote-button';
+    downvoteButton.style.border = 'none';
+    downvoteButton.id = voteButtonId + '_down'; // Set the unique ID
+
+    // Append the button to the button cell
+    voteButtonContainer.appendChild(upvoteButton);
+    voteButtonContainer.appendChild(downvoteButton);
+
+    
+
+    // Append the cells to the second row
+    thirdRow.appendChild(emptyCell2);
+    thirdRow.appendChild(voteButtonCell);
+   
     // Set the initial data-option attribute
     tagsWithDelimitersCell.setAttribute('data-option', '1');
     // Create button container
@@ -398,16 +433,19 @@ function processTags(tags) {
     // Append the rows to the table
     table.appendChild(firstRow);
     table.appendChild(secondRow);
+    table.appendChild(thirdRow);
 
     // Append the cells to the second row
     secondRow.appendChild(buttonCell);
     secondRow.appendChild(tagsWithDelimitersCell);
   
-
     // Apply border styles to cells
     emptyCell.style.border = 'none'; // No border for the empty cell
+    emptyCell2.style.border = 'none'; // No border for the empty cell
     tagsWithoutDelimitersCell.style.border = 'none'; // No border for the cell spanning both columns
     buttonCell.style.border = 'none'; // No border for the button cell
+    voteButtonCell.style.border = 'none'; // No border for the button cell
+    voteButtonCell.style.textAlign = 'left';
     tagsWithDelimitersCell.style.border = '2px solid #000'; // Thick border for the second cell of the second row
     
     // Add the click event listener to the "Back" button
@@ -455,7 +493,7 @@ function processTags(tags) {
   const handleUpdateButtonClick = document.getElementById("update");
 
   handleUpdateButtonClick.addEventListener("click", function() {
-
+    var finalObjectResult = {};
     finalObjectResult = updateStoredFinalObjectResult();
     // var cells = document.getElementsByClassName("title-content-cell");
     // var finalObjectResult = {};
@@ -851,9 +889,7 @@ function combineTraits(preferenceObject, clientTraits2) {
         let preferenceObjectParsed = JSON.parse(result);
         let firstKey = Object.keys(preferenceObjectParsed)[0];
         let firstKeyValue = preferenceObjectParsed[firstKey];
-        console.log("_____________:" + simplifiedTraitsArray.length + " "+ simplifiedTraitsArray);
         simplifiedTraitsArray = [];
-        console.log("_____________:" + simplifiedTraitsArray.length + " "+ simplifiedTraitsArray);
         for(let i = 0; i < firstKeyValue.length; i++) {
           simplifiedTraitsArray.push(firstKeyValue[i]);
         }
@@ -911,8 +947,11 @@ function getPromptElements() {
     var tagText = input.textContent.trim();
     promptElements.push(tagText);
   });
+  var storedPromptElements = [];
+  var storedPromptElements = promptElements;
+  promptElements = [];
 
-  return promptElements;
+  return storedPromptElements;
 }
 
 const gptRequest = document.getElementById("gptRequest");
@@ -945,6 +984,7 @@ gptRequest.addEventListener("submit", (e) => {
   var prompt = getSubject();
   var lang = getLang();
   var info = getInfo();
+  console.log(getPromptElements)
   promptElements = getPromptElements();
   var subject = getSubject();
 
@@ -1193,10 +1233,10 @@ for (let i = 0; i < elementButtons.length; i++) {
 
 });
 
-var inputField = document.getElementById("otherElementInput");
+var inputFieldOtherElement = document.getElementById("otherElementInput");
 
-inputField.addEventListener("keypress", function(event) {
-  if (event.key === "Enter") {
+inputFieldOtherElement.addEventListener("keypress", function(event) {
+  if (event.key === "Enter" && event.metaKey) {
     event.preventDefault(); // Prevent the default form submission
     // Add your submit logic here
     // For example, you can call a function to handle the form submission
@@ -1208,6 +1248,19 @@ function simulateAddElementButtonClick() {
   var addElementButton = document.getElementById("addElementButton");
   addElementButton.click(); // Simulate a click event on the addElementButton
 }
+
+var inputFieldTraits = document.getElementById("traits");
+
+inputFieldTraits.addEventListener("keypress", function(event) {
+  // Check if the Ctrl key is pressed and if the pressed key is 'Enter'
+  if ((event.metaKey||event.ctrlKey) && event.key === "Enter") {
+    event.preventDefault(); // Prevent the default form submission
+    var gptMagicButton = document.getElementById("gptMagicButton");
+    gptMagicButton.click(); // Simulate a click event on the addElementButton
+  }
+});
+
+
 
 
 

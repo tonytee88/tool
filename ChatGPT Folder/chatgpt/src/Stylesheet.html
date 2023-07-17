@@ -119,7 +119,7 @@
 } */
 
   .button-container {
-    display: flex;
+  display: flex;
   justify-content: flex-start;
   align-items: center;
   margin: 0;
@@ -127,7 +127,15 @@
   height: 75px; /* Adjust as needed */
 }
 
-  .button-container button {
+.vote-button-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+  .button-container button, .vote-button-container button {
     margin: 0;
     transition: box-shadow 0.5s;
     padding: 0;
@@ -138,7 +146,7 @@
 
 }
 
-  .button-container button.clicked {
+  .button-container button.clicked, .vote-button-container button.clicked {
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
   }
 
