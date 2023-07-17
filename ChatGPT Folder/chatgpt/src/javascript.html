@@ -954,6 +954,44 @@ function getPromptElements() {
   return storedPromptElements;
 }
 
+let inputs = document.querySelectorAll('#gptRequest input, #gptRequest, #info, #traits');
+
+// Add an event listener to each input field
+inputs.forEach(input => {
+    document.addEventListener('keydown', function(event) {
+        // Check if the Enter key was pressed
+        if (event.key === 'Enter') {
+            // Prevent the Enter key from submitting the form
+            event.preventDefault();
+            
+            return false;
+        }
+    });
+});
+document.addEventListener('keydown', function(event) {
+    // Check if the Enter key was pressed
+    if (event.key === 'Enter') {
+        // Prevent the Enter key from submitting the form
+        event.preventDefault();
+        
+        // Check if the Cmd (for macOS) or Ctrl (for Windows/Linux) key is held
+        if (event.metaKey || event.ctrlKey) {
+            // Check if the Shift key is also held
+            if (event.shiftKey) {
+                // Call the simulateGoBackButtonClick function
+                simulateGoBackButtonClick();
+            } else {
+                // Call the simulateGoNextButtonClick function
+                simulateGoNextButtonClick();
+            }
+        }
+        
+        return false;
+    }
+});
+
+
+
 const gptRequest = document.getElementById("gptRequest");
 
 gptRequest.addEventListener("submit", (e) => {
@@ -1235,8 +1273,8 @@ for (let i = 0; i < elementButtons.length; i++) {
 
 var inputFieldOtherElement = document.getElementById("otherElementInput");
 
-inputFieldOtherElement.addEventListener("keypress", function(event) {
-  if (event.key === "Enter" && event.metaKey) {
+inputFieldOtherElement.addEventListener("keydown", function(event) {
+  if (event.key === "Enter") {
     event.preventDefault(); // Prevent the default form submission
     // Add your submit logic here
     // For example, you can call a function to handle the form submission
@@ -1260,7 +1298,51 @@ inputFieldTraits.addEventListener("keypress", function(event) {
   }
 });
 
+let currentSection = 1;
+const totalSections = 5;
 
+document.getElementById("goNextButton").addEventListener('click', function() {
+  if (currentSection < totalSections) {
+    document.getElementById('step' + currentSection).style.display = 'none';
+    currentSection++;
+    document.getElementById('step' + currentSection).style.display = 'block';
+
+    if (currentSection === totalSections) {
+      this.disabled = true;
+    }
+    
+    if (currentSection > 1) {
+      document.getElementById('goBackButton').disabled = false;
+    }
+  }
+});
+
+document.getElementById('goBackButton').addEventListener('click', function() {
+  if (currentSection > 1) {
+    document.getElementById('step' + currentSection).style.display = 'none';
+    currentSection--;
+    document.getElementById('step' + currentSection).style.display = 'block';
+    
+    if (currentSection === 1) {
+      this.disabled = true;
+    }
+
+    if (currentSection < totalSections) {
+      document.getElementById('goNextButton').disabled = false;
+    }
+  }
+});
+
+function simulateGoNextButtonClick() {
+  var goNextButton = document.getElementById("goNextButton");
+  goNextButton.click(); // Simulate a click event on the addElementButton
+}
+
+function simulateGoBackButtonClick() {
+  var goBackButton = document.getElementById("goBackButton");
+  console.log("HAHA");
+  goBackButton.click(); // Simulate a click event on the addElementButton
+}
 
 
 

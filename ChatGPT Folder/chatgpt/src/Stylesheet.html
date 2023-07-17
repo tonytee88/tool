@@ -5,18 +5,19 @@
     display:flex;
     flex-direction: column;
     justify-content: space-between;
+    background-color : #f1f1f1;
 
   }
   
-  #pageBG {
+  /* #pageBG {
     background: linear-gradient(to bottom, #ffffff, #f1f1f1);
-  }
+  }*/
 
 
   #topContainer {
     top: 0;
     position: sticky;
-    background-color: #fff; /* Added background color for visibility */
+    /* background-color: #fff;*/ /* Added background color for visibility */
     z-index: 999; /* Added higher z-index to ensure it appears on top */
     height: 32px;
     display: flex;
@@ -48,7 +49,7 @@
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
-    background: linear-gradient(to bottom, #ffffff, #f1f1f1);
+    /*background: linear-gradient(to bottom, #ffffff, #f1f1f1);*/
     /*box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);*/
   }
   
@@ -231,5 +232,17 @@ textarea.large-input {
   margin-bottom: 10px;
 }
 
+#step2, #step3, #step4, #step5, .mongoMagic, #goButton {
+  display:none;
+}
+
+.sticky {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #ddd;
+  padding: 10px;
+  text-align: center;
+}
 </style>
  

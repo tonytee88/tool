@@ -18,39 +18,47 @@
       </div>
       <div id="midContainer">
         <div class="container">
-          <div class="section" id="chosenContainer">
-            <div class="label" id="chosen">Chosen Elements:</div>
-            <div class="note">The order of the elements displayed here will be the order used to create the brief tables</div>
-            <button class="element-button">Email Subject Line</button>
-            <button class="element-button">Email Preview Text</button>
-            <button class="element-button">HeroBanner Title</button>
-            <button class="element-button">HeroBanner Text</button>
-            <button class="element-button">HeroBanner CTA</button>
-            <button class="element-button">DescriptiveBlock Title</button>
-            <button class="element-button">DescriptiveBlock Text</button>
-            <button class="element-button">DescriptiveBlock CTA</button>
-            <button class="element-button">ProductBlock Title</button>
-            <button class="element-button">ProductBlock Text</button>
-            <button class="element-button">ProductBlock CTA</button>
-            <div class="element-buttons" id="chosenSection"></div>
-          </div>
-          <div class="section">
-            <div class="label">Recommended Elements:</div>
-            <div class="element-buttons" id="recommendedSection">
-    
+          <div id="step2">
+            <h1 class="titles">Step2 : What's inside your email?</h1>
+            <div class="section" id="chosenContainer">
+              <div class="label" id="chosen">Chosen Elements:</div>
+              <div class="note">The order of the elements displayed here will be the order used to create the brief tables</div>
+              <button class="element-button">Email Subject Line</button>
+              <button class="element-button">Email Preview Text</button>
+              <button class="element-button">HeroBanner Title</button>
+              <button class="element-button">HeroBanner Text</button>
+              <button class="element-button">HeroBanner CTA</button>
+              <button class="element-button">DescriptiveBlock Title</button>
+              <button class="element-button">DescriptiveBlock Text</button>
+              <button class="element-button">DescriptiveBlock CTA</button>
+              <button class="element-button">ProductBlock Title</button>
+              <button class="element-button">ProductBlock Text</button>
+              <button class="element-button">ProductBlock CTA</button>
+              <div class="element-buttons" id="chosenSection"></div>
+            </div>
+            <div class="section">
+              <div class="label">Recommended Elements:</div>
+              <div class="element-buttons" id="recommendedSection">
+
+
+              </div>
+          
+          
+            <div class="section">
+              <div class="label">Other Elements:</div>
+              <div class="note">The characters BEFORE the first SPACE will be the category of the elements, be mindful.</div>
+              <div id="otherSection"></div>
+              <div class="input-field">
+                <form action="">
+                <input type="text" id="otherElementInput" class="form-control">
+                <button id="addElementButton"type="submit">Add</button>
+              </form>
+              </div>
             </div>
           </div>
-          <div class="section">
-            <div class="label">Other Elements:</div>
-            <div class="note">The characters BEFORE the first SPACE will be the category of the elements, be mindful.</div>
-            <div id="otherSection"></div>
-            <div class="input-field">
-              <form action="">
-              <input type="text" id="otherElementInput" class="form-control">
-              <button id="addElementButton"type="submit">Add</button>
-            </form>
-            </div>
-          </div> 
+        </div>
+        <div id="step3">
+          <h1 class="titles">Step3 : Here's your email!</h1>
           <h1>Tag List</h1>
           <div id="tableContainer">
             <button class="option-button" id="loadTags">Load Tags</button>
@@ -60,9 +68,10 @@
               <button class="option-button" id="updateBilingual">Update & FR</button>
             </div>
           </div>
-
+        </div>
+        <div id="step1">
           <form action="" id="gptRequest">
-          <h1>GPT Request</h1>
+          <h1 class="titles">Step1 : Give me some info</h1>
           <div id="clientDiv">
           <label for="client">Pick a client:</label>
           <select id="clients" name="clients">
@@ -79,20 +88,30 @@
           <textarea id="info" class="form-control large-input" placeholder="Add details to the prompt here"></textarea>
           <button id="goButton" class="option-button" type="submit">GO!</button>
           </form>
+        </div>
+        <div id="step4">
+          <h1 class="titles">Step4 : Let's make it better</h1>
           <button class="option-button" id="qaButton">QA magic</button>
           <button class="option-button" id="testFunction">Test Function1</button>
           <form action="" id="clientTraits">
           <textarea id="traits" class="form-control large-input" placeholder="How can I improve this copy and all futur copies?"></textarea>
           <button class="option-button spacedButtons" id="gptMagicButton" type="submit">GPT-Correction</button>
           </form>
-          <button class="option-button spacedButtons" id="findOneMongo" type="submit">Find One Mongo</button>
-          <button class="option-button spacedButtons" id="findAllMongo" type="submit">Find All Mongo</button>
-          <button class="option-button spacedButtons" id="createMongo" type="submit">Create Mongo</button>
-          <button class="option-button spacedButtons" id="updateMongo" type="submit">Update Mongo</button>
-          <button class="option-button spacedButtons" id="deleteMongo" type="submit">Delete Mongo</button>
+        </div>
+        <div id="step5">
+          <button class="option-button spacedButtons mongoMagic" id="findOneMongo" type="submit">Find One Mongo</button>
+          <button class="option-button spacedButtons mongoMagic" id="findAllMongo" type="submit">Find All Mongo</button>
+          <button class="option-button spacedButtons mongoMagic" id="createMongo" type="submit">Create Mongo</button>
+          <button class="option-button spacedButtons mongoMagic" id="updateMongo" type="submit">Update Mongo</button>
+          <button class="option-button spacedButtons mongoMagic" id="deleteMongo" type="submit">Delete Mongo</button>
           <div id="mongoDisplay"></div>
           <button class="option-button" id="mongoDisplayButton">Update Mongo</button>
         </div>
+        </div>
+      </div>
+      <div id="navigation" class="sticky">
+        <button id="goBackButton" class="option-button"disabled>Back</button>
+        <button id="goNextButton"class="option-button">Next</button>
       </div>
       <div id="bottomContainer">
 
@@ -106,5 +125,6 @@
       </div>
       </div>
     </div>
+
   </body>
 </html>
