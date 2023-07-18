@@ -9,6 +9,7 @@ const optionsTotal = 3;
 const designOptions = 3; // Number of design options
 var storedFinalObjectResult = {};
 var promptElements = [];
+var storedPromptElements = [];
 
 var globalApiResponse = {
   "hero banner title": {
@@ -90,29 +91,6 @@ qaButtonClick.addEventListener("click", function() {
             gptRequest.dispatchEvent(event);
         })();
     })
-    // .then(() => {
-    //   return new Promise((resolve) => {
-    //     // Wait until the desired condition is met
-    //     const checkCondition = () => {
-    //       const divElement = document.querySelector("#Email-Subject-Line");
-    //       if (divElement && divElement.innerText !== "Email Subject Line") {
-    //         resolve();
-    //       } else {
-    //         console.log("not yet, rechecking...");
-    //         setTimeout(checkCondition, 5000);  // Check again after a delay
-    //       }
-    //     };
-
-    //     checkCondition();
-    //   });
-    // })
-    // .then(() => {
-    //   // Step 6: Wait for the condition to be met
-
-    //   var sUpdate = document.getElementById("update");
-    //   sUpdate.click();
-    // });
-
 })
 
 // Step 1
@@ -186,7 +164,6 @@ document.getElementById("loadTags").addEventListener("click", function() {
 
     // Create the table via Code.gs
     google.script.run.withSuccessHandler(function(statusLog) {
-      console.log("Tables created successfully! Status: " + statusLog);
     }).createTables(elementsArray);
   //})
 
@@ -733,12 +710,13 @@ function showOptionsOnHover(tag, optionsCount) {
 
     //optionsHoverBottom.style.display = 'none'; // Hide the options initially
     // Loop through the options and add them to the optionsHoverBottom element
+    optionElementGeneratedContainer.innerHTML="Options:";
     for (var optionCount = 1; optionCount <= optionsTotal; optionCount++) {
 
       var optionText = optionCount + " - " + responseForOptionsHover[tag]["option" + optionCount];
       var optionElement = document.createElement('div');
       optionElement.textContent = optionText;
-          optionElementGeneratedContainer.appendChild(optionElement);
+      optionElementGeneratedContainer.appendChild(optionElement);
     }
 
   }
@@ -855,8 +833,8 @@ function combineTraits(preferenceObject, clientTraits2) {
 
   let firstKey = Object.keys(preferenceObjectParsed)[0];
   let firstKeyValue = preferenceObjectParsed[firstKey];
-  console.log(firstKey);
-  console.log(firstKeyValue);
+  //console.log(firstKey);
+  //console.log(firstKeyValue);
   traitsArray = [];
   for(let i = 0; i < firstKeyValue.length; i++) {
     traitsArray.push(firstKeyValue[i].preference);
@@ -869,8 +847,8 @@ function combineTraits(preferenceObject, clientTraits2) {
     }
   }
   // check if we have more than 10 traits
-  console.log(traitsArray.length);
-  console.log(traitsArray);
+  //console.log(traitsArray.length);
+  //console.log(traitsArray);
 
   if (traitsArray.length > 5) {
     new Promise((resolve, reject) => {
@@ -941,17 +919,15 @@ function getInfo() {
 }
 
 function getPromptElements() {
+  storedPromptElements = [];
+  storedPromptElements = promptElements;
+  promptElements = [];
   var inputs = document.querySelectorAll("#mainTable td.text-content-cell");
-
   inputs.forEach(function (input) {
     var tagText = input.textContent.trim();
     promptElements.push(tagText);
   });
-  var storedPromptElements = [];
-  var storedPromptElements = promptElements;
-  promptElements = [];
-
-  return storedPromptElements;
+  return promptElements;
 }
 
 let inputs = document.querySelectorAll('#gptRequest input, #gptRequest, #info, #traits');
@@ -1022,7 +998,7 @@ gptRequest.addEventListener("submit", (e) => {
   var prompt = getSubject();
   var lang = getLang();
   var info = getInfo();
-  console.log(getPromptElements)
+  //console.log(getPromptElements)
   promptElements = getPromptElements();
   var subject = getSubject();
 
@@ -1030,14 +1006,14 @@ gptRequest.addEventListener("submit", (e) => {
   var statusMessage = document.getElementById("statusMessage");
   // Set the message to indicate the running state
   statusMessage.textContent = "Talking to ChatGPT...";
-
+  console.log("storedPromptElements: " + storedPromptElements);
   console.log("ok prompt: " + prompt + " and ok prompt elements: " + promptElements) + "and ok lang: " + lang;
 
   new Promise((resolve, reject) => {
   // Add your condition based on gpt-request-status here
   var topContainer = document.getElementById("topContainer");
   var gptRequestStatus = topContainer.getAttribute("gpt-request-status");
-  console.log("subject: ", subject, "herobannertitle: ", heroBannerTitle, "info: ", info);
+
 
   if (gptRequestStatus === "generate-copy") {
     clientTraits = "";
@@ -1070,8 +1046,8 @@ gptRequest.addEventListener("submit", (e) => {
     // Run getGPTResponse
     google.script.run
     .withSuccessHandler((response) => {
-      console.log("Success:", response.result);  // Only logs the 'result' part of the response
-      console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
+      //console.log("Success:", response.result);  // Only logs the 'result' part of the response
+      //  console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
       globalApiResponse = response.result;  // Only use the 'result' part of the response
       updateStoredFinalObjectResult()
       resolve(response.result);  // Only resolve the 'result' part of the response
@@ -1302,17 +1278,32 @@ let currentSection = 1;
 const totalSections = 5;
 
 document.getElementById("goNextButton").addEventListener('click', function() {
-  if (currentSection < totalSections) {
+  if ((currentSection < totalSections) && (currentSection !== 4)) {
     document.getElementById('step' + currentSection).style.display = 'none';
     currentSection++;
     document.getElementById('step' + currentSection).style.display = 'block';
+  
 
     if (currentSection === totalSections) {
       this.disabled = true;
+      this.style.backgroundColor = '#f1f1f1'; 
     }
     
     if (currentSection > 1) {
       document.getElementById('goBackButton').disabled = false;
+      document.getElementById('goBackButton').style.backgroundColor = '#3498db'; 
+    }
+  }
+  else if (currentSection === 4) {
+    var traits = document.getElementById("traits").value;
+    if (traits !== "") {
+      simulateGptMagicButtonClick()
+      document.getElementById('step' + currentSection).style.display = 'none';
+      currentSection--;
+      document.getElementById('step' + currentSection).style.display = 'block';
+    } else {
+      var statusMessage = document.getElementById("statusMessage");
+      statusMessage.textContent = "Please input valid corrections";
     }
   }
 });
@@ -1322,16 +1313,34 @@ document.getElementById('goBackButton').addEventListener('click', function() {
     document.getElementById('step' + currentSection).style.display = 'none';
     currentSection--;
     document.getElementById('step' + currentSection).style.display = 'block';
+    goNextButton.innerText = "Next"
     
     if (currentSection === 1) {
       this.disabled = true;
+      this.style.backgroundColor = '#f1f1f1'; 
     }
 
     if (currentSection < totalSections) {
       document.getElementById('goNextButton').disabled = false;
+      document.getElementById('goNextButton').style.backgroundColor = '#3498db'; 
     }
   }
 });
+
+document.getElementById("goNextButton").addEventListener('click', function() {
+  if (currentSection === 3) {
+    simulateQaButtonkButtonClick()
+
+  }
+});
+
+document.getElementById("goStep5").addEventListener('click', function() {
+  document.getElementById('step' + currentSection).style.display = 'none';
+    currentSection=5;
+  document.getElementById('step' + '5').style.display = 'block';
+});
+
+
 
 function simulateGoNextButtonClick() {
   var goNextButton = document.getElementById("goNextButton");
@@ -1340,11 +1349,18 @@ function simulateGoNextButtonClick() {
 
 function simulateGoBackButtonClick() {
   var goBackButton = document.getElementById("goBackButton");
-  console.log("HAHA");
   goBackButton.click(); // Simulate a click event on the addElementButton
 }
 
+function simulateQaButtonkButtonClick() {
+  var qaButton = document.getElementById("qaButton");
+  qaButton.click(); // Simulate a click event on the addElementButton
+}
 
+function simulateGptMagicButtonClick() {
+  var gptMagicButton = document.getElementById("gptMagicButton");
+  gptMagicButton.click(); // Simulate a click event on the addElementButton
+}
 
 
 </script>

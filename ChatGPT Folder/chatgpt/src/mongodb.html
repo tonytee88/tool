@@ -131,29 +131,29 @@ handleGptMagicButtonClick.addEventListener("click", function() {
     //make an api call to correct the object and return it
     var clientName = document.getElementById("clients").value;
     function findOneDataPromise(clientName) {
-      return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         google.script.run
-          .withSuccessHandler(response => {
+        .withSuccessHandler(response => {
             resolve(response);
-          })
-          .withFailureHandler(error => {
+        })
+        .withFailureHandler(error => {
             reject(error);
-          })
-          .findOneDataFromMongoDB(clientName);
-      });
+        })
+        .findOneDataFromMongoDB(clientName);
+    });
     }
     foundOneData = findOneDataPromise(clientName)
     .then(response => {
-      //console.log("Success949:", response);
-      foundOneData = response
-      //console.log("foundOneData:" +JSON.stringify(foundOneData))
-      return response; // Return the response to use it further if needed
+    //console.log("Success949:", response);
+    foundOneData = response
+    //console.log("foundOneData:" +JSON.stringify(foundOneData))
+    return response; // Return the response to use it further if needed
     })
     .then(foundOneData => {
-      clientTraits = extractTraits(foundOneData);
-      //console.log("client traits extracted:" + JSON.stringify(clientTraits));
-      clientTraits2 = clientTraits;
-      return clientTraits;
+    clientTraits = extractTraits(foundOneData);
+    //console.log("client traits extracted:" + JSON.stringify(clientTraits));
+    clientTraits2 = clientTraits;
+    return clientTraits;
     }).then(clientTraits => {
     return new Promise((resolve, reject) => {
         google.script.run

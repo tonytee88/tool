@@ -39,8 +39,10 @@
             <div class="section">
               <div class="label">Recommended Elements:</div>
               <div class="element-buttons" id="recommendedSection">
-
-
+                <button class="element-button">Benefits1 Title</button>
+                <button class="element-button">Benefits1 Text</button>
+                <button class="element-button">Tip1 Title</button>
+                <button class="element-button">Tip1 Text</button>
               </div>
           
           
@@ -59,9 +61,8 @@
         </div>
         <div id="step3">
           <h1 class="titles">Step3 : Here's your email!</h1>
-          <h1>Tag List</h1>
           <div id="tableContainer">
-            <button class="option-button" id="loadTags">Load Tags</button>
+            <button class="option-button hideButton" id="loadTags">Load Tags</button>
             <div id="tagList"></div>
             <div id="updateContainer">
               <button class="option-button" id="update" type="submit">Update my document!</button>
@@ -91,11 +92,11 @@
         </div>
         <div id="step4">
           <h1 class="titles">Step4 : Let's make it better</h1>
-          <button class="option-button" id="qaButton">QA magic</button>
+          <button class="option-button hideButton" id="qaButton">QA magic</button>
           <button class="option-button" id="testFunction">Test Function1</button>
           <form action="" id="clientTraits">
           <textarea id="traits" class="form-control large-input" placeholder="How can I improve this copy and all futur copies?"></textarea>
-          <button class="option-button spacedButtons" id="gptMagicButton" type="submit">GPT-Correction</button>
+          <button class="option-button spacedButtons hideButton" id="gptMagicButton" type="submit">GPT-Correction</button>
           </form>
         </div>
         <div id="step5">
@@ -112,6 +113,7 @@
       <div id="navigation" class="sticky">
         <button id="goBackButton" class="option-button"disabled>Back</button>
         <button id="goNextButton"class="option-button">Next</button>
+        <button id="goStep5"class="option-button">5</button>
       </div>
       <div id="bottomContainer">
 
