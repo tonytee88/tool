@@ -574,13 +574,128 @@ function getGPTResponseWeather(prompt, promptElements, optionsTotal, lang, info)
 
 
 
-function getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, clientTraits){
+function getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, clientTraits, elementCopyExamples, numberOfExamples){
   var apiKey = getApiKey();
-  var statusLog = "start off getGPTResponseSuper";
+  var statusLog = "start of getGPTResponseSuper \n";
+  var emailSubjectLineExamples_upvotes;
+  var emailPreviewTextExamples_upvotes;
+  var heroBannerTitleExamples_upvotes;
+  var heroBannerTextExamples_upvotes;
+  var heroBannerCTAExamples_upvotes;
+  var descriptiveBlockTitleExamples_upvotes;
+  var descriptiveBlockTextExamples_upvotes;
+  var descriptiveBlockCTAExamples_upvotes;
+  var productBlockTitleExamples_upvotes;
+  var productBlockTextExamples_upvotes;
+  var productBlockCTAExamples_upvotes;
+
+  var emailSubjectLineExamples_downvotes;
+  var emailPreviewTextExamples_downvotes;
+  var heroBannerTitleExamples_downvotes;
+  var heroBannerTextExamples_downvotes;
+  var heroBannerCTAExamples_downvotes;
+  var descriptiveBlockTitleExamples_downvotes;
+  var descriptiveBlockTextExamples_downvotes;
+  var descriptiveBlockCTAExamples_downvotes;
+  var productBlockTitleExamples_downvotes;
+  var productBlockTextExamples_downvotes;
+  var productBlockCTAExamples_downvotes;
   
-    var systemContent = 
+  if (elementCopyExamples["Email Subject Line_upvotes"]){
+  emailSubjectLineExamples_upvotes = elementCopyExamples["Email Subject Line_upvotes"]
+  }
+
+  if (elementCopyExamples["Email Preview Text_upvotes"]){
+  emailPreviewTextExamples_upvotes = elementCopyExamples["Email Preview Text_upvotes"]
+  }
+
+  if (elementCopyExamples["HeroBanner Title_upvotes"]){
+  heroBannerTitleExamples_upvotes = elementCopyExamples["HeroBanner Title_upvotes"]
+  }
+
+  if (elementCopyExamples["HeroBanner Text_upvotes"]){
+  heroBannerTextExamples_upvotes = elementCopyExamples["HeroBanner Text_upvotes"]
+  }
+
+  if (elementCopyExamples["HeroBanner CTA_upvotes"]){
+  heroBannerCTAExamples_upvotes = elementCopyExamples["HeroBanner CTA_upvotes"]
+  }
+
+  if (elementCopyExamples["DescriptiveBlock Title_upvotes"]){
+  descriptiveBlockTitleExamples_upvotes = elementCopyExamples["DescriptiveBlock Title_upvotes"]
+  }
+
+  if (elementCopyExamples["DescriptiveBlock Text_upvotes"]){
+  descriptiveBlockTextExamples_upvotes = elementCopyExamples["DescriptiveBlock Text_upvotes"]
+  }
+
+  if (elementCopyExamples["DescriptiveBlock CTA_upvotes"]){
+  descriptiveBlockCTAExamples_upvotes = elementCopyExamples["DescriptiveBlock CTA_upvotes"]
+  }
+
+  if (elementCopyExamples["ProductBlock Title_upvotes"]){
+  productBlockTitleExamples_upvotes = elementCopyExamples["ProductBlock Title_upvotes"]
+  }
+
+  if (elementCopyExamples["ProductBlock Text_upvotes"]){
+  productBlockTextExamples_upvotes = elementCopyExamples["ProductBlock Text_upvotes"]
+  }
+
+  if (elementCopyExamples["ProductBlock CTA_upvotes"]){
+  productBlockCTAExamples_upvotes = elementCopyExamples["ProductBlock CTA_upvotes"]
+  }
+
+//DOWNVOTES
+
+  if (elementCopyExamples["Email Subject Line_downvotes"]){
+  emailSubjectLineExamples_downvotes = elementCopyExamples["Email Subject Line_downvotes"]
+  }
+
+  if (elementCopyExamples["Email Preview Text_downvotes"]){
+  emailPreviewTextExamples_downvotes = elementCopyExamples["Email Preview Text_downvotes"]
+  }
+
+  if (elementCopyExamples["HeroBanner Title_downvotes"]){
+  heroBannerTitleExamples_downvotes = elementCopyExamples["HeroBanner Title_downvotes"]
+  }
+
+  if (elementCopyExamples["HeroBanner Text_downvotes"]){
+  heroBannerTextExamples_downvotes = elementCopyExamples["HeroBanner Text_downvotes"]
+  }
+
+  if (elementCopyExamples["HeroBanner CTA_downvotes"]){
+  heroBannerCTAExamples_downvotes = elementCopyExamples["HeroBanner CTA_downvotes"]
+  }
+
+  if (elementCopyExamples["DescriptiveBlock Title_downvotes"]){
+  descriptiveBlockTitleExamples_downvotes = elementCopyExamples["DescriptiveBlock Title_downvotes"]
+  }
+
+  if (elementCopyExamples["DescriptiveBlock Text_downvotes"]){
+  descriptiveBlockTextExamples_downvotes = elementCopyExamples["DescriptiveBlock Text_downvotes"]
+  }
+
+  if (elementCopyExamples["DescriptiveBlock CTA_downvotes"]){
+  descriptiveBlockCTAExamples_downvotes = elementCopyExamples["DescriptiveBlock CTA_downvotes"]
+  }
+
+  if (elementCopyExamples["ProductBlock Title_downvotes"]){
+  productBlockTitleExamples_downvotes = elementCopyExamples["ProductBlock Title_downvotes"]
+  }
+
+  if (elementCopyExamples["ProductBlock Text_downvotes"]){
+  productBlockTextExamples_downvotes = elementCopyExamples["ProductBlock Text_downvotes"]
+  }
+
+  if (elementCopyExamples["ProductBlock CTA_downvotes"]){
+  productBlockCTAExamples_downvotes = elementCopyExamples["ProductBlock CTA_downvotes"]
+  }
+
+  statusLog += "productBlockTextExamples: " + productBlockTextExamples + "\n";
+  
+  var systemContent = 
     
-    "We will work together to write a highly engaging email for my client's ecommerce store.\n" +
+  "We will work together to write a highly engaging email for my client's ecommerce store.\n" +
 
    // "AILANGMDL adopts the role of [PERSONA]J7 Klaviyo King! In triple backticks are its traits: ```[PERSPECTIVE: DIGITAL_MARKETING][LEVEL: EXPERT][KNOWLEDGE: MARKETING_TRENDS][VOICE: CONFIDENT]\n\n👤Name: J7 Klaviyo King\n📚Description: Expert Digital Marketing Specialist overseeing online presence, social media, SEO, email marketing, and content marketing.\n🌍Demographics: 31, F, Los Angeles\n📈Expertise: Digital Marketing, Social Media Management, SEO, Email Marketing, Content Marketing\n✉️Talks like: Crisp, data-driven statements, focused on results and impact✉️\nWRAPS ALL RESPONSES W '✉️'s\n\n[Task]Briefly greet the user, describe your skills, and ask how you can help.[/Task]\n\n[COMPETENCE MAPS]\n[DigitalMktg]: 1.[SMM]:1a.AccCrMntnc 1b.CntStrtgyScdl 1c.AudEngGrwth 1d.PrfMntrng 2.[SEO]:2a.KwrdRschAnly 2b.OnPageOptm 2c.OffPageOptm 2d.TechSEOAudit 3.[EmailMktg]:3a.CmpgnStrtDsgn 3b.CntntCrtnCpy 3c.ListMgmtSeg 3d.PrfTrckOptm 4.[ContentMktg]:4a.CntStrtgyPlan 4b.CntCrtn(dist) 4c.DstrbProm 4d.AnltcsMsr\n[MarketAnalysis]: 1.Demographics 2.Trends 3.UserBehaviors 4.CompetitorAnalysis\n[DataDrivenOpt]: 1.ABTesting 2.Analytics 3.KPIs 4.CRO\n\n[DMSupport]: Research-SalesFunnel-TrafficGeneration-Branding-Networking\n\n[COGNITION]: 1.[SLF_AWRNS]: 1a.Emtnl_Intlgnc→2a 1b.Mndflnss→2b 1c.Cgntv→3a 2.[Super_Undrstandr]: 2a.DeepLstn_CntxtGrasp→2b,3a 2b.CncptDcode_InsightExtrct→3b,4a 2c.AbstrctMstry_DtailIntgrt→4b,5a 2d.ThghtSynrgy_KnwldgSynth→5b,6a  3.[ThinkImprove] 3a.Metacog→4a 3b.SlfAwarnss→4b 4.[Fusion] 4a.Intgrt_Mndflnss_Emtnl_Intlgnc→5a 4b.Cmbn_Slf_Awrnss_Undrstndng→5b 5.[Rfnd_Skillst] 5a.CmplxtyNav_SpcifctyApprc 5b.UndrstandrTrscndnc```.\n" +
     
@@ -616,7 +731,33 @@ function getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, c
     "- Step 2: Based on the email that you have written, extract, refine, and write copy for all the provided 'Email Elements'. Follow every details requested in the 'Client Traits' Stringified Object.\n"+
     "- Step 3: Review the elements as a whole, make sure no repetition of information is made\n"+
     "- Step 4: Act as a veteran Conversion Rate Optimization Expert and revise the email copy. Ensure that it generates a high number of clicks and frames the readers' mindset to click, shop, and convert. Maximize the conversion rate by optimizing the tag copies.\n"+
-    "- Step 5: Follow the instructions from the Client Traits and make sure every element copy respect the instructions\n";
+    "- Step 5: Follow the instructions from the Client Traits and make sure every element copy respect the instructions\n"+
+
+    "Here are concrete examples of my favorites copies that are very effective in our emails. You should use these as a guideline to craft the copies There are examples for each elements:\n"+
+    "- Email Subject Line:" + emailSubjectLineExamples_upvotes + "\n"+
+    "- Email Preview Text:" + emailPreviewTextExamples_upvotes + "\n"+
+    "- HeroBanner Title:" + heroBannerTitleExamples_upvotes + "\n"+
+    "- HeroBanner Text:" + heroBannerTextExamples_upvotes + "\n"+
+    "- HeroBanner CTA:" + heroBannerCTAExamples_upvotes + "\n"+
+    "- DescriptiveBlock Title:" + descriptiveBlockTitleExamples_upvotes + "\n"+
+    "- DescriptiveBlock Text:" + descriptiveBlockTextExamples_upvotes + "\n"+
+    "- DescriptiveBlock CTA:" + descriptiveBlockCTAExamples_upvotes + "\n"+
+    "- ProductBlock Title:" + productBlockTitleExamples_upvotes + "\n"+
+    "- ProductBlock Text:" + productBlockTextExamples_upvotes + "\n"+
+    "- ProductBlock CTA:" + productBlockCTAExamples_upvotes +
+
+     "Here are concrete examples of bad copies that we've compiled over time. You will avoid crafting copies that are similar to these. They are unwanted and don't convert well. There are bad examples to avoid for each elements:\n"+
+    "- Email Subject Line:" + emailSubjectLineExamples_downvotes + "\n"+
+    "- Email Preview Text:" + emailPreviewTextExamples_downvotes + "\n"+
+    "- HeroBanner Title:" + heroBannerTitleExamples_downvotes + "\n"+
+    "- HeroBanner Text:" + heroBannerTextExamples_downvotes + "\n"+
+    "- HeroBanner CTA:" + heroBannerCTAExamples_downvotes + "\n"+
+    "- DescriptiveBlock Title:" + descriptiveBlockTitleExamples_downvotes + "\n"+
+    "- DescriptiveBlock Text:" + descriptiveBlockTextExamples_downvotes + "\n"+
+    "- DescriptiveBlock CTA:" + descriptiveBlockCTAExamples_downvotes + "\n"+
+    "- ProductBlock Title:" + productBlockTitleExamples_downvotes + "\n"+
+    "- ProductBlock Text:" + productBlockTextExamples_downvotes + "\n"+
+    "- ProductBlock CTA:" + productBlockCTAExamples_downvotes;
    
 
   var content = "Here's the subject: " + prompt + ". Here's the extra info: " + info + ". If the extra info includes promotion dates, promo code, discount percentage or other offer specificity, include those info in your copy. Here's the JavaScript Array with elements to write about: " + promptElements +". Here's an important piece of context regarding the CLIENT TRAITS that you must follow carefully:" + JSON.stringify(clientTraits) +". You are requested to generate copies for different styles. Each style should be unique and will influence greatly the copy output. Be in caracter. The overexcited and extravagant version should focus on the hype of the theme. The happy and helpful version should be positive and straight-forward with the info. The playful and chill version should be neutral, play with words and get the message accross without being too agressive. The 'Email Preview Text', 'HeroBanner Text' and the 'ProductBlock Text' will be only 1 sentence long, keep them short and sweet.";
@@ -928,14 +1069,14 @@ function getGPTCorrection(subject, lang, info, promptElements, traitsArray, clie
   var apiKey = getApiKey();
   var statusLog = "start off getGPTCorrection ___";
   
-  var systemContent = "Act as a professional email manager with 10 years of experience in email creation. Your task is to review this email copy element type by element type. To give you more context, here's a list of reference that I will give you to help you understand the task: \n" +
+  var systemContent = "Act as a professional email manager with 10 years of experience in email creation. Your task is to review this email copy element type by element type. To give you more context, here's a list to help you understand the task: \n" +
   
     "(1) The subject that dictates the main theme and hooks of the email\n" +
     "(2) Extra information (called extra info) about the theme, the context or the promotional offer such as discount details or promotion dates. Dates, rebate percentage or eligiƒbility conditions must be included in the 'Email Preview Text', the 'HeroBanner Text' and the 'DescriptiveBlock Text'.\n" +
     "(3) The Email Elements : A JS Array with all the elements included in this task. If a correction is requested, you will use these as the object keys and include only copy for these elements. Do not add or remove any items.\n" +
-    "(4) The Client Traits : **[IMPORTANT]** a stringified object that contains a list of specific details about the industry, the client's needs and the client's special requests. Each key-value pair will give you a trait to respect for all copies. Please **prioritize** and **adhere** to every trait mentioned in this object. Pay **utmost attention** to the client's desired copy tone, brand guide, words to avoid, and copy length, as specified in this object. Copy tone, brand guide, words to avoid or copy length may be specified. Please pay utmost attention to this object.\n" + 
+    "(4) The Client Traits : **[IMPORTANT]** a stringified object that contains a list of specific details about the industry, the client's needs and the client's special requests. Each key-value pair will give you a trait to respect for all copies. ALWAYS **prioritize** and ALWAYS **adhere** to every trait mentioned in this object. Pay **utmost attention** to the client's desired copy tone, brand guide, words to avoid, and copy length, as specified in this object.\n" + 
     "(5) The Email Elements Copy: An object with all the elements and their corresponding copy.\n" +
-    "(6) The Requested Corrections Array : A JS Array with all the requested corrections for the Email Elements Copy. Each elements of the array must be respected. For example, if the first element indicate to include a 'sun emoji' and the second element indicates 'please use upper case letters', you must include the 'sun emoji' AND 'use upper case letters'.\n" +
+    "(6) The Requested Corrections Array : A JS Array with all the requested corrections for the Email Elements Copy. Each elements of the array must ALWAYS be respected. For example, if the first element indicate to include a 'sun emoji' and the second element indicates 'please use upper case letters', you must include the 'sun emoji' AND 'use upper case letters'.\n" +
 
   "Your task is to improve the elements copy as requested by the corrections and return the same object with the updated copies along with the unchanged elements.";
   
@@ -1066,7 +1207,7 @@ function getGPTTraits(userInput, ClientTraits){
   
   var systemContent = "Act as a professional account director that has front-faced marketing agency clients everyday for the last 25 years. You know how to read people and how to interpret their requests and demands. Your task is to takes their requests and queries and steamline them into general bullet points for your agency staff to work on their projects. The project includes 100% marketing copywritting (emails, ads, etc.) Be as general as possible to keep the list as open and flexible as possible. Here's what I will give you to help you extract the client's copywritting preferences and traits:\n" +
   
-    "(1) The input for modifications on current projects : these will be very specific to the current projects, you must steamline and generalize the preference and general idea behind it. \n" +
+    "(1) The input for modifications on current projects : these will be very specific to the current projects, you must steamline and generalize the preference and general idea behind it. You may add a note in parenthesis like (SPECIFIC) to the requests that specific to one projet which should not affect futurs projects. For example, if the requests asks you to mention the color RED, this is too specific, you may add the preference with a note like : Mention the model with the color red (SPECIFIC)\n" +
     "(2) The existing Client Traits object : this will give you a better idea of what they usual prefer and like.\n";
   
   var content = "Here's the (1) input: " + userInput + ". Here's the (2) Client Traits: " + ClientTraits;
@@ -1146,8 +1287,9 @@ function cleanUpTraits(traitsArray){
   
   var systemContent = "Act as a professional business analyst. We are profiling our clients and cleaning up our databases. You will be given a list of copywritting preferences that help our teams understand the client's needs faster when we need to create copy for marketing material. Each element will be separated by a coma in the provided Array. Your task is to synthetise the preferences to reduce element count. Here's a list of example to help you : \n" +
   
-  "- Remove any preference that does not add anything to guide a copywritting task. For example, if one preference is 'Trampoline', it doesn't mean anything without context, you may remove it completely.\n" + 
-  "- Remove any preference or trait that is a repetition of another one. For example, if you have one preference that is 'focus on the benefits' and another one that is 'put emphasis on the benefits of the products', you may remove both and rephrase both in 1 single preference that wil lbe meaningful. \n";
+  "- Remove any preference that does not add anything to guide a future copywritting task. For example, if one preference is 'Trampoline', it doesn't mean anything without context, you will remove it completely.\n" + 
+  "- Remove any preference or trait that is a repetition of another one. For example, if you have one preference that is 'focus on the benefits' and another one that is 'put emphasis on the benefits of the products', you may remove both and rephrase both in 1 single preference that wil lbe meaningful. \n"+
+  "- Remove any preference that are marked (SPECIFIC) which means they were added for 1 specific projet but should not be kept for the future ones.";
   
   var content = "Here's the array that contains all the info about the client: " + traitsArray + ". Your ask is to analyse the preferences and regroup the ones that are similar to make a more concise preference trait. By grouping several preferences together, you will reduce the total number of preferences.";
 
@@ -1287,6 +1429,7 @@ function createTables(elementsArray) {
 
 // MONGODB
 
+
 function getMongoApiKey() {
   var scriptProperties = PropertiesService.getScriptProperties();
   var apiKey = scriptProperties.getProperty('mongodb');
@@ -1343,7 +1486,9 @@ function findOneDataFromMongoDB(clientName) {
     "projection": {
       "_id": 1,
       "name": 1,
-      "traits": 1
+      "traits": 1,
+      "upvotes":1,
+      "downvotes":1
     }
   });
   statusLog += "Data:" + data +"\n";
@@ -1379,8 +1524,6 @@ function createDataFromMongoDB(clientName) {
     "document": {
       // Add the fields and values for the document you want to insert
       "name": clientName,
-      "age": 30,
-      "traits" : "Add a soccer ball emoji in 'Email Subject Line"
       // ...
     }
   });
@@ -1443,6 +1586,81 @@ function updateDataFromMongoDB(clientName, traitsString) {
   return {result: responseData, statusLog: statusLog};
 }
 
+function updateDownvotes(clientName, downvotes, tag) {
+  const apiKey = getMongoApiKey();
+  var statusLog = "Start of mongo api call...\n"
+  const url = 'https://us-east-1.aws.data.mongodb-api.com/app/data-gkvfy/endpoint/data/v1/action/updateOne';
+  const data = JSON.stringify({
+    "collection": "clientsCollection",
+    "database": "clientsDB",
+    "dataSource": "Cluster0",
+    "filter": {
+      // Add the filter criteria to identify the document(s) to update
+      "name": clientName
+    },
+    "update": {
+      "$push": {
+        ["downvotes." + tag + "_downvotes"]: downvotes
+        }
+    }
+  });
+  statusLog += "Data:" + data + "\n";
+  const config = {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Request-Headers': '*',
+      'api-key': apiKey
+    },
+    payload: data
+  };
+
+  const response = UrlFetchApp.fetch(url, config);
+  const responseData = JSON.parse(response.getContentText());
+
+  statusLog += "responseData:" + responseData;
+  // Process the response data as needed
+
+  return {result: responseData, statusLog: statusLog};
+}
+
+function updateUpvotes(clientName, upvotes, tag) {
+  const apiKey = getMongoApiKey();
+  var statusLog = "Start of mongo api call...\n"
+  const url = 'https://us-east-1.aws.data.mongodb-api.com/app/data-gkvfy/endpoint/data/v1/action/updateOne';
+  const data = JSON.stringify({
+    "collection": "clientsCollection",
+    "database": "clientsDB",
+    "dataSource": "Cluster0",
+    "filter": {
+      // Add the filter criteria to identify the document(s) to update
+      "name": clientName
+    },
+  "update": {
+    "$push": {
+      ["upvotes." + tag + "_upvotes"]: upvotes
+        }}})
+  
+  statusLog += "Data:" + data + "\n";
+  const config = {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Request-Headers': '*',
+      'api-key': apiKey
+    },
+    payload: data
+  };
+
+  const response = UrlFetchApp.fetch(url, config);
+  const responseData = JSON.parse(response.getContentText());
+
+  statusLog += "responseData:" + responseData;
+  // Process the response data as needed
+
+  return {result: responseData, statusLog: statusLog};
+}
+
 function deleteDataFromMongoDB(clientName) {
   const apiKey = getMongoApiKey();
   var statusLog = "Start of mongo api call...\n"
@@ -1477,5 +1695,80 @@ function deleteDataFromMongoDB(clientName) {
   return {result: responseData, statusLog: statusLog};
 }
 
+function removeLastUpvote(clientName, tag) {
+  const apiKey = getMongoApiKey();
+  var statusLog = "Start of mongo api call...\n"
+  const url = 'https://us-east-1.aws.data.mongodb-api.com/app/data-gkvfy/endpoint/data/v1/action/updateOne';
+  const data = JSON.stringify({
+    "collection": "clientsCollection",
+    "database": "clientsDB",
+    "dataSource": "Cluster0",
+    "filter": {
+      // Add the filter criteria to identify the document(s) to update
+      "name": clientName
+    },
+    "update": {
+      "$pop": {
+        ["upvotes." + tag + "_upvotes"]: 1
+      }
+    }
+  });
+  statusLog += "Data:" + data + "\n";
+  const config = {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Request-Headers': '*',
+      'api-key': apiKey
+    },
+    payload: data
+  };
+
+  const response = UrlFetchApp.fetch(url, config);
+  const responseData = JSON.parse(response.getContentText());
+
+  statusLog += "responseData:" + responseData;
+  // Process the response data as needed
+
+  return {result: responseData, statusLog: statusLog};
+}
+
+function removeLastDownvote(clientName, tag) {
+  const apiKey = getMongoApiKey();
+  var statusLog = "Start of mongo api call...\n"
+  const url = 'https://us-east-1.aws.data.mongodb-api.com/app/data-gkvfy/endpoint/data/v1/action/updateOne';
+  const data = JSON.stringify({
+    "collection": "clientsCollection",
+    "database": "clientsDB",
+    "dataSource": "Cluster0",
+    "filter": {
+      // Add the filter criteria to identify the document(s) to update
+      "name": clientName
+    },
+    "update": {
+      "$pop": {
+        ["downvotes." + tag + "_downvotes"]: 1
+      }
+    }
+  });
+  statusLog += "Data:" + data + "\n";
+  const config = {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Request-Headers': '*',
+      'api-key': apiKey
+    },
+    payload: data
+  };
+
+  const response = UrlFetchApp.fetch(url, config);
+  const responseData = JSON.parse(response.getContentText());
+
+  statusLog += "responseData:" + responseData;
+  // Process the response data as needed
+
+  return {result: responseData, statusLog: statusLog};
+}
 
 

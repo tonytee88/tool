@@ -1,8 +1,24 @@
 <script>
 
-window.addEventListener('load', function() {
-  console.log('Page is loaded');
-});
+// async function sequentialSteps() {
+//   try {
+//     const result1 = await asyncFunction1();
+//     console.log('Result 1:', result1);
+    
+//     const result2 = await asyncFunction2(result1);  // Assume asyncFunction2 takes result1 as an argument.
+//     console.log('Result 2:', result2);
+    
+//     const result3 = await asyncFunction3(result2);  // Assume asyncFunction3 takes result2 as an argument.
+//     console.log('Result 3:', result3);
+    
+//     // And so on...
+    
+//   } catch (error) {
+//     console.error('An error occurred:', error);
+//   }
+// }
+
+// sequentialSteps();
 
 var optionsCount = 1;
 const optionsTotal = 3;
@@ -10,6 +26,60 @@ const designOptions = 3; // Number of design options
 var storedFinalObjectResult = {};
 var promptElements = [];
 var storedPromptElements = [];
+var finalObjectResult = {};
+var storedEmailSubject = "";
+var firstTimeStep3 = 0;
+var upvoteContent = "";
+var clientMongoDocument = {};
+var elementCopyExamples = {};
+const numberOfExamples = 5;
+var documentNamesObj;
+var namesArray = [];
+
+window.addEventListener('load', function() {
+  sidebarInit();
+});
+
+function getNamesArray() {
+  console.log("documentNamesObj: " + documentNamesObj)
+  namesArray = documentNamesObj.documents.map(function(doc) {
+  return doc.name;
+  })
+}
+
+async function sidebarInit() {
+    try {
+      if (currentSection === 1) {
+      statusMessage.textContent = "Initializing client list...";
+      } else {
+        statusMessage.textContent = "Updating client list...";
+      }
+      var result1 = await findAllData();
+      var result2 = await getNamesArray(result1);
+      var result3 = await getDropListNames();
+      if (currentSection === 1) {
+      statusMessage.textContent = "GPT loaded.";
+      document.getElementById('step1').style.display = 'block';
+      }
+    } catch (error) {
+      console.error('An error occurred:', error);
+    }
+  }
+
+
+function getDropListNames() {
+  var dropdown = document.getElementById('clients');
+  
+  namesArray.forEach(function(name) {
+  var option = document.createElement('option');
+  option.text = name;
+  option.value = name;
+  dropdown.add(option);
+});
+}
+
+
+
 
 var globalApiResponse = {
   "hero banner title": {
@@ -266,7 +336,7 @@ function getCategory(tag) {
 
 function updateStoredFinalObjectResult() {
   var cells = document.getElementsByClassName("title-content-cell");
-    var finalObjectResult = {};
+    finalObjectResult = {};
 
     for (var i = 0; i < cells.length; i++) {
       var cell = cells[i];
@@ -341,12 +411,14 @@ function processTags(tags) {
     upvoteButton.className = 'upvote-button';
     upvoteButton.style.border = 'none';
     upvoteButton.id = voteButtonId + '_up'; // Set the unique ID
+    upvoteButton.setAttribute("data-upvoted", "0")
 
     var downvoteButton = document.createElement('button');
     downvoteButton.textContent = '⬇';
     downvoteButton.className = 'downvote-button';
     downvoteButton.style.border = 'none';
     downvoteButton.id = voteButtonId + '_down'; // Set the unique ID
+    downvoteButton.setAttribute("data-downvoted", "0")
 
     // Append the button to the button cell
     voteButtonContainer.appendChild(upvoteButton);
@@ -424,6 +496,8 @@ function processTags(tags) {
     voteButtonCell.style.border = 'none'; // No border for the button cell
     voteButtonCell.style.textAlign = 'left';
     tagsWithDelimitersCell.style.border = '2px solid #000'; // Thick border for the second cell of the second row
+    upvoteButton.style.fontSize = "12px";
+    downvoteButton.style.fontSize = "12px";
     
     // Add the click event listener to the "Back" button
     backButton.addEventListener('click', function() {
@@ -456,9 +530,110 @@ function processTags(tags) {
     setTimeout(function() {
       nextButton.classList.remove('clicked');
     }, 500);
-    // Rest of your code...
+  
   });
 
+  upvoteButton.addEventListener('click', function(event) {
+    // Extract the tag from the button id
+    var clickStatus =  upvoteButton.getAttribute("data-upvoted")
+    if (clickStatus === "0") {
+      upvoteButton.style.color = "green";
+      upvoteButton.style.fontSize = "16px";
+      upvoteButton.setAttribute("data-upvoted", "1")
+    let tag = this.id.replace('_up', '').replace('voteButton_', '').replace(/-/g, ' ').replace('{', '').replace('}', '');
+    // Find the corresponding div using the tag
+    let associatedDiv = document.getElementById(tag.replace(/\s+/g, '-').replace('{', '').replace('}', ''));
+    upvoteContent = associatedDiv.textContent;
+    // If the div was found
+    if (associatedDiv) {
+        // Log the text content of the div
+      var clientName = document.getElementById("clients").value;
+      new Promise((resolve, reject) => {
+          google.script.run
+            .withSuccessHandler(response => {
+              resolve(response);
+            })
+            .withFailureHandler(error => {
+              reject(error);
+            })
+            .updateUpvotes(clientName, upvoteContent, tag);;
+        });
+      }} else {
+        upvoteButton.style.color = "black";
+        upvoteButton.style.fontSize = "12px";
+        upvoteButton.setAttribute("data-upvoted", "0")
+        let tag = this.id.replace('_up', '').replace('voteButton_', '').replace('-', ' ').replace('{', '').replace('}', '');
+        // Find the corresponding div using the tag
+        let associatedDiv = document.getElementById(tag.replace(/\s+/g, '-').replace('{', '').replace('}', ''));
+        upvoteContent = associatedDiv.textContent;
+        // If the div was found
+        if (associatedDiv) {
+          var clientName = document.getElementById("clients").value;
+          new Promise((resolve, reject) => {
+              google.script.run
+                .withSuccessHandler(response => {
+                  resolve(response);
+                })
+                .withFailureHandler(error => {
+                  reject(error);
+                })
+                .removeLastUpvote(clientName, tag);;
+            })
+          }}
+    });
+      
+
+  
+  
+  downvoteButton.addEventListener('click', function(event) {
+    var clickStatus =  downvoteButton.getAttribute("data-downvoted")
+    if (clickStatus === "0") {
+      downvoteButton.style.color = "red";
+      downvoteButton.style.fontSize = "16px";
+      downvoteButton.setAttribute("data-downvoted", "1")
+    
+    let tag = this.id.replace('_down', '').replace('voteButton_', '').replace('-', ' ').replace('{', '').replace('}', '');
+
+    // Find the corresponding div using the tag
+    let associatedDiv = document.getElementById(tag.replace(/\s+/g, '-').replace('{', '').replace('}', ''));
+    downvoteContent = associatedDiv.textContent;
+    // If the div was found
+    if (associatedDiv) {
+        // Log the text content of the div
+      var clientName = document.getElementById("clients").value;
+      new Promise((resolve, reject) => {
+          google.script.run
+            .withSuccessHandler(response => {
+              resolve(response);
+            })
+            .withFailureHandler(error => {
+              reject(error);
+            })
+            .updateDownvotes(clientName, downvoteContent, tag);;
+        });
+      }} else {
+        downvoteButton.style.color = "black";
+        downvoteButton.style.fontSize = "12px";
+        downvoteButton.setAttribute("data-downvoted", "0")
+        let tag = this.id.replace('_down', '').replace('voteButton_', '').replace('-', ' ').replace('{', '').replace('}', '');
+        // Find the corresponding div using the tag
+        let associatedDiv = document.getElementById(tag.replace(/\s+/g, '-').replace('{', '').replace('}', ''));
+        downvoteContent = associatedDiv.textContent;
+        // If the div was found
+        if (associatedDiv) {
+          var clientName = document.getElementById("clients").value;
+          new Promise((resolve, reject) => {
+              google.script.run
+                .withSuccessHandler(response => {
+                  resolve(response);
+                })
+                .withFailureHandler(error => {
+                  reject(error);
+                })
+                .removeLastDownvote(clientName, tag);;
+            })
+          }}
+    });
 
   });
 
@@ -470,7 +645,7 @@ function processTags(tags) {
   const handleUpdateButtonClick = document.getElementById("update");
 
   handleUpdateButtonClick.addEventListener("click", function() {
-    var finalObjectResult = {};
+    finalObjectResult = {};
     finalObjectResult = updateStoredFinalObjectResult();
     // var cells = document.getElementsByClassName("title-content-cell");
     // var finalObjectResult = {};
@@ -632,7 +807,7 @@ function processTags(tags) {
 
     handleUpdateBilingualButtonClick.addEventListener("click", function() {
     var cells = document.getElementsByClassName("title-content-cell");
-    var finalObjectResult = {};
+    finalObjectResult = {};
 
     for (var i = 0; i < cells.length; i++) {
       var cell = cells[i];
@@ -826,6 +1001,32 @@ function extractTraits(response) {
     return {};
   }
 }
+
+// function extractUpvotes(response) {
+//   if (response && response.document && response.document.upvotes) {
+//     var upvotesObject = response.document.upvotes;
+//     return upvotesObject;
+//   } else {
+//     return null; // or some default value
+//   }
+// }
+
+// function extractTraits(response) {
+//   if (response && response.document && response.document.traits) {
+//     const traits = response.document.traits;
+//     const traitArray = traits.split(',').map(trait => trait.trim());
+    
+//     const clientTraits = {};
+//     for (var i = 0; i < traitArray.length; i++) {
+//       const key = 'trait' + (i + 1);
+//       clientTraits[key] = i < traitArray.length ? traitArray[i] : '';
+//     }
+  
+//     return clientTraits;
+//   } else {
+//     return {};
+//   }
+// }
 
 function combineTraits(preferenceObject, clientTraits2) {
   // Get the first key name from the apiResponse object
@@ -1039,15 +1240,39 @@ gptRequest.addEventListener("submit", (e) => {
     })
     .then(foundOneData => {
       clientTraits = extractTraits(foundOneData);
-      //console.log("clienttraits 953:" + JSON.stringify(clientTraits));
+      clientMongoDocument = foundOneData;
       return clientTraits;
     }).then(clientTraits => {
+      elementCopyExamples = {};
+      let clientMongoDocumentUpvotes = clientMongoDocument.document.upvotes;
+      let clientMongoDocumentDownvotes = clientMongoDocument.document.downvotes;
 
+      for (let element of promptElements) {
+        if (clientMongoDocumentUpvotes.hasOwnProperty(element + "_upvotes")) {
+            let examplesArray = clientMongoDocumentUpvotes[element + "_upvotes"];
+            let lastFiveExamples = examplesArray.slice(-numberOfExamples);
+            // Store it in a variable. As we're in a loop, let's use a dynamic variable name
+            elementCopyExamples[element + "_upvotes"] = lastFiveExamples;
+        }
+      }
+
+      for (let element of promptElements) {
+        if (clientMongoDocumentUpvotes.hasOwnProperty(element + "_downvotes")) {
+            let examplesArray = clientMongoDocumentDownvotes[element + "_downvotes"];
+            let lastFiveExamples = examplesArray.slice(-numberOfExamples);
+            // Store it in a variable. As we're in a loop, let's use a dynamic variable name
+            elementCopyExamples[element + "_downvotes"] = lastFiveExamples;
+        }
+      }
+      var test123 = elementCopyExamples["Email Text Preview_downvotes"]
+      console.log(JSON.stringify(test123));
+    
+    }).then(result => {    
     // Run getGPTResponse
     google.script.run
     .withSuccessHandler((response) => {
       //console.log("Success:", response.result);  // Only logs the 'result' part of the response
-      //  console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
+      console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
       globalApiResponse = response.result;  // Only use the 'result' part of the response
       updateStoredFinalObjectResult()
       resolve(response.result);  // Only resolve the 'result' part of the response
@@ -1056,7 +1281,7 @@ gptRequest.addEventListener("submit", (e) => {
       console.log("Error:", error);
       reject(error);
     })
-    .getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, clientTraits);
+    .getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, clientTraits, elementCopyExamples, numberOfExamples);
    // });
   });
   } else {
@@ -1278,11 +1503,32 @@ let currentSection = 1;
 const totalSections = 5;
 
 document.getElementById("goNextButton").addEventListener('click', function() {
+
   if ((currentSection < totalSections) && (currentSection !== 4)) {
     document.getElementById('step' + currentSection).style.display = 'none';
     currentSection++;
-    document.getElementById('step' + currentSection).style.display = 'block';
+    console.log("currentSection after ++: " + currentSection);
+    if ((currentSection === 3) && (firstTimeStep3 === 0)) {
   
+      simulateQaButtonkButtonClick()
+      firstTimeStep3 = 1;
+      var qaButton = document.getElementById("qaButton");
+      qaButton.classList.remove("hideButton");
+      const checkCondition = () => {
+        var emailSubjectLineField = document.getElementById("Email-Subject-Line");
+        if (emailSubjectLineField.textContent !== "Email Subject Line") {
+          storedEmailSubject = emailSubjectLineField.textContent;
+          document.getElementById('step' + currentSection).style.display = 'block';
+        } else {
+        console.log("not yet, rechecking...");
+        setTimeout(checkCondition, 500);  // Check again after a delay
+        }
+        };
+        checkCondition();
+    } else {
+      document.getElementById('step' + currentSection).style.display = 'block';
+
+    }
 
     if (currentSection === totalSections) {
       this.disabled = true;
@@ -1300,7 +1546,30 @@ document.getElementById("goNextButton").addEventListener('click', function() {
       simulateGptMagicButtonClick()
       document.getElementById('step' + currentSection).style.display = 'none';
       currentSection--;
-      document.getElementById('step' + currentSection).style.display = 'block';
+          
+      const checkCondition = (retryCount = 0, maxRetries = 20) => {
+      var emailSubjectLineField = document.getElementById("Email-Subject-Line");
+      console.log("emailSubjectLineField: " + emailSubjectLineField.textContent);
+      console.log("storedEmailSubject: " + storedEmailSubject);
+      
+      if (emailSubjectLineField.textContent !== storedEmailSubject) {
+        storedEmailSubject = emailSubjectLineField.textContent;
+        document.getElementById('step' + currentSection).style.display = 'block';
+      } else {
+        console.log("Not yet, rechecking...");
+
+        if (retryCount < maxRetries) {
+          setTimeout(() => checkCondition(retryCount + 1), 500); // Check again after a delay
+        } else {
+          console.log("Max reached, displaying answers")
+          storedEmailSubject = emailSubjectLineField.textContent;
+          document.getElementById('step' + currentSection).style.display = 'block';
+        }
+      }
+    };
+
+    checkCondition();
+      // document.getElementById('step' + currentSection).style.display = 'block';
     } else {
       var statusMessage = document.getElementById("statusMessage");
       statusMessage.textContent = "Please input valid corrections";
@@ -1327,17 +1596,21 @@ document.getElementById('goBackButton').addEventListener('click', function() {
   }
 });
 
-document.getElementById("goNextButton").addEventListener('click', function() {
-  if (currentSection === 3) {
-    simulateQaButtonkButtonClick()
+// document.getElementById("goNextButton").addEventListener('click', function() {
+//   if (currentSection === 3) {
+//     simulateQaButtonkButtonClick()
 
-  }
-});
+//   }
+// });
 
 document.getElementById("goStep5").addEventListener('click', function() {
   document.getElementById('step' + currentSection).style.display = 'none';
-    currentSection=5;
+  currentSection=5;
   document.getElementById('step' + '5').style.display = 'block';
+  document.getElementById('goBackButton').disabled = false;
+  document.getElementById('goBackButton').style.backgroundColor = '#3498db'; 
+  document.getElementById('goNextButton').disabled = true;
+  document.getElementById('goNextButton').style.backgroundColor = '#f1f1f1'; 
 });
 
 
@@ -1350,6 +1623,12 @@ function simulateGoNextButtonClick() {
 function simulateGoBackButtonClick() {
   var goBackButton = document.getElementById("goBackButton");
   goBackButton.click(); // Simulate a click event on the addElementButton
+}
+
+function simulateFindAllMongoButtonClick() {
+  var findAllMongoButton = document.getElementById("findAllMongo");
+  findAllMongoButton.click(); // Simulate a click event on the addElementButton
+  return documentNamesObj
 }
 
 function simulateQaButtonkButtonClick() {

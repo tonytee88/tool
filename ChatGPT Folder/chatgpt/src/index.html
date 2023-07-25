@@ -64,6 +64,9 @@
           <div id="tableContainer">
             <button class="option-button hideButton" id="loadTags">Load Tags</button>
             <div id="tagList"></div>
+            <div>
+              <button class="option-button hideButton" id="qaButton">Refresh</button>
+            </div>
             <div id="updateContainer">
               <button class="option-button" id="update" type="submit">Update my document!</button>
               <button class="option-button" id="updateBilingual">Update & FR</button>
@@ -76,12 +79,6 @@
           <div id="clientDiv">
           <label for="client">Pick a client:</label>
           <select id="clients" name="clients">
-            <option value="ONT">ONT</option>
-            <option value="None">SELECT</option>
-            
-            <option value="ALP">ALP</option>
-            <option value="MAUI">MAUI</option>
-            <option value="CLD">CLD</option>
           </select>
           </div>
           <input type="text" id="subject" class="form-control" placeholder="Enter your subject..." value="Telescope Flash Sale">
@@ -92,7 +89,7 @@
         </div>
         <div id="step4">
           <h1 class="titles">Step4 : Let's make it better</h1>
-          <button class="option-button hideButton" id="qaButton">QA magic</button>
+          
           <button class="option-button" id="testFunction">Test Function1</button>
           <form action="" id="clientTraits">
           <textarea id="traits" class="form-control large-input" placeholder="How can I improve this copy and all futur copies?"></textarea>
@@ -100,11 +97,16 @@
           </form>
         </div>
         <div id="step5">
-          <button class="option-button spacedButtons mongoMagic" id="findOneMongo" type="submit">Find One Mongo</button>
-          <button class="option-button spacedButtons mongoMagic" id="findAllMongo" type="submit">Find All Mongo</button>
-          <button class="option-button spacedButtons mongoMagic" id="createMongo" type="submit">Create Mongo</button>
+          <h1 class="titles">Step5 : Inside the Brain</h1>
+          <div class="note">This is for advanced users only, don't click anything if you don't know what these buttons do!</div>
+          <div class="label">Client name (3 letters)</div>
+          <input type="text" id="newClientName" class="form-control" placeholder="Client Name, e.g : ONT">
+          <button class="option-button spacedButtons" id="findOneMongo" type="submit">Find One Mongo</button>
+          <button class="option-button spacedButtons" id="findAllMongo" type="submit">Find All Mongo</button>
+          <button class="option-button spacedButtons" id="createMongo" type="submit">Create Mongo</button>
           <button class="option-button spacedButtons mongoMagic" id="updateMongo" type="submit">Update Mongo</button>
           <button class="option-button spacedButtons mongoMagic" id="deleteMongo" type="submit">Delete Mongo</button>
+        
           <div id="mongoDisplay"></div>
           <button class="option-button" id="mongoDisplayButton">Update Mongo</button>
         </div>

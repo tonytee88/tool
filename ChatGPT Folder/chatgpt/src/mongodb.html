@@ -5,16 +5,21 @@ var clientName = document.getElementById("clients").value;
 
 // findAllData
 function findAllData() {
-    google.script.run
-  .withSuccessHandler(response => {
-    console.log("Success:", response.result); 
-    console.log("statusLog:", response.statusLog); 
-  })
-  .withFailureHandler(error => {
-    console.log("Error:", error);
-  })
-  .findAllDataFromMongoDB();
-
+    return new Promise((resolve, reject) => {
+        google.script.run
+            .withSuccessHandler(response => {
+                //console.log("Success:", response.result); 
+                //console.log("statusLog:", response.statusLog);
+                documentNamesObj = response.result;
+                console.log("documentNamesObj: " + JSON.stringify(documentNamesObj));
+                resolve(documentNamesObj);
+            })
+            .withFailureHandler(error => {
+                console.log("Error:", error);
+                reject(error);
+            })
+            .findAllDataFromMongoDB();
+    });
 }
 
 const handleFindAllMongoClick = document.getElementById("findAllMongo");
@@ -71,7 +76,9 @@ function createData(clientName) {
     google.script.run
   .withSuccessHandler(response => {
     console.log("Success:", response.result); 
-    console.log("statusLog:", response.statusLog); 
+    console.log("statusLog:", response.statusLog);
+    sidebarInit(); 
+    statusMessage.textContent = "New client created: "+clientName+".";
   })
   .withFailureHandler(error => {
     console.log("Error:", error);
@@ -83,8 +90,8 @@ function createData(clientName) {
 const handleCreateMongoClick = document.getElementById("createMongo");
 
 handleCreateMongoClick.addEventListener("click", function() {
-    var clientName = document.getElementById("clients").value;
-    console.log(clientName);
+    var clientName = document.getElementById("newClientName").value;
+    statusMessage.textContent = "Giving birth...";
     createData(clientName);
 });
 
@@ -168,7 +175,32 @@ handleGptMagicButtonClick.addEventListener("click", function() {
         console.log("Error:", error);
         reject(error);
         }).getGPTCorrection(subject, lang, info, promptElements, traitsArray, clientTraits, storedFinalObjectResult);
-    }).then((result) => {
+    })
+    .then((result) => {
+        statusMessage.textContent = "Translating with ChatGPT...";
+        if (lang === "English") {
+        // Skip requestTranslation and continue to the next step
+        return Promise.resolve(result);
+        } else {
+        // Proceed with requestTranslation
+        return new Promise((resolve, reject) => {
+            console.log("Success:", result);
+            google.script.run
+            .withSuccessHandler((response) => {
+                console.log("Success:", response.result);
+                console.log("Success:", response.statusLog);
+                globalApiResponse = response.result;
+                resolve(response.result);
+            })
+            .withFailureHandler((error) => {
+                console.log("Error:", error);
+                reject(error);
+            })
+            .requestTranslation1(result, lang);
+        });
+        }
+    })
+    .then((result) => {
         statusMessage.textContent = "Extracting client intel...";
         // Handle the API response
         return new Promise((resolve, reject) => {
@@ -190,7 +222,6 @@ handleGptMagicButtonClick.addEventListener("click", function() {
         reject(error);
         }).getGPTTraits(traits, clientTraits2);
         })
-    
     .then((result) => {
         statusMessage.textContent = "Spoon feeding the Brain...";
         return new Promise((resolve, reject) => {
