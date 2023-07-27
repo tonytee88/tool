@@ -691,7 +691,7 @@ function getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, c
   productBlockCTAExamples_downvotes = elementCopyExamples["ProductBlock CTA_downvotes"]
   }
 
-  statusLog += "productBlockTextExamples: " + productBlockTextExamples + "\n";
+  //statusLog += "productBlockTextExamples: " + productBlockTextExamples + "\n";
   
   var systemContent = 
     

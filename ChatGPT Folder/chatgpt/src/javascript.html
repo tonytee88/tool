@@ -181,6 +181,8 @@ document.getElementById("loadTags").addEventListener("click", function() {
     // Step 2
     processTags(tags);
   
+  });
+  
     // Step 3
     // var updateContainer = document.getElementById("updateContainer");
     // var createBriefButton = document.getElementById("createBrief");
@@ -195,127 +197,50 @@ document.getElementById("loadTags").addEventListener("click", function() {
     // Step 4
     // Initialize elementsArray as an empty array
     //createBriefButton.addEventListener("click", function() {
-    var elementsArray = [];
+function createTablesInDoc() { 
+  return new Promise((resolve, reject) => {
+  var chosenDiv = document.getElementById("chosenContainer");
+  var elementButtons = chosenDiv.getElementsByClassName("element-button");
+  var elementsArray = [];
 
-    for (var i = 0; i < elementButtons.length; i++) {
-      var category = "category " + (i + 1);
-      var value = elementButtons[i].textContent;
-      var elementName = elementButtons[i].textContent;
+  for (var i = 0; i < elementButtons.length; i++) {
+    var category = "category " + (i + 1);
+    var value = elementButtons[i].textContent;
+    var elementName = elementButtons[i].textContent;
 
-      // Special handling for "email subject line" and "email preview text"
-      if (value === "Email Subject Line" || value === "Email Preview Text") {
-        value = "Email Misc";
+    // Special handling for "email subject line" and "email preview text"
+    if (value === "Email Subject Line" || value === "Email Preview Text") {
+      value = "Email Misc";
+    } else {
+      // Get the category name by extracting the characters before the first space
+      var firstSpaceIndex = value.indexOf(' ');
+      if (firstSpaceIndex !== -1) {
+        value = value.substring(0, firstSpaceIndex);
       } else {
-        // Get the category name by extracting the characters before the first space
-        var firstSpaceIndex = value.indexOf(' ');
-        if (firstSpaceIndex !== -1) {
-          value = value.substring(0, firstSpaceIndex);
-        } else {
-          value = "Other";  // Default category if no space is found
-        }
-      }
-
-      // Check if the category already exists in the elementsArray
-      var categoryExists = false;
-      for (var j = 0; j < elementsArray.length; j++) {
-        if (elementsArray[j][0] === value) {
-          // Add the element to the existing category
-          elementsArray[j].push([elementName, "{" + elementName + "}"]);
-          categoryExists = true;
-          break;
-        }
-      }
-
-      if (!categoryExists) {
-        // Add a new category with the element
-        elementsArray.push([value, [elementName, "{" + elementName + "}"]]);
+        value = "Other";  // Default category if no space is found
       }
     }
-
-    // Create the table via Code.gs
-    google.script.run.withSuccessHandler(function(statusLog) {
-    }).createTables(elementsArray);
-  //})
-
-  //   var elementsArray = [];
-  // createBriefButton.addEventListener("click", function() {
-  // var addedCategories = new Set();
-
-  // // Group elements by categories
-  // tags.forEach(function(tag) {
-  //   var category = getCategory(tag);
-  //   var elementName = getElementName(tag);
-
-  //   if (tag === "Email Subject Line" || tag === "Email Preview Text") {
-  //     // Special handling for "email subject line" and "email preview text"
-  //     var specialCategory = "Email Misc";
-  //     if (!addedCategories.has(specialCategory)) {
-  //       elementsArray.push({category: specialCategory, elements: {}});
-  //       addedCategories.add(specialCategory);
-  //     }
-  //     elementsArray.find(obj => obj.category === specialCategory).elements[elementName] = "{" + elementName + "}";
-  //   } else {
-  //     // Check if category exists in the elementsArray
-  //     if (!addedCategories.has(category)) {
-  //       elementsArray.push({category: category, elements: {}});
-  //       addedCategories.add(category);
-  //     }
-  //     // Add the element to the category in the elementsArray
-  //     elementsArray.find(obj => obj.category === category).elements[elementName] = "{" + elementName + "}";
-  //   }
-  // });
-
-  // console.log(JSON.stringify(elementsArray));
-
-
-
-  //   // Dictate the order of the elements for table creation
-  //   var chosenDiv = document.getElementById("chosenContainer");
-  //   var elementButtons = chosenDiv.getElementsByClassName("element-button");
-  //   var addedCategories = new Set();  // Set to store added categories
-
-  //   var elementsOrder = {};  // Initialize the elementsOrder object
-
-  //   console.log(elementButtons.length);  // Add this line
-
-  //   var categoryCounter = 1;  // Initialize a separate counter for the categories
-
-  //   for (var i = 0; i < elementButtons.length; i++) {
-  //     var key = "category " + categoryCounter;  // Use the separate counter here
-  //     var value = elementButtons[i].textContent;
-      
-  //     // Special handling for "email subject line" and "email preview text"
-  //     if (value === "Email Subject Line" || value === "Email Preview Text") {
-  //       value = "Email Misc";
-  //     } else {
-  //       // Get the category name by extracting the characters before the first space
-  //       var firstSpaceIndex = value.indexOf(' ');
-  //       if (firstSpaceIndex !== -1) {
-  //         value = value.substring(0, firstSpaceIndex);
-  //       } else {
-  //         value = "Other";  // Default category if no space is found
-  //       }
-  //     }
-      
-  //     // Check if the category has already been added
-  //     if (!addedCategories.has(value)) {
-  //       elementsOrder[key] = value;
-  //       addedCategories.add(value);  // Add the category to the set of added categories
-  //       categoryCounter++;  // Only increase the category counter if a new category is added
-  //     }
-  //   }
-
-  //   console.log(elementsOrder);  // Add this line
-
-  //   // Create the table via Code.gs
-  //   google.script.run.withSuccessHandler(function(statusLog) {
-  //     console.log("Tables created successfully! Status: " + statusLog);
-  //   }).createTables(elementsArray, elementsOrder);
-
-
-  //   });
-
-
+    // Check if the category already exists in the elementsArray
+    var categoryExists = false;
+    for (var j = 0; j < elementsArray.length; j++) {
+      if (elementsArray[j][0] === value) {
+        // Add the element to the existing category
+        elementsArray[j].push([elementName, "{" + elementName + "}"]);
+        categoryExists = true;
+        break;
+      }
+    }
+    if (!categoryExists) {
+      // Add a new category with the element
+      elementsArray.push([value, [elementName, "{" + elementName + "}"]]);
+    }
+  }
+  // Create the table via Code.gs
+  google.script.run.withSuccessHandler(function(statusLog) {
+    resolve();
+  }).createTables(elementsArray);
+});
+}   
 
 function getCategory(tag) {
     var firstSpaceIndex = tag.indexOf(' ');
@@ -327,12 +252,9 @@ function getCategory(tag) {
     }
   }
 
-  function getElementName(tag) {
+function getElementName(tag) {
       return tag.trim(); // Remove leading and trailing whitespace
     }
-  
-    
-});
 
 function updateStoredFinalObjectResult() {
   var cells = document.getElementsByClassName("title-content-cell");
@@ -645,27 +567,19 @@ function processTags(tags) {
   const handleUpdateButtonClick = document.getElementById("update");
 
   handleUpdateButtonClick.addEventListener("click", function() {
-    finalObjectResult = {};
-    finalObjectResult = updateStoredFinalObjectResult();
-    // var cells = document.getElementsByClassName("title-content-cell");
-    // var finalObjectResult = {};
+    
+    async function runInSequence() {
+      try {
+        await createTablesInDoc();
+        finalObjectResult = {};
+        finalObjectResult = await updateStoredFinalObjectResult();
+        await google.script.run.updateDocument(finalObjectResult);
+      } catch (error) {
+        console.error('An error occurred:', error);
+      }
+    }
 
-    // for (var i = 0; i < cells.length; i++) {
-    //   var cell = cells[i];
-    //   var cellText = cell.innerText.trim();
-    //   var nextRow = cell.parentNode.nextElementSibling;
-    //   var nextCell = nextRow ? nextRow.children[cell.cellIndex] : null;
-
-    //   if (nextCell !== null && nextCell.classList.contains("text-content-cell")) {
-    //     var key = "{" + cellText + "}";
-    //     var value = nextCell.innerText.trim();
-    //     finalObjectResult[key] = value;
-    //   }
-    // }
-    // storedFinalObjectResult = finalObjectResult;
-
-    // Call a function in your Code.gs file to update the document with finalObjectResult
-    google.script.run.updateDocument(finalObjectResult);
+    runInSequence();
   });
 
     //end of updatedocument
@@ -806,41 +720,34 @@ function processTags(tags) {
     const handleUpdateBilingualButtonClick = document.getElementById("updateBilingual");
 
     handleUpdateBilingualButtonClick.addEventListener("click", function() {
-    var cells = document.getElementsByClassName("title-content-cell");
-    finalObjectResult = {};
-
-    for (var i = 0; i < cells.length; i++) {
-      var cell = cells[i];
-      var cellText = cell.innerText.trim();
-      var nextRow = cell.parentNode.nextElementSibling;
-      var nextCell = nextRow ? nextRow.children[cell.cellIndex] : null;
-
-      if (nextCell !== null && nextCell.classList.contains("text-content-cell")) {
-        var key = "{" + cellText + "}";
-        var value = nextCell.innerText.trim();
-        finalObjectResult[key] = value;
-      }
-    }
-    // Call a function in your Code.gs file to update the document with finalObjectResult
-    google.script.run.updateDocument(finalObjectResult);
-
-
-    //end of updatedocument
-
-    //start of gpt request for French :
     
-    // load the tags, clean up the stuff and create tables
+      function clickLoadTagsButton() {
+        // Get the button element
+        const loadTagsButton = document.getElementById("loadTags");
+        // Create a new 'click' event
+        const event = new Event('click');
+        // Dispatch the event
+        loadTagsButton.dispatchEvent(event);
+      }
+
+      async function runInSequence() {
+        try {
+          // await updateEnglishFinalObjectResult();
+          await createTablesInDoc();
+          //finalObjectResult = {};
+          finalObjectResult = await updateStoredFinalObjectResult();
+          await google.script.run.updateDocument(finalObjectResult);
+          clickLoadTagsButton()
+        } catch (error) {
+          console.error('An error occurred:', error);
+        }
+      }
+    runInSequence();
+    //end of updatedocument
+    //start of gpt request for French :
+        // load the tags, clean up the stuff and create tables
     new Promise((resolve) => {
         (function() {
-            // Get the button element
-            const loadTagsButton = document.getElementById("loadTags");
-
-            // Create a new 'click' event
-            const event = new Event('click');
-
-            // Dispatch the event
-            loadTagsButton.dispatchEvent(event);
-
             // simulate async operation
             setTimeout(resolve, 1000);  // Adjust this delay as needed
         })();
@@ -859,15 +766,12 @@ function processTags(tags) {
             gptRequest.dispatchEvent(event);
         })();
     });
-
     
     //create elements for design phase
     
         //Change gpt-request-status
     //add the code to change and prepare design stuff, see same script a bit above
   })
-
-
 }
 
 //END OF PROCESS TAG FUNCTION
@@ -1248,25 +1152,20 @@ gptRequest.addEventListener("submit", (e) => {
       let clientMongoDocumentDownvotes = clientMongoDocument.document.downvotes;
 
       for (let element of promptElements) {
-        if (clientMongoDocumentUpvotes.hasOwnProperty(element + "_upvotes")) {
+        if (clientMongoDocumentUpvotes && clientMongoDocumentUpvotes.hasOwnProperty(element + "_upvotes")) {
             let examplesArray = clientMongoDocumentUpvotes[element + "_upvotes"];
             let lastFiveExamples = examplesArray.slice(-numberOfExamples);
-            // Store it in a variable. As we're in a loop, let's use a dynamic variable name
             elementCopyExamples[element + "_upvotes"] = lastFiveExamples;
         }
       }
 
       for (let element of promptElements) {
-        if (clientMongoDocumentUpvotes.hasOwnProperty(element + "_downvotes")) {
+        if (clientMongoDocumentDownvotes && clientMongoDocumentDownvotes.hasOwnProperty(element + "_downvotes")) {
             let examplesArray = clientMongoDocumentDownvotes[element + "_downvotes"];
             let lastFiveExamples = examplesArray.slice(-numberOfExamples);
-            // Store it in a variable. As we're in a loop, let's use a dynamic variable name
             elementCopyExamples[element + "_downvotes"] = lastFiveExamples;
         }
-      }
-      var test123 = elementCopyExamples["Email Text Preview_downvotes"]
-      console.log(JSON.stringify(test123));
-    
+      }  
     }).then(result => {    
     // Run getGPTResponse
     google.script.run
@@ -1507,7 +1406,6 @@ document.getElementById("goNextButton").addEventListener('click', function() {
   if ((currentSection < totalSections) && (currentSection !== 4)) {
     document.getElementById('step' + currentSection).style.display = 'none';
     currentSection++;
-    console.log("currentSection after ++: " + currentSection);
     if ((currentSection === 3) && (firstTimeStep3 === 0)) {
   
       simulateQaButtonkButtonClick()
