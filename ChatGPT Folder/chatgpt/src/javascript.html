@@ -35,6 +35,7 @@ var elementCopyExamples = {};
 const numberOfExamples = 5;
 var documentNamesObj;
 var namesArray = [];
+var processTagsAddedListeners = 0;
 
 window.addEventListener('load', function() {
   sidebarInit();
@@ -66,6 +67,14 @@ async function sidebarInit() {
     }
   }
 
+function updateDocumentPromise(result) {
+    return new Promise((resolve, reject) => {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(reject)
+        .updateDocument(result);
+    });
+};
 
 function getDropListNames() {
   var dropdown = document.getElementById('clients');
@@ -77,9 +86,6 @@ function getDropListNames() {
   dropdown.add(option);
 });
 }
-
-
-
 
 var globalApiResponse = {
   "hero banner title": {
@@ -104,7 +110,6 @@ var heroBannerTitle;
 var heroBannerText;
 var heroBannerCTA;
 var designTips;
-
 
 // const testFunctionClick = document.getElementById("testFunction");
 
@@ -163,118 +168,104 @@ qaButtonClick.addEventListener("click", function() {
     })
 })
 
-// Step 1
+// Setup "LoadTags" to execute ProcessTags
 document.getElementById("loadTags").addEventListener("click", function() {
-    var chosenDiv = document.getElementById("chosenContainer");
-    var elementButtons = chosenDiv.getElementsByClassName("element-button");
-    var tags = [];
-    
-    // Convert HTMLCollection to array using spread operator
-    var buttonArray = [...elementButtons];
-
-    buttonArray.forEach(function(button) {
-      tags.push(button.textContent);
-    });
-    setTimeout(() => {}, 1000)
-    buttonArray = [];
-    console.log(tags);
-    // Step 2
-    processTags(tags);
-  
-  });
-  
-    // Step 3
-    // var updateContainer = document.getElementById("updateContainer");
-    // var createBriefButton = document.getElementById("createBrief");
-
-    // if (!createBriefButton) {
-    //   createBriefButton = document.createElement("button");
-    //   createBriefButton.id = "createBrief";
-    //   createBriefButton.classList.add("option-button");
-    //   createBriefButton.textContent = "Create the Brief";
-    //   updateContainer.appendChild(createBriefButton);
-    // }
-    // Step 4
-    // Initialize elementsArray as an empty array
-    //createBriefButton.addEventListener("click", function() {
-function createTablesInDoc() { 
-  return new Promise((resolve, reject) => {
   var chosenDiv = document.getElementById("chosenContainer");
   var elementButtons = chosenDiv.getElementsByClassName("element-button");
-  var elementsArray = [];
+  var tags = [];
 
-  for (var i = 0; i < elementButtons.length; i++) {
-    var category = "category " + (i + 1);
-    var value = elementButtons[i].textContent;
-    var elementName = elementButtons[i].textContent;
+  // Convert HTMLCollection to array using spread operator
+  buttonArray = [...elementButtons];
 
-    // Special handling for "email subject line" and "email preview text"
-    if (value === "Email Subject Line" || value === "Email Preview Text") {
-      value = "Email Misc";
-    } else {
-      // Get the category name by extracting the characters before the first space
-      var firstSpaceIndex = value.indexOf(' ');
-      if (firstSpaceIndex !== -1) {
-        value = value.substring(0, firstSpaceIndex);
-      } else {
-        value = "Other";  // Default category if no space is found
-      }
-    }
-    // Check if the category already exists in the elementsArray
-    var categoryExists = false;
-    for (var j = 0; j < elementsArray.length; j++) {
-      if (elementsArray[j][0] === value) {
-        // Add the element to the existing category
-        elementsArray[j].push([elementName, "{" + elementName + "}"]);
-        categoryExists = true;
-        break;
-      }
-    }
-    if (!categoryExists) {
-      // Add a new category with the element
-      elementsArray.push([value, [elementName, "{" + elementName + "}"]]);
-    }
-  }
-  // Create the table via Code.gs
-  google.script.run.withSuccessHandler(function(statusLog) {
-    resolve();
-  }).createTables(elementsArray);
+  buttonArray.forEach(function(button) {
+    tags.push(button.textContent);
+  });
+  setTimeout(() => {}, 1000)
+  
+  console.log(tags);
+  // Step 2
+  processTags(tags);
+  
 });
+  
+function createTablesInDoc() { 
+  return new Promise((resolve, reject) => {
+    var chosenDiv = document.getElementById("chosenContainer");
+    var elementButtons = chosenDiv.getElementsByClassName("element-button");
+    var elementsArray = [];
+
+    for (var i = 0; i < elementButtons.length; i++) {
+      var category = "category " + (i + 1);
+      var value = elementButtons[i].textContent;
+      var elementName = elementButtons[i].textContent;
+
+      // Special handling for "email subject line" and "email preview text"
+      if (value === "Email Subject Line" || value === "Email Preview Text") {
+        value = "Email Misc";
+      } else {
+        // Get the category name by extracting the characters before the first space
+        var firstSpaceIndex = value.indexOf(' ');
+        if (firstSpaceIndex !== -1) {
+          value = value.substring(0, firstSpaceIndex);
+        } else {
+          value = "Other";  // Default category if no space is found
+        }
+      }
+      // Check if the category already exists in the elementsArray
+      var categoryExists = false;
+      for (var j = 0; j < elementsArray.length; j++) {
+        if (elementsArray[j][0] === value) {
+          // Add the element to the existing category
+          elementsArray[j].push([elementName, "{" + elementName + "}"]);
+          categoryExists = true;
+          break;
+        }
+      }
+      if (!categoryExists) {
+        // Add a new category with the element
+        elementsArray.push([value, [elementName, "{" + elementName + "}"]]);
+      }
+    }
+    // Create the table via Code.gs
+    google.script.run.withSuccessHandler(function(statusLog) {
+      resolve();
+    }).createTables(elementsArray);
+  });
 }   
 
 function getCategory(tag) {
-    var firstSpaceIndex = tag.indexOf(' ');
-    if (firstSpaceIndex !== -1) {
-      return tag.substring(0, firstSpaceIndex);
-    } else {
-      // Return a default category if no space is found in the tag
-      return "Other";
-    }
+  var firstSpaceIndex = tag.indexOf(' ');
+  if (firstSpaceIndex !== -1) {
+    return tag.substring(0, firstSpaceIndex);
+  } else {
+    // Return a default category if no space is found in the tag
+    return "Other";
   }
+}
 
 function getElementName(tag) {
-      return tag.trim(); // Remove leading and trailing whitespace
-    }
+  return tag.trim(); // Remove leading and trailing whitespace
+}
 
 function updateStoredFinalObjectResult() {
   var cells = document.getElementsByClassName("title-content-cell");
-    finalObjectResult = {};
+  finalObjectResult = {};
 
-    for (var i = 0; i < cells.length; i++) {
-      var cell = cells[i];
-      var cellText = cell.innerText.trim();
-      var nextRow = cell.parentNode.nextElementSibling;
-      var nextCell = nextRow ? nextRow.children[cell.cellIndex] : null;
+  for (var i = 0; i < cells.length; i++) {
+    var cell = cells[i];
+    var cellText = cell.innerText.trim();
+    var nextRow = cell.parentNode.nextElementSibling;
+    var nextCell = nextRow ? nextRow.children[cell.cellIndex] : null;
 
-      if (nextCell !== null && nextCell.classList.contains("text-content-cell")) {
-        var key = "{" + cellText + "}";
-        var value = nextCell.innerText.trim();
-        finalObjectResult[key] = value;
-      }
+    if (nextCell !== null && nextCell.classList.contains("text-content-cell")) {
+      var key = "{" + cellText + "}";
+      var value = nextCell.innerText.trim();
+      finalObjectResult[key] = value;
     }
-    storedFinalObjectResult = finalObjectResult;
+  }
+  storedFinalObjectResult = finalObjectResult;
   return finalObjectResult
-  };
+};
 
 
 function processTags(tags) {
@@ -345,8 +336,6 @@ function processTags(tags) {
     // Append the button to the button cell
     voteButtonContainer.appendChild(upvoteButton);
     voteButtonContainer.appendChild(downvoteButton);
-
-    
 
     // Append the cells to the second row
     thirdRow.appendChild(emptyCell2);
@@ -421,142 +410,218 @@ function processTags(tags) {
     upvoteButton.style.fontSize = "12px";
     downvoteButton.style.fontSize = "12px";
     
-    // Add the click event listener to the "Back" button
-    backButton.addEventListener('click', function() {
-      var buttonId = this.id;
-      var tagsWithDelimitersCellId = buttonId.replace('button_', ''); // Remove the 'button_' prefix
-      var tagsWithDelimitersCell = document.getElementById(tagsWithDelimitersCellId);
-      var test183 = parseInt(tagsWithDelimitersCell.getAttribute('data-option'));
-      
-      showPreviousOption(tagsWithDelimitersCell, tagsWithDelimitersCellId);
-    });
+    //add condition to check if listeners were already added, so they're only once.
 
-    // Add the click event listener to the "Next" button
-    nextButton.addEventListener('click', function() {
-      var buttonId = this.id;
-      var tagsWithDelimitersCellId = buttonId.replace('button_', ''); // Remove the 'button_' prefix
-      tagsWithDelimitersCellId = tagsWithDelimitersCellId.replace('_next', ''); // Remove the '_next' suffix
-      var tagsWithDelimitersCell = document.getElementById(tagsWithDelimitersCellId);
-      showNextOption(tagsWithDelimitersCell, tagsWithDelimitersCellId);
-    });
-    backButton.addEventListener('click', function() {
-    backButton.classList.add('clicked');
-    setTimeout(function() {
-      backButton.classList.remove('clicked');
-    }, 500);
-    // Rest of your code...
-  });
-
-  nextButton.addEventListener('click', function() {
-    nextButton.classList.add('clicked');
-    setTimeout(function() {
-      nextButton.classList.remove('clicked');
-    }, 500);
-  
-  });
-
-  upvoteButton.addEventListener('click', function(event) {
-    // Extract the tag from the button id
-    var clickStatus =  upvoteButton.getAttribute("data-upvoted")
-    if (clickStatus === "0") {
-      upvoteButton.style.color = "green";
-      upvoteButton.style.fontSize = "16px";
-      upvoteButton.setAttribute("data-upvoted", "1")
-    let tag = this.id.replace('_up', '').replace('voteButton_', '').replace(/-/g, ' ').replace('{', '').replace('}', '');
-    // Find the corresponding div using the tag
-    let associatedDiv = document.getElementById(tag.replace(/\s+/g, '-').replace('{', '').replace('}', ''));
-    upvoteContent = associatedDiv.textContent;
-    // If the div was found
-    if (associatedDiv) {
-        // Log the text content of the div
-      var clientName = document.getElementById("clients").value;
-      new Promise((resolve, reject) => {
-          google.script.run
-            .withSuccessHandler(response => {
-              resolve(response);
-            })
-            .withFailureHandler(error => {
-              reject(error);
-            })
-            .updateUpvotes(clientName, upvoteContent, tag);;
-        });
-      }} else {
-        upvoteButton.style.color = "black";
-        upvoteButton.style.fontSize = "12px";
-        upvoteButton.setAttribute("data-upvoted", "0")
-        let tag = this.id.replace('_up', '').replace('voteButton_', '').replace('-', ' ').replace('{', '').replace('}', '');
-        // Find the corresponding div using the tag
-        let associatedDiv = document.getElementById(tag.replace(/\s+/g, '-').replace('{', '').replace('}', ''));
-        upvoteContent = associatedDiv.textContent;
-        // If the div was found
-        if (associatedDiv) {
-          var clientName = document.getElementById("clients").value;
-          new Promise((resolve, reject) => {
-              google.script.run
-                .withSuccessHandler(response => {
-                  resolve(response);
-                })
-                .withFailureHandler(error => {
-                  reject(error);
-                })
-                .removeLastUpvote(clientName, tag);;
-            })
-          }}
-    });
-      
-
-  
-  
-  downvoteButton.addEventListener('click', function(event) {
-    var clickStatus =  downvoteButton.getAttribute("data-downvoted")
-    if (clickStatus === "0") {
-      downvoteButton.style.color = "red";
-      downvoteButton.style.fontSize = "16px";
-      downvoteButton.setAttribute("data-downvoted", "1")
     
-    let tag = this.id.replace('_down', '').replace('voteButton_', '').replace('-', ' ').replace('{', '').replace('}', '');
+    if (processTagsAddedListeners === 0) {
+      processTagsAddedListeners = 1;
+      console.log("processTagsAddedListeners is 0")
 
-    // Find the corresponding div using the tag
-    let associatedDiv = document.getElementById(tag.replace(/\s+/g, '-').replace('{', '').replace('}', ''));
-    downvoteContent = associatedDiv.textContent;
-    // If the div was found
-    if (associatedDiv) {
-        // Log the text content of the div
-      var clientName = document.getElementById("clients").value;
-      new Promise((resolve, reject) => {
-          google.script.run
-            .withSuccessHandler(response => {
-              resolve(response);
-            })
-            .withFailureHandler(error => {
-              reject(error);
-            })
-            .updateDownvotes(clientName, downvoteContent, tag);;
-        });
-      }} else {
-        downvoteButton.style.color = "black";
-        downvoteButton.style.fontSize = "12px";
-        downvoteButton.setAttribute("data-downvoted", "0")
-        let tag = this.id.replace('_down', '').replace('voteButton_', '').replace('-', ' ').replace('{', '').replace('}', '');
-        // Find the corresponding div using the tag
-        let associatedDiv = document.getElementById(tag.replace(/\s+/g, '-').replace('{', '').replace('}', ''));
-        downvoteContent = associatedDiv.textContent;
-        // If the div was found
-        if (associatedDiv) {
-          var clientName = document.getElementById("clients").value;
-          new Promise((resolve, reject) => {
-              google.script.run
-                .withSuccessHandler(response => {
-                  resolve(response);
-                })
-                .withFailureHandler(error => {
-                  reject(error);
-                })
-                .removeLastDownvote(clientName, tag);;
-            })
-          }}
-    });
+      // Add the click event listener to the "Back" button
+      backButton.addEventListener('click', function() {
+        var buttonId = this.id;
+        var tagsWithDelimitersCellId = buttonId.replace('button_', ''); // Remove the 'button_' prefix
+        var tagsWithDelimitersCell = document.getElementById(tagsWithDelimitersCellId);
+        //var test183 = parseInt(tagsWithDelimitersCell.getAttribute('data-option'));
 
+        showPreviousOption(tagsWithDelimitersCell, tagsWithDelimitersCellId);
+      });
+
+      // Add the click event listener to the "Next" button
+      nextButton.addEventListener('click', function() {
+        var buttonId = this.id;
+        var tagsWithDelimitersCellId = buttonId.replace('button_', ''); // Remove the 'button_' prefix
+        tagsWithDelimitersCellId = tagsWithDelimitersCellId.replace('_next', ''); // Remove the '_next' suffix
+        var tagsWithDelimitersCell = document.getElementById(tagsWithDelimitersCellId);
+        showNextOption(tagsWithDelimitersCell, tagsWithDelimitersCellId);
+      });
+      backButton.addEventListener('click', function() {
+        backButton.classList.add('clicked');
+        setTimeout(function() {
+          backButton.classList.remove('clicked');
+        }, 500);
+        // Rest of your code...
+      });
+
+      nextButton.addEventListener('click', function() {
+        nextButton.classList.add('clicked');
+        setTimeout(function() {
+          nextButton.classList.remove('clicked');
+        }, 500);
+      
+      });
+
+      upvoteButton.addEventListener('click', function(event) {
+        // Extract the tag from the button id
+        var clickStatus =  upvoteButton.getAttribute("data-upvoted")
+        if (clickStatus === "0") {
+          upvoteButton.style.color = "green";
+          upvoteButton.style.fontSize = "16px";
+          upvoteButton.setAttribute("data-upvoted", "1")
+          let tag = this.id.replace('_up', '').replace('voteButton_', '').replace(/-/g, ' ').replace('{', '').replace('}', '');
+          // Find the corresponding div using the tag
+          let associatedDiv = document.getElementById(tag.replace(/\s+/g, '-').replace('{', '').replace('}', ''));
+          upvoteContent = associatedDiv.textContent;
+          // If the div was found
+          if (associatedDiv) {
+              // Log the text content of the div
+            var clientName = document.getElementById("clients").value;
+            new Promise((resolve, reject) => {
+                google.script.run
+                  .withSuccessHandler(response => {
+                    resolve(response);
+                  })
+                  .withFailureHandler(error => {
+                    reject(error);
+                  })
+                  .updateUpvotes(clientName, upvoteContent, tag);;
+              });
+        }} else {
+          upvoteButton.style.color = "black";
+          upvoteButton.style.fontSize = "12px";
+          upvoteButton.setAttribute("data-upvoted", "0")
+          let tag = this.id.replace('_up', '').replace('voteButton_', '').replace('-', ' ').replace('{', '').replace('}', '');
+          // Find the corresponding div using the tag
+          let associatedDiv = document.getElementById(tag.replace(/\s+/g, '-').replace('{', '').replace('}', ''));
+          upvoteContent = associatedDiv.textContent;
+          // If the div was found
+          if (associatedDiv) {
+            var clientName = document.getElementById("clients").value;
+            new Promise((resolve, reject) => {
+                google.script.run
+                  .withSuccessHandler(response => {
+                    resolve(response);
+                  })
+                  .withFailureHandler(error => {
+                    reject(error);
+                  })
+                  .removeLastUpvote(clientName, tag);;
+              })
+          }
+        }
+      });
+    
+      downvoteButton.addEventListener('click', function(event) {
+        var clickStatus =  downvoteButton.getAttribute("data-downvoted")
+        if (clickStatus === "0") {
+          downvoteButton.style.color = "red";
+          downvoteButton.style.fontSize = "16px";
+          downvoteButton.setAttribute("data-downvoted", "1")
+        
+          let tag = this.id.replace('_down', '').replace('voteButton_', '').replace('-', ' ').replace('{', '').replace('}', '');
+
+          // Find the corresponding div using the tag
+          let associatedDiv = document.getElementById(tag.replace(/\s+/g, '-').replace('{', '').replace('}', ''));
+          downvoteContent = associatedDiv.textContent;
+          // If the div was found
+          if (associatedDiv) {
+              // Log the text content of the div
+            var clientName = document.getElementById("clients").value;
+            new Promise((resolve, reject) => {
+                google.script.run
+                  .withSuccessHandler(response => {
+                    resolve(response);
+                  })
+                  .withFailureHandler(error => {
+                    reject(error);
+                  })
+                  .updateDownvotes(clientName, downvoteContent, tag);;
+            });
+          }
+        } else {
+            downvoteButton.style.color = "black";
+            downvoteButton.style.fontSize = "12px";
+            downvoteButton.setAttribute("data-downvoted", "0")
+            let tag = this.id.replace('_down', '').replace('voteButton_', '').replace('-', ' ').replace('{', '').replace('}', '');
+            // Find the corresponding div using the tag
+            let associatedDiv = document.getElementById(tag.replace(/\s+/g, '-').replace('{', '').replace('}', ''));
+            downvoteContent = associatedDiv.textContent;
+            // If the div was found
+            if (associatedDiv) {
+              var clientName = document.getElementById("clients").value;
+              new Promise((resolve, reject) => {
+                  google.script.run
+                    .withSuccessHandler(response => {
+                      resolve(response);
+                    })
+                    .withFailureHandler(error => {
+                      reject(error);
+                    })
+                    .removeLastDownvote(clientName, tag);;
+                })
+              }
+          }
+      });
+    
+      const handleUpdateButtonClick = document.getElementById("update");
+      //handleUpdateButtonClick.removeEventListener("click", updateButtonSequence);
+      handleUpdateButtonClick.addEventListener("click", updateButtonSequence);
+      
+        async function updateButtonSequence() {
+          try {
+            await createTablesInDoc();
+            finalObjectResult = {};
+            console.log("this ran once when adding listeners to the updatebutton")
+            finalObjectResult = await updateStoredFinalObjectResult();
+            await updateDocumentPromise(finalObjectResult);
+          } catch (error) {
+            console.error('An error occurred:', error);
+          }
+        }
+    
+      const handleUpdateBilingualButtonClick = document.getElementById("updateBilingual");
+
+      //handleUpdateBilingualButtonClick.removeEventListener("click", startBilingualProcess);
+      handleUpdateBilingualButtonClick.addEventListener("click", startBilingualProcess);
+
+        function clickLoadTagsButton() {
+          // Get the button element
+          const loadTagsButton = document.getElementById("loadTags");
+          // Create a new 'click' event
+          const event = new Event('click');
+          // Dispatch the event
+          loadTagsButton.dispatchEvent(event);
+        }
+
+        async function updateBilingualSequence() {
+          try {
+            // await updateEnglishFinalObjectResult();
+            await createTablesInDoc();
+            console.log("this ran once when adding listeners to the updatebilingualbutton")
+            //finalObjectResult = {};
+            finalObjectResult = await updateStoredFinalObjectResult();
+            await updateDocumentPromise(finalObjectResult);
+            clickLoadTagsButton()
+          } catch (error) {
+            console.error('An error occurred:', error);
+          }
+        }
+
+        function startBilingualProcess() {
+          updateBilingualSequence();
+          //leave the fake asyn for now, we will remove it later
+          new Promise((resolve) => {
+              (function() {
+                  // simulate async operation
+                  setTimeout(resolve, 1000);  // Adjust this delay as needed
+              })();
+          }).then(() => {
+              // run gptrequest with French
+              (function() {
+                  // Get the form element
+                  const gptRequest = document.getElementById("gptRequest");
+                  const lang = document.getElementById("lang");
+                  lang.value = "Français (Québec)";
+
+                  // Create a new 'submit' event
+                  const event = new Event('submit');
+
+                  // Dispatch the event
+                  gptRequest.dispatchEvent(event);
+              })();
+          })
+        }
+    }
   });
 
   // Append the table to the tag list element
@@ -564,215 +629,150 @@ function processTags(tags) {
 
   //end of table generating code
    
-  const handleUpdateButtonClick = document.getElementById("update");
-
-  handleUpdateButtonClick.addEventListener("click", function() {
-    
-    async function runInSequence() {
-      try {
-        await createTablesInDoc();
-        finalObjectResult = {};
-        finalObjectResult = await updateStoredFinalObjectResult();
-        await google.script.run.updateDocument(finalObjectResult);
-      } catch (error) {
-        console.error('An error occurred:', error);
-      }
-    }
-
-    runInSequence();
-  });
 
     //end of updatedocument
     // function "bidon" to isolate design phase -- remove "function bidon() {} to enable design phase"
-    function bidon() {
-    //create elements for design phase
+  //   function bidon() {
+  //   //create elements for design phase
     
-    //Change gpt-request-status
-    var topContainer = document.getElementById("topContainer");
-    topContainer.setAttribute("gpt-request-status", "generate-design-tips");
+  //   //Change gpt-request-status
+  //   var topContainer = document.getElementById("topContainer");
+  //   topContainer.setAttribute("gpt-request-status", "generate-design-tips");
 
-    // Get the text content of the required divs
-    try {
-      heroBannerTitle = document.getElementById("HeroBanner-Title").textContent.trim();
-      heroBannerSubtitle = document.getElementById("HeroBanner-Text").textContent.trim();
-      heroBannerCTA = document.getElementById("HeroBanner-CTA").textContent.trim();
+  //   // Get the text content of the required divs
+  //   try {
+  //     heroBannerTitle = document.getElementById("HeroBanner-Title").textContent.trim();
+  //     heroBannerSubtitle = document.getElementById("HeroBanner-Text").textContent.trim();
+  //     heroBannerCTA = document.getElementById("HeroBanner-CTA").textContent.trim();
 
-      // If an error occurs within the try block, the catch block will handle it
-    } catch (error) {
-      // Code to handle the error
-      console.error('An error occurred:', error.message);
-      var statusMessage = document.getElementById("statusMessage");
-      // Set the message to indicate the running state
-      statusMessage.textContent = "Make sure your tags include : 'hero banner title', 'hero banner text' and 'hero banner cta'";
-    }
+  //     // If an error occurs within the try block, the catch block will handle it
+  //   } catch (error) {
+  //     // Code to handle the error
+  //     console.error('An error occurred:', error.message);
+  //     var statusMessage = document.getElementById("statusMessage");
+  //     // Set the message to indicate the running state
+  //     statusMessage.textContent = "Make sure your tags include : 'hero banner title', 'hero banner text' and 'hero banner cta'";
+  //   }
 
-    // Clear the content of div with id="tableContainer"
-    var tableContainer = document.getElementById("tableContainer");
-    tableContainer.innerHTML = "";
+  //   // Clear the content of div with id="tableContainer"
+  //   var tableContainer = document.getElementById("tableContainer");
+  //   tableContainer.innerHTML = "";
 
-    // Generate a new table with 4 rows
-    for (var i = 1; i <= designOptions; i++) {
-    // Create a new table for each design option
-    var newTable = document.createElement("table");
-    newTable.id = 'designTable' + i;
+  //   // Generate a new table with 4 rows
+  //   for (var i = 1; i <= designOptions; i++) {
+  //   // Create a new table for each design option
+  //   var newTable = document.createElement("table");
+  //   newTable.id = 'designTable' + i;
 
-    // Create the first row with two divs
-    var row1 = document.createElement("tr");
+  //   // Create the first row with two divs
+  //   var row1 = document.createElement("tr");
 
-    var cell1 = document.createElement("td");
-    var div1 = document.createElement("div");
-    div1.textContent = "Option " + i;
-    // Apply CSS styles to div1
+  //   var cell1 = document.createElement("td");
+  //   var div1 = document.createElement("div");
+  //   div1.textContent = "Option " + i;
+  //   // Apply CSS styles to div1
 
-    var cell2 = document.createElement("td");
-    var div2 = document.createElement("div");
+  //   var cell2 = document.createElement("td");
+  //   var div2 = document.createElement("div");
 
-    // Create a button element
-    var deleteButton = document.createElement("button");
-    deleteButton.id = 'deleteDesignIdea' + i;
-    deleteButton.innerHTML = "&#128465"; // Unicode character for trash can
-    deleteButton.style.fontSize = "12px"; // Set the font size to make the button small
+  //   // Create a button element
+  //   var deleteButton = document.createElement("button");
+  //   deleteButton.id = 'deleteDesignIdea' + i;
+  //   deleteButton.innerHTML = "&#128465"; // Unicode character for trash can
+  //   deleteButton.style.fontSize = "12px"; // Set the font size to make the button small
 
-    // Apply CSS styles to the button
-    //deleteButton.style.boxShadow = "0 0 5px rgba(0, 0, 0, 0.3)";
-    deleteButton.style.transition = "box-shadow 0.3s ease-in-out";
+  //   // Apply CSS styles to the button
+  //   //deleteButton.style.boxShadow = "0 0 5px rgba(0, 0, 0, 0.3)";
+  //   deleteButton.style.transition = "box-shadow 0.3s ease-in-out";
 
-    // Add event listeners for hover and click animations
-    deleteButton.addEventListener("mouseover", function() {
-      this.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.5)";
-    });
+  //   // Add event listeners for hover and click animations
+  //   deleteButton.addEventListener("mouseover", function() {
+  //     this.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.5)";
+  //   });
 
-    deleteButton.addEventListener("mouseout", function() {
-      this.style.boxShadow = "0 0 5px rgba(0, 0, 0, 0.3)";
-    });
+  //   deleteButton.addEventListener("mouseout", function() {
+  //     this.style.boxShadow = "0 0 5px rgba(0, 0, 0, 0.3)";
+  //   });
 
-    deleteButton.addEventListener("click", createDeleteTableHandler(i)); // Call a separate function to handle the deletion
+  //   deleteButton.addEventListener("click", createDeleteTableHandler(i)); // Call a separate function to handle the deletion
 
-    // Append the button to the second div
-    div2.appendChild(deleteButton);
+  //   // Append the button to the second div
+  //   div2.appendChild(deleteButton);
 
-    cell1.appendChild(div1);
-    cell2.appendChild(div2);
-    row1.appendChild(cell1);
-    row1.appendChild(cell2);
+  //   cell1.appendChild(div1);
+  //   cell2.appendChild(div2);
+  //   row1.appendChild(cell1);
+  //   row1.appendChild(cell2);
 
-    newTable.appendChild(row1);
-    // Create the second row with the response from the API call
-    var row2 = document.createElement("tr");
-    var cell3 = document.createElement("td");
-    cell3.colSpan = 2;
-    cell3.id = "cell3_option" + i;
-    cell3.className = "cell3_option";
-    //var response = getGPTDesignResponse(lang, heroBannerTitle, heroBannerText, heroBannerCTA, subject, info);
-    //cell3.textContent = "Response: " + JSON.stringify(response.result);
+  //   newTable.appendChild(row1);
+  //   // Create the second row with the response from the API call
+  //   var row2 = document.createElement("tr");
+  //   var cell3 = document.createElement("td");
+  //   cell3.colSpan = 2;
+  //   cell3.id = "cell3_option" + i;
+  //   cell3.className = "cell3_option";
+  //   //var response = getGPTDesignResponse(lang, heroBannerTitle, heroBannerText, heroBannerCTA, subject, info);
+  //   //cell3.textContent = "Response: " + JSON.stringify(response.result);
     
-    row2.appendChild(cell3);
-    newTable.appendChild(row2);
+  //   row2.appendChild(cell3);
+  //   newTable.appendChild(row2);
 
-    // Append the new table to the table container
-    var tableContainer = document.getElementById("tableContainer");
-    tableContainer.appendChild(newTable);
+  //   // Append the new table to the table container
+  //   var tableContainer = document.getElementById("tableContainer");
+  //   tableContainer.appendChild(newTable);
 
-  }
-    var addButton = document.createElement("button");
-    addButton.id = "addDesignTips";
-    addButton.className = "option-button";
-    addButton.textContent = "Add Design Tip";
+  // }
+  //   var addButton = document.createElement("button");
+  //   addButton.id = "addDesignTips";
+  //   addButton.className = "option-button";
+  //   addButton.textContent = "Add Design Tip";
 
-    tableContainer.appendChild(addButton);
+  //   tableContainer.appendChild(addButton);
  
 
 
-   // Find the textarea with class "large-input"
-   var textarea = document.querySelector(".large-input");
-    textarea.value = "Focus on the sale"; // Change the text
+  //  // Find the textarea with class "large-input"
+  //  var textarea = document.querySelector(".large-input");
+  //   textarea.value = "Focus on the sale"; // Change the text
 
-    //Scroll back to the top for best UX
-    document.documentElement.scrollTop = 0; // For modern browsers
-    document.body.scrollTop = 0; // For older browsers
+  //   //Scroll back to the top for best UX
+  //   document.documentElement.scrollTop = 0; // For modern browsers
+  //   document.body.scrollTop = 0; // For older browsers
 
-    // Add an animation to the textarea
-    textarea.classList.add("textarea-animation");
-    setTimeout(function() {
-      textarea.classList.remove("textarea-animation");
-    }, 1000);
+  //   // Add an animation to the textarea
+  //   textarea.classList.add("textarea-animation");
+  //   setTimeout(function() {
+  //     textarea.classList.remove("textarea-animation");
+  //   }, 1000);
 
-    const handleAddDesignTipsButtonClick = document.getElementById("addDesignTips");
+  //   const handleAddDesignTipsButtonClick = document.getElementById("addDesignTips");
 
-    handleAddDesignTipsButtonClick.addEventListener("click", function() {
-    var designTips = document.getElementsByClassName("cell3_option");
-    var designTipsText = [];
+  //   handleAddDesignTipsButtonClick.addEventListener("click", function() {
+  //   var designTips = document.getElementsByClassName("cell3_option");
+  //   var designTipsText = [];
 
-    for (var i = 0; i < designTips.length; i++) {
-      var designTip = designTips[i];
-      var textContent = designTip.textContent.trim(); // Trim the text content
-      designTipsText.push(textContent);
-    }
+  //   for (var i = 0; i < designTips.length; i++) {
+  //     var designTip = designTips[i];
+  //     var textContent = designTip.textContent.trim(); // Trim the text content
+  //     designTipsText.push(textContent);
+  //   }
 
-    console.log(designTipsText);
-    google.script.run.addDesignTips(designTipsText);
-  });
+  //   console.log(designTipsText);
+  //   google.script.run.addDesignTips(designTipsText);
+  // });
   
-  }
-  //end of function bidon()
+  // }
+  // //end of function bidon()
 
 
-    const handleUpdateBilingualButtonClick = document.getElementById("updateBilingual");
 
-    handleUpdateBilingualButtonClick.addEventListener("click", function() {
-    
-      function clickLoadTagsButton() {
-        // Get the button element
-        const loadTagsButton = document.getElementById("loadTags");
-        // Create a new 'click' event
-        const event = new Event('click');
-        // Dispatch the event
-        loadTagsButton.dispatchEvent(event);
-      }
-
-      async function runInSequence() {
-        try {
-          // await updateEnglishFinalObjectResult();
-          await createTablesInDoc();
-          //finalObjectResult = {};
-          finalObjectResult = await updateStoredFinalObjectResult();
-          await google.script.run.updateDocument(finalObjectResult);
-          clickLoadTagsButton()
-        } catch (error) {
-          console.error('An error occurred:', error);
-        }
-      }
-    runInSequence();
-    //end of updatedocument
-    //start of gpt request for French :
-        // load the tags, clean up the stuff and create tables
-    new Promise((resolve) => {
-        (function() {
-            // simulate async operation
-            setTimeout(resolve, 1000);  // Adjust this delay as needed
-        })();
-    }).then(() => {
-        // run gptrequest with French
-        (function() {
-            // Get the form element
-            const gptRequest = document.getElementById("gptRequest");
-            const lang = document.getElementById("lang");
-            lang.value = "Français (Québec)";
-
-            // Create a new 'submit' event
-            const event = new Event('submit');
-
-            // Dispatch the event
-            gptRequest.dispatchEvent(event);
-        })();
-    });
     
     //create elements for design phase
     
         //Change gpt-request-status
     //add the code to change and prepare design stuff, see same script a bit above
-  })
-}
+  }
+
 
 //END OF PROCESS TAG FUNCTION
 //----------------------------------------------------------------------------------------------------------------

@@ -1390,7 +1390,6 @@ function createTables(elementsArray) {
     headerCell.setFontFamily("Nunito");
     headerCell.setBold(false);
     
-    // Note that text transform is not supported in Google Apps Script, so it's removed
     
   // Loop through the elements in the category
   for (var j = 0; j < elements.length; j++) {
