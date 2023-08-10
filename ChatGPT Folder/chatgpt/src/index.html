@@ -77,9 +77,8 @@
           <form action="" id="gptRequest">
           <h1 class="titles">Step1 : Give me some info</h1>
           <div id="clientDiv">
-          <label for="client">Pick a client:</label>
-          <select id="clients" name="clients">
-          </select>
+          <div id="clientLabel">Pick a client: </div>
+          <select id="clients" name="clients"></select>
           </div>
           <input type="text" id="subject" class="form-control" placeholder="Enter your subject..." value="Telescope Flash Sale">
           <input type="text" id="lang" class="form-control" placeholder="Enter the language" value="English">
@@ -101,21 +100,21 @@
           <div class="note">This is for advanced users only, don't click anything if you don't know what these buttons do!</div>
           <div class="label">Client name (3 letters)</div>
           <input type="text" id="newClientName" class="form-control" placeholder="Client Name, e.g : ONT">
-          <button class="option-button spacedButtons" id="findOneMongo" type="submit">Find One Mongo</button>
-          <button class="option-button spacedButtons" id="findAllMongo" type="submit">Find All Mongo</button>
+          <button class="option-button spacedButtons " id="findOneMongo" type="submit">Find One Mongo</button>
+          <button class="option-button spacedButtons " id="findAllMongo" type="submit">Find All Mongo</button>
           <button class="option-button spacedButtons" id="createMongo" type="submit">Create Mongo</button>
           <button class="option-button spacedButtons mongoMagic" id="updateMongo" type="submit">Update Mongo</button>
           <button class="option-button spacedButtons mongoMagic" id="deleteMongo" type="submit">Delete Mongo</button>
         
           <div id="mongoDisplay"></div>
-          <button class="option-button" id="mongoDisplayButton">Update Mongo</button>
+          <button class="option-button" id="mongoDisplayButton">Display Brain</button>
         </div>
         </div>
       </div>
       <div id="navigation" class="sticky">
         <button id="goBackButton" class="option-button"disabled>Back</button>
         <button id="goNextButton"class="option-button">Next</button>
-        <button id="goStep5"class="option-button">5</button>
+        <button id="goStep5">🧠</button>
       </div>
       <div id="bottomContainer">
 
