@@ -50,17 +50,31 @@ function getNamesArray() {
 
 async function sidebarInit() {
     try {
-      if (currentSection === 1) {
-      statusMessage.textContent = "Initializing client list...";
-      } else {
+      var clientListDiv = document.getElementById('clientDiv');
+      var clientLabel = document.getElementById('clientLabel');
+      var clientSelector = document.getElementById('clients');
+      
+      clientLabel.style.display = 'none';
+      clientSelector.style.display = 'none';
+
+      var clientListStatus = document.createElement('div');
+      clientListStatus.className = 'statusMessage';
+      clientListStatus.textContent = "Pick a client: [Loading]";
+      clientListDiv.appendChild(clientListStatus);
+      
+      if (currentSection !== 1) {
         statusMessage.textContent = "Updating client list...";
       }
       var result1 = await findAllData();
       var result2 = await getNamesArray(result1);
       var result3 = await getDropListNames();
-      if (currentSection === 1) {
-      statusMessage.textContent = "GPT loaded.";
-      document.getElementById('step1').style.display = 'block';
+      
+      clientListStatus.style.display = 'none';
+      clientLabel.style.display = 'block';
+      clientSelector.style.display = 'block';
+
+      if (currentSection === 5) {
+        statusMessage.textContent = "Client list updated.";
       }
     } catch (error) {
       console.error('An error occurred:', error);
@@ -410,12 +424,6 @@ function processTags(tags) {
     upvoteButton.style.fontSize = "12px";
     downvoteButton.style.fontSize = "12px";
     
-    //add condition to check if listeners were already added, so they're only once.
-
-    
-    if (processTagsAddedListeners === 0) {
-      processTagsAddedListeners = 1;
-      console.log("processTagsAddedListeners is 0")
 
       // Add the click event listener to the "Back" button
       backButton.addEventListener('click', function() {
@@ -552,7 +560,8 @@ function processTags(tags) {
               }
           }
       });
-    
+    if (processTagsAddedListeners === 0) {
+      processTagsAddedListeners = 1;
       const handleUpdateButtonClick = document.getElementById("update");
       //handleUpdateButtonClick.removeEventListener("click", updateButtonSequence);
       handleUpdateButtonClick.addEventListener("click", updateButtonSequence);
@@ -1445,10 +1454,10 @@ document.getElementById("goNextButton").addEventListener('click', function() {
       document.getElementById('step' + currentSection).style.display = 'none';
       currentSection--;
           
-      const checkCondition = (retryCount = 0, maxRetries = 20) => {
+      const checkCondition = (retryCount = 0, maxRetries = 30) => {
       var emailSubjectLineField = document.getElementById("Email-Subject-Line");
-      console.log("emailSubjectLineField: " + emailSubjectLineField.textContent);
-      console.log("storedEmailSubject: " + storedEmailSubject);
+      //console.log("emailSubjectLineField: " + emailSubjectLineField.textContent);
+      //console.log("storedEmailSubject: " + storedEmailSubject);
       
       if (emailSubjectLineField.textContent !== storedEmailSubject) {
         storedEmailSubject = emailSubjectLineField.textContent;
