@@ -8,8 +8,8 @@ function findAllData() {
     return new Promise((resolve, reject) => {
         google.script.run
             .withSuccessHandler(response => {
-                //console.log("Success:", response.result); 
-                //console.log("statusLog:", response.statusLog);
+                console.log("Success:", response.result); 
+                console.log("statusLog:", response.statusLog);
                 documentNamesObj = response.result;
                 console.log("documentNamesObj: " + JSON.stringify(documentNamesObj));
                 resolve(documentNamesObj);
@@ -260,18 +260,7 @@ handleGptMagicButtonClick.addEventListener("click", function() {
 const handleMongoDisplayClick = document.getElementById("mongoDisplayButton");
 
 handleMongoDisplayClick.addEventListener("click", function() {
-    // Make the API call
-    // var statusMessage = document.getElementById("statusMessage");
-    // var traits = document.getElementById("traits").value;
-    // traitsArray.push(traits); // push it later after having formatted the input
-    // var subject = getSubject();
-    // var lang = getLang();
-    // var info = getInfo();
-
-    // Set the message to indicate the running state
-    //statusMessage.textContent = "Talking to ChatGPT...";
-    //make an api call to correct the object and return it
-    var clientName = document.getElementById("clients").value;
+    var clientName = document.getElementById("newClientName").value;
     function findOneDataPromise(clientName) {
       return new Promise((resolve, reject) => {
         google.script.run
@@ -288,7 +277,7 @@ handleMongoDisplayClick.addEventListener("click", function() {
     .then(response => {
       //console.log("Success949:", response);
       foundOneData = response
-      //console.log("foundOneData:" +JSON.stringify(foundOneData))
+      console.log("foundOneData:" +JSON.stringify(foundOneData))
       return response; // Return the response to use it further if needed
     })
     .then(foundOneData => {
@@ -300,12 +289,41 @@ handleMongoDisplayClick.addEventListener("click", function() {
   // Extract and display the traits in the desired format
   const traitsList = document.getElementById("mongoDisplay");
   traitsList.innerHTML = "";
+  clientDocument = foundOneData;
+
+    // Display traits
+  const traitHeading = document.createElement("h3");
+  traitHeading.textContent = "Traits:";
+  traitsList.appendChild(traitHeading);
 
   for (const key in clientTraits) {
     const listItem = document.createElement("li");
     listItem.textContent = `${key}: ${clientTraits[key]}`;
     traitsList.appendChild(listItem);
   }
+
+    // Display upvotes
+  const upvoteHeading = document.createElement("h3");
+  upvoteHeading.textContent = "Upvotes:";
+  traitsList.appendChild(upvoteHeading);
+
+  for (const key in clientDocument.document.upvotes) {
+    const listItem = document.createElement("li");
+    listItem.textContent = `${key}: ${clientDocument.document.upvotes[key]}`;
+    traitsList.appendChild(listItem);
+  }
+
+  // Display downvotes
+  const downvoteHeading = document.createElement("h3");
+  downvoteHeading.textContent = "Downvotes:";
+  traitsList.appendChild(downvoteHeading);
+
+  for (const key in clientDocument.document.downvotes) {
+    const listItem = document.createElement("li");
+    listItem.textContent = `${key}: ${clientDocument.document.downvotes[key]}`;
+    traitsList.appendChild(listItem);
+  }
+
 })
 });
 
