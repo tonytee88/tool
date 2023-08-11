@@ -38,7 +38,7 @@ var namesArray = [];
 var processTagsAddedListeners = 0;
 
 window.addEventListener('load', function() {
-  //sidebarInit();
+  sidebarInit();
 });
 
 function getNamesArray() {
@@ -58,8 +58,8 @@ async function sidebarInit() {
       clientSelector.style.display = 'none';
 
       var clientListStatus = document.createElement('div');
-      clientListStatus.id = clientListStatus
-      clientSelector.style.display = 'block';
+      //clientListStatus.id = clientListStatus
+      //clientSelector.style.display = 'block';
       clientListStatus.className = 'statusMessage';
       clientListStatus.textContent = "Pick a client: [Loading]";
       clientListDiv.appendChild(clientListStatus);
