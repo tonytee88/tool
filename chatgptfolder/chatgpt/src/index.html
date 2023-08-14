@@ -9,7 +9,32 @@
       }
       
     </style>
-
+    <script>
+    function loadMainJS() {
+      const script = document.createElement("script");
+      script.src = "https://tonytee88.github.io/tool/chatgptfolder/chatgpt/javascript/javascript.js";
+      script.onload = function() {
+        // Callback for when script is loaded and executed.
+        console.log("External main js loaded!");
+      };
+      script.onerror = function() {
+        console.error("Error loading external main js.");
+      };
+      document.head.appendChild(script);
+    }
+    function loadMongo() {
+      const script = document.createElement("script");
+      script.src = "https://tonytee88.github.io/tool/chatgptfolder/chatgpt/javascript/mongodb.js";
+      script.onload = function() {
+        // Callback for when script is loaded and executed.
+        console.log("External mongodb js loaded!");
+      };
+      script.onerror = function() {
+        console.error("Error loading external mongodb js.");
+      };
+      document.head.appendChild(script);
+    }
+  </script>
     <?!= include('Stylesheet') ?>
     </head>
   <body>
@@ -128,9 +153,10 @@
         <div id="optionsContainer">
         <div id="optionsHoverBottom" class="optionsHover"></div>  
       
-
-        <?!= include('mongodb') ?>
-
+        <script>
+          loadMongo();
+          loadMainJS();
+        </script>
       
       </div>
       </div>
