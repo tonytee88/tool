@@ -83,7 +83,7 @@ document.getElementById("clients").addEventListener("change", function() {
   var selectedClientName = this.options[this.selectedIndex].text;
   document.getElementById("clientNameStep5").value = selectedClientName;
   var statusMessage = document.getElementById("statusMessage");
-    statusMessage.textContent = "Client selected!";
+  statusMessage.textContent = "";
   console.log(selectedClientName);
 });  
 
