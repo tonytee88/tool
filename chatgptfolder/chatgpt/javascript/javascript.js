@@ -82,6 +82,7 @@ async function sidebarInit() {
 document.getElementById("clients").addEventListener("change", function() {
   var selectedClientName = this.options[this.selectedIndex].text;
   document.getElementById("clientNameStep5").value = selectedClientName;
+  console.log(selectedClientName);
 });  
 
 function updateDocumentPromise(result) {
