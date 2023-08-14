@@ -37,6 +37,98 @@ var processTagsAddedListeners = 0;
 
 window.addEventListener('load', function() {
   sidebarInit();
+  function moveElementButton(button, fromSection, toSection) {
+    fromSection.removeChild(button);
+    toSection.appendChild(button);
+  }
+
+  // Add event listeners to element buttons
+  var chosenSection = document.getElementById('chosenContainer');
+  var recommendedSection = document.getElementById('recommendedSection');
+  var elementButtons = document.getElementsByClassName('element-button');
+
+  for (let i = 0; i < elementButtons.length; i++) {
+    elementButtons[i].addEventListener('click', function() {
+      if (chosenSection.contains(this)) {
+        // Move from chosen to recommended
+        moveElementButton(this, chosenSection, recommendedSection);
+      } else if (recommendedSection.contains(this)) {
+        // Move from recommended to chosen
+        moveElementButton(this, recommendedSection, chosenSection);
+      }
+    });
+  }
+
+  // Add event listener to "Add" button
+  var addElementButton = document.getElementById('addElementButton');
+  var otherElementInput = document.getElementById('otherElementInput');
+  var chosenElementButtons = chosenSection.querySelector('.element-buttons');
+
+  addElementButton.addEventListener('click', function() {
+  var elementText = otherElementInput.value.trim();
+
+  if (elementText !== '') {
+    // Create new element button
+
+    //Title
+    newElementButtonTitleText = elementText + " Title";
+    var newElementButtonTitle = document.createElement('button');
+    newElementButtonTitle.className = 'element-button';
+    newElementButtonTitle.textContent = newElementButtonTitleText;
+
+    //Text
+    newElementButtonTextText = elementText + " Text";
+    var newElementButtonText = document.createElement('button');
+    newElementButtonText.className = 'element-button';
+    newElementButtonText.textContent = newElementButtonTextText;
+
+    //CTA
+    newElementButtonCTAText = elementText + " CTA";
+    var newElementButtonCTA = document.createElement('button');
+    newElementButtonCTA.className = 'element-button';
+    newElementButtonCTA.textContent = newElementButtonCTAText;
+
+    // Add listener Title
+    newElementButtonTitle.addEventListener('click', function() {
+    if (chosenSection.contains(this)) {
+      // Move from chosen to recommended
+      moveElementButton(this, chosenSection, recommendedSection);
+    } else if (recommendedSection.contains(this)) {
+      // Move from recommended to chosen
+      moveElementButton(this, recommendedSection, chosenSection);
+    }
+  });
+    // Add listener Text
+       newElementButtonText.addEventListener('click', function() {
+    if (chosenSection.contains(this)) {
+      // Move from chosen to recommended
+      moveElementButton(this, chosenSection, recommendedSection);
+    } else if (recommendedSection.contains(this)) {
+      // Move from recommended to chosen
+      moveElementButton(this, recommendedSection, chosenSection);
+    }
+  });
+       // Add listener CTA
+       newElementButtonCTA.addEventListener('click', function() {
+    if (chosenSection.contains(this)) {
+      // Move from chosen to recommended
+      moveElementButton(this, chosenSection, recommendedSection);
+    } else if (recommendedSection.contains(this)) {
+      // Move from recommended to chosen
+      moveElementButton(this, recommendedSection, chosenSection);
+    }
+  });
+
+
+    // Add the new button to the chosen section
+    chosenSection.appendChild(newElementButtonTitle);
+    chosenSection.appendChild(newElementButtonText);
+    chosenSection.appendChild(newElementButtonCTA);
+
+    // Clear input field
+    otherElementInput.value = '';
+  }
+  });
 });
 
 function getNamesArray() {
@@ -1298,98 +1390,7 @@ function createDeleteTableHandler(index) {
 
 window.onload = function() {
   // Function to move an element button between sections
-  function moveElementButton(button, fromSection, toSection) {
-    fromSection.removeChild(button);
-    toSection.appendChild(button);
-  }
-
-  // Add event listeners to element buttons
-  var chosenSection = document.getElementById('chosenContainer');
-  var recommendedSection = document.getElementById('recommendedSection');
-  var elementButtons = document.getElementsByClassName('element-button');
-
-for (let i = 0; i < elementButtons.length; i++) {
-  elementButtons[i].addEventListener('click', function() {
-    if (chosenSection.contains(this)) {
-      // Move from chosen to recommended
-      moveElementButton(this, chosenSection, recommendedSection);
-    } else if (recommendedSection.contains(this)) {
-      // Move from recommended to chosen
-      moveElementButton(this, recommendedSection, chosenSection);
-    }
-  });
-}
-
-  // Add event listener to "Add" button
-  var addElementButton = document.getElementById('addElementButton');
-  var otherElementInput = document.getElementById('otherElementInput');
-  var chosenElementButtons = chosenSection.querySelector('.element-buttons');
-
-  addElementButton.addEventListener('click', function() {
-  var elementText = otherElementInput.value.trim();
-
-  if (elementText !== '') {
-    // Create new element button
-
-    //Title
-    newElementButtonTitleText = elementText + " Title";
-    var newElementButtonTitle = document.createElement('button');
-    newElementButtonTitle.className = 'element-button';
-    newElementButtonTitle.textContent = newElementButtonTitleText;
-
-    //Text
-    newElementButtonTextText = elementText + " Text";
-    var newElementButtonText = document.createElement('button');
-    newElementButtonText.className = 'element-button';
-    newElementButtonText.textContent = newElementButtonTextText;
-
-    //CTA
-    newElementButtonCTAText = elementText + " CTA";
-    var newElementButtonCTA = document.createElement('button');
-    newElementButtonCTA.className = 'element-button';
-    newElementButtonCTA.textContent = newElementButtonCTAText;
-
-    // Add listener Title
-    newElementButtonTitle.addEventListener('click', function() {
-    if (chosenSection.contains(this)) {
-      // Move from chosen to recommended
-      moveElementButton(this, chosenSection, recommendedSection);
-    } else if (recommendedSection.contains(this)) {
-      // Move from recommended to chosen
-      moveElementButton(this, recommendedSection, chosenSection);
-    }
-  });
-    // Add listener Text
-       newElementButtonText.addEventListener('click', function() {
-    if (chosenSection.contains(this)) {
-      // Move from chosen to recommended
-      moveElementButton(this, chosenSection, recommendedSection);
-    } else if (recommendedSection.contains(this)) {
-      // Move from recommended to chosen
-      moveElementButton(this, recommendedSection, chosenSection);
-    }
-  });
-       // Add listener CTA
-       newElementButtonCTA.addEventListener('click', function() {
-    if (chosenSection.contains(this)) {
-      // Move from chosen to recommended
-      moveElementButton(this, chosenSection, recommendedSection);
-    } else if (recommendedSection.contains(this)) {
-      // Move from recommended to chosen
-      moveElementButton(this, recommendedSection, chosenSection);
-    }
-  });
-
-
-    // Add the new button to the chosen section
-    chosenSection.appendChild(newElementButtonTitle);
-    chosenSection.appendChild(newElementButtonText);
-    chosenSection.appendChild(newElementButtonCTA);
-
-    // Clear input field
-    otherElementInput.value = '';
-  }
-});
+  //aaaa CODE COUCOU
 
 };
 
