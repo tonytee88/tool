@@ -7,10 +7,10 @@ function findAllData() {
     return new Promise((resolve, reject) => {
         google.script.run
             .withSuccessHandler(response => {
-                console.log("Success:", response.result); 
-                console.log("statusLog:", response.statusLog);
+                //console.log("Success:", response.result); 
+                //console.log("statusLog:", response.statusLog);
                 documentNamesObj = response.result;
-                console.log("documentNamesObj: " + JSON.stringify(documentNamesObj));
+                //console.log("documentNamesObj: " + JSON.stringify(documentNamesObj));
                 resolve(documentNamesObj);
             })
             .withFailureHandler(error => {

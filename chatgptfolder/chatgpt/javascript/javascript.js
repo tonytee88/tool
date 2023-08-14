@@ -40,7 +40,7 @@ window.addEventListener('load', function() {
 });
 
 function getNamesArray() {
-  console.log("documentNamesObj: " + documentNamesObj)
+  //console.log("documentNamesObj: " + documentNamesObj)
   namesArray = documentNamesObj.documents.map(function(doc) {
   return doc.name;
   })
