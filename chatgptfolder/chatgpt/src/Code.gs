@@ -1376,7 +1376,7 @@ function createTables(elementsArray, lang) {
   var body = document.getBody();
 
   // Append the H1 styled paragraph with "EMAILS FOR {lang}" text
-  var headerParagraph = body.appendParagraph("EMAILS FOR " + lang);
+  var headerParagraph = body.appendParagraph("Email for " + lang);
   headerParagraph.setHeading(DocumentApp.ParagraphHeading.HEADING1);
 
   // Loop through elementsArray to create the tables

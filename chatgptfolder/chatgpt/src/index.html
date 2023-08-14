@@ -99,15 +99,21 @@
           <h1 class="titles">Step5 : Inside the Brain</h1>
           <div class="note">This is for advanced users only, don't click anything if you don't know what these buttons do!</div>
           <div class="label">Client name (3 letters)</div>
-          <input type="text" id="newClientName" class="form-control" placeholder="Client Name, e.g : ONT">
-          <button class="option-button spacedButtons " id="findOneMongo" type="submit">Find One Mongo</button>
-          <button class="option-button spacedButtons " id="findAllMongo" type="submit">Find All Mongo</button>
-          <button class="option-button spacedButtons" id="createMongo" type="submit">Create Mongo</button>
+          <input type="text" id="clientNameStep5" class="form-control" placeholder="Client Name, e.g : ONT">
+          <button class="option-button spacedButtons mongoMagic" id="findOneMongo" type="submit">Find One Mongo</button>
+          <button class="option-button spacedButtons mongoMagic" id="findAllMongo" type="submit">Find All Mongo</button>
           <button class="option-button spacedButtons mongoMagic" id="updateMongo" type="submit">Update Mongo</button>
           <button class="option-button spacedButtons mongoMagic" id="deleteMongo" type="submit">Delete Mongo</button>
-        
           <div id="mongoDisplay"></div>
           <button class="option-button" id="mongoDisplayButton">Display Brain</button>
+          <button class="option-button spacedButtons" id="startCreateMongoProcess" type="submit">Create a new client</button>
+        </div>
+        <div id="step6">
+          <h1 class="titles">Create a new client</h1>
+          <div class="note">This is for advanced users only, don't click anything if you don't know what these buttons do!</div>
+          <input type="text" id="newClientName" class="form-control" placeholder="Client Name, e.g : ONT">
+          <button class="option-button spacedButtons mongoMagic" id="createMongo" type="submit">Create Mongo</button>
+          
         </div>
         </div>
       </div>
