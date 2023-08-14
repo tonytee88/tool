@@ -1296,7 +1296,7 @@ function createDeleteTableHandler(index) {
 }
 //-------
 
-document.addEventListener('DOMContentLoaded', function() {
+window.onload = function() {
   // Function to move an element button between sections
   function moveElementButton(button, fromSection, toSection) {
     fromSection.removeChild(button);
