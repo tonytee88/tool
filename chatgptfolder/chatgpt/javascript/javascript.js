@@ -1391,7 +1391,7 @@ for (let i = 0; i < elementButtons.length; i++) {
   }
 });
 
-});
+};
 
 var inputFieldOtherElement = document.getElementById("otherElementInput");
 
