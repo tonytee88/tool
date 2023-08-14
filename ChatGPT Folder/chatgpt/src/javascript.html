@@ -58,8 +58,6 @@ async function sidebarInit() {
       clientSelector.style.display = 'none';
 
       var clientListStatus = document.createElement('div');
-      //clientListStatus.id = clientListStatus
-      //clientSelector.style.display = 'block';
       clientListStatus.className = 'statusMessage';
       clientListStatus.textContent = "Pick a client: [Loading]";
       clientListDiv.appendChild(clientListStatus);
@@ -83,6 +81,11 @@ async function sidebarInit() {
     }
   }
 
+document.getElementById("clients").addEventListener("change", function() {
+  var selectedClientName = this.options[this.selectedIndex].text;
+  document.getElementById("newClientName").value = selectedClientName;
+});  
+
 function updateDocumentPromise(result) {
     return new Promise((resolve, reject) => {
       google.script.run
@@ -95,6 +98,12 @@ function updateDocumentPromise(result) {
 function getDropListNames() {
   var dropdown = document.getElementById('clients');
   
+  // Create and add the "Select One" option
+  var selectOneOption = document.createElement('option');
+  selectOneOption.text = "Select One";
+  selectOneOption.value = "INVALID"; // You might want to set a specific value for this option
+  dropdown.add(selectOneOption);
+
   namesArray.forEach(function(name) {
   var option = document.createElement('option');
   option.text = name;
@@ -243,9 +252,10 @@ function createTablesInDoc() {
       }
     }
     // Create the table via Code.gs
+    var lang = getLang();
     google.script.run.withSuccessHandler(function(statusLog) {
       resolve();
-    }).createTables(elementsArray);
+    }).createTables(elementsArray, lang);
   });
 }   
 
@@ -1415,6 +1425,13 @@ const totalSections = 5;
 document.getElementById("goNextButton").addEventListener('click', function() {
 
   if ((currentSection < totalSections) && (currentSection !== 4)) {
+    var clientName = document.getElementById("clients").value;
+    console.log(clientName)
+    if ((currentSection === 1) && (clientName === "INVALID")){
+      var statusMessage = document.getElementById("statusMessage");
+      statusMessage.textContent = "Please select a client or create a new one first";
+
+    } else {
     document.getElementById('step' + currentSection).style.display = 'none';
     currentSection++;
     if ((currentSection === 3) && (firstTimeStep3 === 0)) {
@@ -1438,7 +1455,7 @@ document.getElementById("goNextButton").addEventListener('click', function() {
       document.getElementById('step' + currentSection).style.display = 'block';
 
     }
-
+  }
     if (currentSection === totalSections) {
       this.disabled = true;
       this.style.backgroundColor = '#f1f1f1'; 

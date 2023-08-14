@@ -1371,9 +1371,13 @@ function cleanUpTraits(traitsArray){
 
 
 
-function createTables(elementsArray) {
+function createTables(elementsArray, lang) {
   var document = DocumentApp.getActiveDocument();
   var body = document.getBody();
+
+  // Append the H1 styled paragraph with "EMAILS FOR {lang}" text
+  var headerParagraph = body.appendParagraph("EMAILS FOR " + lang);
+  headerParagraph.setHeading(DocumentApp.ParagraphHeading.HEADING1);
 
   // Loop through elementsArray to create the tables
   for (var i = 0; i < elementsArray.length; i++) {
