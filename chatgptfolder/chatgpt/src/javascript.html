@@ -1427,7 +1427,7 @@ document.getElementById("goNextButton").addEventListener('click', function() {
   if ((currentSection < totalSections) && (currentSection !== 4)) {
     var clientName = document.getElementById("clients").value;
     console.log(clientName)
-    if ((currentSection === 1) && (clientName === "INVALID")){
+    if ((currentSection === 1) && ((clientName === "INVALID") || (clientName ===""))){
       var statusMessage = document.getElementById("statusMessage");
       statusMessage.textContent = "Please select a client or create a new one first";
 

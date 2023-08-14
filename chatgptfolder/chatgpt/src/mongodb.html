@@ -260,7 +260,7 @@ handleGptMagicButtonClick.addEventListener("click", function() {
 const handleMongoDisplayClick = document.getElementById("mongoDisplayButton");
 
 handleMongoDisplayClick.addEventListener("click", function() {
-    var clientName = document.getElementById("newClientName").value;
+    var clientName = document.getElementById("clientNameStep5").value;
     function findOneDataPromise(clientName) {
       return new Promise((resolve, reject) => {
         google.script.run
