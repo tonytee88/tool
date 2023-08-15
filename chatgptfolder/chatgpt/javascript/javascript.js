@@ -17,7 +17,7 @@
 // }
 
 // sequentialSteps();
-console.log("new js file successfully merged");
+console.log("js file successfully overwritten");
 var optionsCount = 1;
 const optionsTotal = 3;
 const designOptions = 3; // Number of design options
