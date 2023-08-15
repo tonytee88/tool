@@ -12,10 +12,9 @@
     <script>
       function loadMainJS() {
       const script = document.createElement("script");
-      script.src = "https://cdn.jsdelivr.net/gh/tonytee88/tool@v1.0.1/chatgptfolder/chatgpt/javascript/javascript.js";
+      script.src = "http://localhost:3000/static/javascript.js";
       script.onload = function() {
         // Callback for when script is loaded and executed.
-        console.log("js raw file loaded");
       };
       script.onerror = function() {
         console.error("Error loading external main js.");
@@ -24,10 +23,9 @@
     }
     function loadMongo() {
       const script = document.createElement("script");
-      script.src = "https://cdn.jsdelivr.net/gh/tonytee88/tool@v1.0.1/chatgptfolder/chatgpt/javascript/mongodb.js";
+      script.src = "http://localhost:3000/static/mongodb.js";
       script.onload = function() {
         // Callback for when script is loaded and executed.
-        console.log("mongodb raw file loaded");
       };
       script.onerror = function() {
         console.error("Error loading external mongodb js.");
