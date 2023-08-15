@@ -1,3 +1,4 @@
+console.log("mongodb18 yes indeed")
 var clientTraits2;
 var foundOneData;
 var clientName = document.getElementById("clients").value;

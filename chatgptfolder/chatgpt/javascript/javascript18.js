@@ -17,7 +17,7 @@
 // }
 
 // sequentialSteps();
-console.log("test")
+console.log("javascript18 yes indeed")
 var optionsCount = 1;
 const optionsTotal = 3;
 const designOptions = 3; // Number of design options
