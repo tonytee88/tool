@@ -1,4 +1,4 @@
-console.log("raw js file via jsdelvr works!");
+console.log("raw mongo file via jsdelvr works!");
 var clientTraits2;
 var foundOneData;
 var clientName = document.getElementById("clients").value;
