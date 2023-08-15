@@ -17,7 +17,7 @@
 // }
 
 // sequentialSteps();
-console.log("js file successfully overwritten");
+console.log("NEWFEATURES/JAVASCRIPT.JS");
 var optionsCount = 1;
 const optionsTotal = 3;
 const designOptions = 3; // Number of design options

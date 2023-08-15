@@ -1,4 +1,4 @@
-console.log("raw mongo file via jsdelvr works x 11");
+console.log("NEWFEATURES/MONGODB.JS");
 var clientTraits2;
 var foundOneData;
 var clientName = document.getElementById("clients").value;
