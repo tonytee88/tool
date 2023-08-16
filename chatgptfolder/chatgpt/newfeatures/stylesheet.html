@@ -1,0 +1,272 @@
+<style>
+  /* Global Styles */
+  body {
+    font-family: Arial, sans-serif;
+    display:flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color : #f1f1f1;
+
+  }
+  
+  /* #pageBG {
+    background: linear-gradient(to bottom, #ffffff, #f1f1f1);
+  }*/
+
+
+  #topContainer {
+    top: 0;
+    position: sticky;
+    background-color: #f1f1f1; /* Added background color for visibility */
+    z-index: 999; /* Added higher z-index to ensure it appears on top */
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  
+  }
+
+  #midContainer {
+    padding-bottom: 144px;
+    /*background: linear-gradient(to bottom, #ffffff, #f1f1f1);*/
+  
+  }
+
+  #bottomContainer {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  /*background: linear-gradient(to bottom, #ffffff, #f1f1f1);*/
+  z-index: 999; /* Added higher z-index to ensure it appears on top */
+  height: 144px;
+  display: none;
+  }
+
+
+  /* Container Styles */
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    /*background: linear-gradient(to bottom, #ffffff, #f1f1f1);*/
+    /*box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);*/
+  }
+  
+
+
+  /* Button Styles */
+  .option-button {
+    display: inline-block;
+    background-color: #3498db;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  #goStep5 {
+    display: inline-block;
+    background-color: #f1f1f1;
+    color: #fff;
+    padding: 2px;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .option-button:hover {
+    background-color: #228cd6;
+  }
+  
+  /* Form Styles */
+  .form-control {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.3s ease;
+  }
+  
+  .form-control:focus {
+    outline: none;
+    border-color: #3498db;
+  }
+  
+  /* Table Styles */
+  #mainTable, #designTable1, #designTable2, #designTable3 {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+  }
+  
+  .cell3_option {
+    border: 1px solid #000;
+    padding: 10px;
+
+  } 
+
+   #mainTable th,
+  #mainTable td {
+    border: 1px solid #000;
+    padding: 10px;
+    text-align: center; 
+  } 
+  
+/*  #mainTable tbody tr:nth-child(odd) {
+    background-color: #fff;
+  }
+  
+  #mainTable tbody tr:nth-child(even) {
+    background-color: #f1f1f1;
+  }
+
+  #maintable.text-content-cell {
+  text-align: left; 
+} */
+
+  .button-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  height: 75px; /* Adjust as needed */
+}
+
+.vote-button-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+  .button-container button, .vote-button-container button {
+    margin: 0;
+    transition: box-shadow 0.5s;
+    padding: 0;
+    width: fit-content;
+    height: fit-content;
+    line-height: 1;
+    border-radius: 50%;
+
+}
+
+  .button-container button.clicked, .vote-button-container button.clicked {
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  }
+
+  #refreshContainer, #updateContainer {
+    padding-top:12px;
+  }
+
+  #statusMessage {
+    flex: 1;
+    font-size: 18px;
+
+  }
+
+  .options-hover {
+  position: absolute;
+  background-color: #fff;
+  border: 1px solid #000;
+  padding: 5px;
+  display: none;
+}
+
+.large-input {
+  height: 100px; /* Adjust the height as needed */
+  resize: vertical;
+  vertical-align: top;
+  overflow: auto;
+}
+
+textarea.large-input {
+  font-family: Arial, sans-serif;
+}
+
+.textarea-animation {
+  animation: text-size 1s ease-in-out;
+}
+
+@keyframes text-size {
+  0% { font-size: inherit; }
+  50% { font-size: 18px; }
+  100% { font-size: inherit; }
+}
+
+#addDesignTips {
+  margin-top : 12px;
+}
+
+.section {
+        margin-bottom: 10px;
+      }
+
+.label {
+  font-weight: bold;
+}
+
+.element-button {
+  display: inline-block;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  padding: 5px 10px;
+  background-color: #3498db;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  border:none;
+}
+
+.input-field {
+  margin-bottom: 5px;
+}
+
+#testFunction {
+  display:none;
+}
+
+.note {
+  font-size: 11px;
+  font-family: Arial, sans-serif;
+  font-style:italic;
+}
+
+#clientDiv, #goButton, #update, .spacedButtons {
+  margin-bottom: 10px;
+}
+
+#step2, #step3, #step4, #step5, #step6, .mongoMagic, #goButton, .hideButton {
+  display:none;
+}
+
+.sticky {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+#goBackButton {
+  background-color: #f1f1f1;
+}
+
+.label {
+  margin-top: 4px;
+}
+
+#clientDiv {
+  display: flex;
+}
+
+</style>
+ 
