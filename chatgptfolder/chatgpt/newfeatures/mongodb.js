@@ -1,3 +1,4 @@
+console.log("NEWFEATURES/MONGODB.JS");
 var clientTraits2;
 var foundOneData;
 var clientName = document.getElementById("clients").value;
