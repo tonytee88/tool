@@ -5,9 +5,7 @@
     <style>
       body {
         font-family: Arial, sans-serif
-
       }
-      
     </style>
     <script>
       function loadMainJS() {
@@ -32,8 +30,24 @@
       };
       document.head.appendChild(script);
     }
+  function loadMainCSS() {
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.type = "text/css";
+    link.href = "http://localhost:3000/static/newfeatures/stylesheet.css";
+    
+    link.onload = function() {
+      console.log("External stylesheet loaded via local");
+    };
+    
+    link.onerror = function() {
+      console.error("Error loading external stylesheet.");
+    };
+
+    document.head.appendChild(link);
+  }
+
   </script>
-    <?!= include('Stylesheet') ?>
     </head>
   <body>
     <div id="pageBG">
@@ -152,6 +166,7 @@
         <div id="optionsHoverBottom" class="optionsHover"></div>  
       
         <script>
+          loadMainCSS
           loadMongo();
           loadMainJS();
         </script>
