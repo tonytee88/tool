@@ -10,3 +10,4 @@ instance/
 api_klaviyo/
 __pycache__/
 testUI/index.html
+chatgptfolder/chatgpt/output_file_name.csv
