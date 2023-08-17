@@ -38,7 +38,7 @@ const version = "1.17";
 
 window.addEventListener('load', function() {
   sidebarInit();
-  function moveElementButton1(button, fromSection, toSection) {
+  function moveElementButton(button, fromSection, toSection) {
     fromSection.removeChild(button);
     toSection.appendChild(button);
   }

@@ -1774,7 +1774,7 @@ function removeLastDownvote(clientName, tag) {
   return {result: responseData, statusLog: statusLog};
 }
 
-function logUsageOnServer(prompt, timeStamp, version, lang, info, requestedCorrections, clientName) {
+function logUsageOnServer11(prompt, timeStamp, version, lang, info, requestedCorrections, clientName) {
   var statusLog = "Start of logUsageOnServer function \n";
   statusLog += "prompt:" + prompt + " \n";
   statusLog += "timeStamp:" + timeStamp + " \n";
@@ -1786,3 +1786,41 @@ function logUsageOnServer(prompt, timeStamp, version, lang, info, requestedCorre
   return statusLog
 }
 
+function logUsageOnServer(prompt, timeStamp, version, lang, info, requestedCorrections, clientName) {
+  const apiKey = getMongoApiKey();
+  var statusLog = "Start of logUsageOnServer function \n"
+  const url = 'https://us-east-1.aws.data.mongodb-api.com/app/data-gkvfy/endpoint/data/v1/action/insertOne';
+  const data = JSON.stringify({
+    "collection": "usageCollection",
+    "database": "clientsDB",
+    "dataSource": "Cluster0",
+    "document": {
+      // Add the fields and values for the document you want to insert
+      "version": version,
+      "clientName": clientName,
+      "prompt": prompt,
+      "timeStamp": timeStamp,
+      "lang": lang,
+      "info": info,
+      "requestedCorrections": requestedCorrections
+    }
+  });
+
+  const config = {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Request-Headers': '*',
+      'api-key': apiKey
+    },
+    payload: data
+  };
+
+  const response = UrlFetchApp.fetch(url, config);
+  const responseData = JSON.parse(response.getContentText());
+
+  statusLog += "responseData:" + responseData;
+  // Process the response data as needed
+
+  return statusLog
+}
