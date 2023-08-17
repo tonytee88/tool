@@ -1774,4 +1774,9 @@ function removeLastDownvote(clientName, tag) {
   return {result: responseData, statusLog: statusLog};
 }
 
+function logUsageOnServer(prompt, timeStamp, version, lang, info, requestedCorrections) {
+  var statusLog = "Start of logUsageOnServer function \n";
+  statusLog += "timeStamp:" + timeStamp + " \n";
+  return statusLog
+}
 

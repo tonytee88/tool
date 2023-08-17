@@ -2,6 +2,7 @@ console.log("BIGUPDATE/MONGODB.JS");
 var clientTraits2;
 var foundOneData;
 var clientName = document.getElementById("clients").value;
+var requestedCorrections = document.getElementById("traits").value;
 
 // findAllData
 function findAllData() {

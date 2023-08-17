@@ -34,6 +34,7 @@ const numberOfExamples = 5;
 var documentNamesObj;
 var namesArray = [];
 var processTagsAddedListeners = 0;
+const version = "1.17";
 
 window.addEventListener('load', function() {
   sidebarInit();
@@ -1295,6 +1296,16 @@ gptRequest.addEventListener("submit", (e) => {
       reject(error);
     })
     .getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, clientTraits, elementCopyExamples, numberOfExamples);
+    //get date and time of gpt request    
+    var timeStamp = getDateAndTime();
+    console.log(timeStamp);
+    //make the api call
+    google.script.run
+    .withSuccessHandler((response) => {
+      console.log("statusLog:", response);
+    })
+    .logUsageOnServer(prompt, timeStamp, version, lang, info, requestedCorrections);
+
    // });
   });
   } else {
@@ -1567,4 +1578,26 @@ function simulateQaButtonkButtonClick() {
 function simulateGptMagicButtonClick() {
   var gptMagicButton = document.getElementById("gptMagicButton");
   gptMagicButton.click(); // Simulate a click event on the addElementButton
+}
+
+
+
+function getDateAndTime() {
+  const currentDate = new Date();  
+  // Formatting the date and time
+  const formattedDate = [
+    ("0" + currentDate.getDate()).slice(-2),
+    ("0" + (currentDate.getMonth() + 1)).slice(-2),
+    currentDate.getFullYear()
+  ].join("/");
+
+  const formattedTime = [
+    ("0" + currentDate.getHours()).slice(-2),
+    ("0" + currentDate.getMinutes()).slice(-2),
+    ("0" + currentDate.getSeconds()).slice(-2)
+  ].join(":");
+
+  const finalFormat = formattedDate + " " + formattedTime;
+  
+  return finalFormat
 }
