@@ -41,7 +41,7 @@ function storeLog(type, ...data) {
 document.getElementById('goBugReport').addEventListener('click', function() {
     // For demonstration, just show logs in an alert
     // In a real scenario, you might want to send these logs to a server
-    console.log(logs);
+    console.log(JSON.stringify(logs));
 });
 
 var clientTraits2;
