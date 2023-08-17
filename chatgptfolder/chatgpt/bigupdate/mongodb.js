@@ -1,8 +1,73 @@
 console.log("BIGUPDATE/MONGODB.JS");
+
+// 1. Overriding the console.log and window.onerror methods:
+
+// Store original console.log function
+const originalConsoleLog = console.log;
+
+let logs = [];
+
+console.log = function(...args) {
+  const error = new Error();
+  let stackLines = error.stack.split('\n');
+  let match = stackLines[2].match(/\(([^)]+)\)/);
+  let location = match ? match[1] : "window.error"; 
+
+  // Check if location is window.error and update location from error stack
+  if (location === "window.error" && typeof args[0] === 'string' && args[0].startsWith("Error stack:")) {
+    let stackMatch = args[0].match(/\(([^)]+)\)$/);
+    if (stackMatch) {
+      location = stackMatch[1];
+    }
+  }
+
+  storeLog('log', location, ...args);
+  originalConsoleLog.apply(console, [location, ...args]);
+};
+
+function storeLog(type, ...data) {
+    logs.push({
+        type: type,
+        data: data,
+        timestamp: new Date().toISOString()
+    });
+
+    while (logs.length > 10) {
+        logs.shift();
+    }
+}
+// 2. Creating a "Bug Report" Button:
+
+document.getElementById('goBugReport').addEventListener('click', function() {
+    // For demonstration, just show logs in an alert
+    // In a real scenario, you might want to send these logs to a server
+    console.log(logs);
+});
+
 var clientTraits2;
 var foundOneData;
 var clientName = document.getElementById("clients").value;
 var requestedCorrections = document.getElementById("traits").value;
+
+function getDateAndTime() {
+  const currentDate = new Date();  
+  // Formatting the date and time
+  const formattedDate = [
+    ("0" + currentDate.getDate()).slice(-2),
+    ("0" + (currentDate.getMonth() + 1)).slice(-2),
+    currentDate.getFullYear()
+  ].join("/");
+
+  const formattedTime = [
+    ("0" + currentDate.getHours()).slice(-2),
+    ("0" + currentDate.getMinutes()).slice(-2),
+    ("0" + currentDate.getSeconds()).slice(-2)
+  ].join(":");
+
+  const finalFormat = formattedDate + " " + formattedTime;
+  
+  return finalFormat
+}
 
 // findAllData
 function findAllData() {
@@ -176,6 +241,16 @@ handleGptMagicButtonClick.addEventListener("click", function() {
         console.log("Error:", error);
         reject(error);
         }).getGPTCorrection(subject, lang, info, promptElements, traitsArray, clientTraits, storedFinalObjectResult);
+        //get date and time of gpt request    
+        var prompt = getSubject();
+        var timeStamp = getDateAndTime();
+        requestedCorrections = document.getElementById("traits").value;
+        //make the api call
+        google.script.run
+        .withSuccessHandler((response) => {
+          console.log("statusLog:", response);
+        })
+        .logUsageOnServer(prompt, timeStamp, version, lang, info, requestedCorrections, clientName);
     })
     .then((result) => {
         statusMessage.textContent = "Translating with ChatGPT...";

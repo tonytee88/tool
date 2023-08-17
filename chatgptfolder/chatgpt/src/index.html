@@ -10,9 +10,22 @@
       
     </style>
     <script>
+      //Explicitly console.logging the window error to be able to capture them for bug reporting :
+      window.addEventListener("error", function(event) {
+        //console.log("Message: " + event.message);
+        //console.log("Source: " + event.filename);
+        //console.log("Line number: " + event.lineno);
+        //console.log("Column number: " + event.colno);
+        if (event.error && event.error.stack) {
+            console.log("Error stack: " + event.error.stack);
+        } else {
+            console.log("Error object: " + JSON.stringify(event.error));
+        }
+    });
       function loadMainJS() {
       const script = document.createElement("script");
       script.src = "http://localhost:3000/static/bigupdate/javascript.js";
+      script.crossOrigin = "anonymous";
       script.onload = function() {
         // Callback for when script is loaded and executed.
       };
@@ -24,6 +37,7 @@
     function loadMongo() {
       const script = document.createElement("script");
       script.src = "http://localhost:3000/static/bigupdate/mongodb.js";
+      script.crossOrigin = "anonymous";
       script.onload = function() {
         // Callback for when script is loaded and executed.
       };
@@ -161,6 +175,7 @@
         <button id="goBackButton" class="option-button"disabled>Back</button>
         <button id="goNextButton"class="option-button">Next</button>
         <button id="goStep5">🧠</button>
+        <button id="goBugReport">🐛</button>
       </div>
       <div id="bottomContainer">
 

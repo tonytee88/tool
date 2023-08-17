@@ -66,7 +66,7 @@
     transition: background-color 0.3s ease;
   }
   
-  #goStep5 {
+  #goStep5, #goBugReport {
     display: inline-block;
     background-color: #f1f1f1;
     color: #fff;

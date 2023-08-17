@@ -10,7 +10,7 @@ function setupSideBar() {
   var html = HtmlService.createTemplateFromFile('index');
   // Evaluate the HTML template
   var sidebar = html.evaluate();
-  sidebar.setTitle('ChatGPT Super Tool');
+  sidebar.setTitle('AI Tool');
   DocumentApp.getUi().showSidebar(sidebar);
 }
 
@@ -1774,9 +1774,15 @@ function removeLastDownvote(clientName, tag) {
   return {result: responseData, statusLog: statusLog};
 }
 
-function logUsageOnServer(prompt, timeStamp, version, lang, info, requestedCorrections) {
+function logUsageOnServer(prompt, timeStamp, version, lang, info, requestedCorrections, clientName) {
   var statusLog = "Start of logUsageOnServer function \n";
+  statusLog += "prompt:" + prompt + " \n";
   statusLog += "timeStamp:" + timeStamp + " \n";
+  statusLog += "version:" + version + " \n";
+  statusLog += "lang:" + lang + " \n";
+  statusLog += "info:" + info + " \n";
+  statusLog += "requestedCorrections:" + requestedCorrections + " \n";
+  statusLog += "clientName:" + clientName + " \n";
   return statusLog
 }
 

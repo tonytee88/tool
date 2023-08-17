@@ -38,7 +38,7 @@ const version = "1.17";
 
 window.addEventListener('load', function() {
   sidebarInit();
-  function moveElementButton(button, fromSection, toSection) {
+  function moveElementButton1(button, fromSection, toSection) {
     fromSection.removeChild(button);
     toSection.appendChild(button);
   }
@@ -1298,15 +1298,12 @@ gptRequest.addEventListener("submit", (e) => {
     .getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, clientTraits, elementCopyExamples, numberOfExamples);
     //get date and time of gpt request    
     var timeStamp = getDateAndTime();
-    console.log(timeStamp);
     //make the api call
     google.script.run
     .withSuccessHandler((response) => {
       console.log("statusLog:", response);
     })
-    .logUsageOnServer(prompt, timeStamp, version, lang, info, requestedCorrections);
-
-   // });
+    .logUsageOnServer(prompt, timeStamp, version, lang, info, requestedCorrections, clientName);
   });
   } else {
     // Run getGPTDesignResponse
@@ -1501,6 +1498,8 @@ document.getElementById("goNextButton").addEventListener('click', function() {
           setTimeout(() => checkCondition(retryCount + 1), 500); // Check again after a delay
         } else {
           console.log("Max reached, displaying answers")
+          var statusMessage = document.getElementById("statusMessage");
+          statusMessage.textContent = "Max waiting delay reached, displaying copy";
           storedEmailSubject = emailSubjectLineField.textContent;
           document.getElementById('step' + currentSection).style.display = 'block';
         }
@@ -1578,26 +1577,4 @@ function simulateQaButtonkButtonClick() {
 function simulateGptMagicButtonClick() {
   var gptMagicButton = document.getElementById("gptMagicButton");
   gptMagicButton.click(); // Simulate a click event on the addElementButton
-}
-
-
-
-function getDateAndTime() {
-  const currentDate = new Date();  
-  // Formatting the date and time
-  const formattedDate = [
-    ("0" + currentDate.getDate()).slice(-2),
-    ("0" + (currentDate.getMonth() + 1)).slice(-2),
-    currentDate.getFullYear()
-  ].join("/");
-
-  const formattedTime = [
-    ("0" + currentDate.getHours()).slice(-2),
-    ("0" + currentDate.getMinutes()).slice(-2),
-    ("0" + currentDate.getSeconds()).slice(-2)
-  ].join(":");
-
-  const finalFormat = formattedDate + " " + formattedTime;
-  
-  return finalFormat
 }
