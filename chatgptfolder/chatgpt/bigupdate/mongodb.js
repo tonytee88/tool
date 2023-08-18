@@ -80,10 +80,13 @@ document.getElementById('sendBugReport').addEventListener('click', function() {
         console.error(error);
       })
       .createBugReportAsanaTask(title, text, formattedLogs, bugReporter);
-      console.log("task created");
   }
 
   sendBugReport(logs);
+  var clientName = document.getElementById("newClientName").value;
+  statusMessage.textContent = "Bug reported via Asana. Thank you!";
+  step7.style.display = 'none';
+  step1.style.display = 'block';
 });
 
 var clientTraits2;
@@ -180,27 +183,46 @@ handleUpdateMongoClick.addEventListener("click", function() {
 });
 
 // createData
-function createData(clientName) {
-    google.script.run
-  .withSuccessHandler(response => {
-    console.log("Success:", response.result); 
-    console.log("statusLog:", response.statusLog);
-    sidebarInit(); 
-    statusMessage.textContent = "New client created: "+clientName+".";
-  })
-  .withFailureHandler(error => {
-    console.log("Error:", error);
-  })
-  .createDataFromMongoDB(clientName);
-
+function createDataPromise(clientName) {
+  return new Promise((resolve, reject) => {
+      google.script.run
+          .withSuccessHandler(response => {
+              resolve(response);
+          })
+          .withFailureHandler(error => {
+              reject(error);
+          })
+          .createDataFromMongoDB(clientName);
+  });
 }
+
+document.getElementById('startCreateMongoProcess').addEventListener('click', function() {
+  step1.style.display = 'none';
+  step2.style.display = 'none';
+  step3.style.display = 'none';
+  step4.style.display = 'none';
+  step5.style.display = 'none';
+  step7.style.display = 'none';
+  step6.style.display = 'block';
+})
 
 const handleCreateMongoClick = document.getElementById("createMongo");
 
-handleCreateMongoClick.addEventListener("click", function() {
-    var clientName = document.getElementById("newClientName").value;
-    statusMessage.textContent = "Giving birth...";
-    createData(clientName);
+handleCreateMongoClick.addEventListener("click", async function() {
+  var clientName = document.getElementById("newClientName").value;
+  statusMessage.textContent = "Giving birth...";
+
+  try {
+      const response = await createDataPromise(clientName);
+      console.log("Success:", response.result);
+      console.log("statusLog:", response.statusLog);
+      sidebarInit();
+      statusMessage.textContent = "New client created: " + clientName + ".";
+      step6.style.display = 'none';
+      step1.style.display = 'block';
+  } catch (error) {
+      console.log("Error:", error);
+  }
 });
 
 // deleteData

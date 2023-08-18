@@ -191,6 +191,11 @@ function updateDocumentPromise(result) {
 function getDropListNames() {
   var dropdown = document.getElementById('clients');
   
+  // Clear existing options from dropdown
+  while (dropdown.firstChild) {
+    dropdown.removeChild(dropdown.firstChild);
+  }
+  
   // Create and add the "Select One" option
   var selectOneOption = document.createElement('option');
   selectOneOption.text = "Select One";
@@ -1577,11 +1582,3 @@ function simulateGptMagicButtonClick() {
   gptMagicButton.click(); // Simulate a click event on the addElementButton
 }
 
-// new feature : if I click on the bug report button : 
-// hide all, load new div : bug report with
-// TITLE, EXPLANATION, VAR LOG
-// Title and explanation can be an input from user
-// var log will be the console logs
-// make an api call to Asana to create a task
-// assign to tony, due date tomorrow, projet AI bug et idées
-// see latest chatgpt 4 replies for guidance
