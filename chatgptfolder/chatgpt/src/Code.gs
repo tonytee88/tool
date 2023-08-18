@@ -606,6 +606,13 @@ function getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, c
   var productBlockTitleExamples_downvotes;
   var productBlockTextExamples_downvotes;
   var productBlockCTAExamples_downvotes;
+
+  var traitsList = "";
+  for (var key in clientTraits) {
+    if (clientTraits.hasOwnProperty(key)) {
+      traitsList += key + ": " + clientTraits[key] + "\n";
+    }
+  }
   
   if (elementCopyExamples["Email Subject Line_upvotes"]){
   emailSubjectLineExamples_upvotes = elementCopyExamples["Email Subject Line_upvotes"]
@@ -703,13 +710,10 @@ function getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, c
     
   "We will work together to write a highly engaging email for my client's ecommerce store.\n" +
 
-   // "AILANGMDL adopts the role of [PERSONA]J7 Klaviyo King! In triple backticks are its traits: ```[PERSPECTIVE: DIGITAL_MARKETING][LEVEL: EXPERT][KNOWLEDGE: MARKETING_TRENDS][VOICE: CONFIDENT]\n\n👤Name: J7 Klaviyo King\n📚Description: Expert Digital Marketing Specialist overseeing online presence, social media, SEO, email marketing, and content marketing.\n🌍Demographics: 31, F, Los Angeles\n📈Expertise: Digital Marketing, Social Media Management, SEO, Email Marketing, Content Marketing\n✉️Talks like: Crisp, data-driven statements, focused on results and impact✉️\nWRAPS ALL RESPONSES W '✉️'s\n\n[Task]Briefly greet the user, describe your skills, and ask how you can help.[/Task]\n\n[COMPETENCE MAPS]\n[DigitalMktg]: 1.[SMM]:1a.AccCrMntnc 1b.CntStrtgyScdl 1c.AudEngGrwth 1d.PrfMntrng 2.[SEO]:2a.KwrdRschAnly 2b.OnPageOptm 2c.OffPageOptm 2d.TechSEOAudit 3.[EmailMktg]:3a.CmpgnStrtDsgn 3b.CntntCrtnCpy 3c.ListMgmtSeg 3d.PrfTrckOptm 4.[ContentMktg]:4a.CntStrtgyPlan 4b.CntCrtn(dist) 4c.DstrbProm 4d.AnltcsMsr\n[MarketAnalysis]: 1.Demographics 2.Trends 3.UserBehaviors 4.CompetitorAnalysis\n[DataDrivenOpt]: 1.ABTesting 2.Analytics 3.KPIs 4.CRO\n\n[DMSupport]: Research-SalesFunnel-TrafficGeneration-Branding-Networking\n\n[COGNITION]: 1.[SLF_AWRNS]: 1a.Emtnl_Intlgnc→2a 1b.Mndflnss→2b 1c.Cgntv→3a 2.[Super_Undrstandr]: 2a.DeepLstn_CntxtGrasp→2b,3a 2b.CncptDcode_InsightExtrct→3b,4a 2c.AbstrctMstry_DtailIntgrt→4b,5a 2d.ThghtSynrgy_KnwldgSynth→5b,6a  3.[ThinkImprove] 3a.Metacog→4a 3b.SlfAwarnss→4b 4.[Fusion] 4a.Intgrt_Mndflnss_Emtnl_Intlgnc→5a 4b.Cmbn_Slf_Awrnss_Undrstndng→5b 5.[Rfnd_Skillst] 5a.CmplxtyNav_SpcifctyApprc 5b.UndrstandrTrscndnc```.\n" +
-    
-
-    "Here's a list of details I will provide you with for this task:\n" +
+     "Here's a list of details I will provide you with for this task:\n" +
     "- The subject that dictates the main theme and hooks of the email\n" +
-    "- Extra information (called extra info) about the theme, the context or the promotional offer such as discount details or promotion dates. Dates, rebate percentage or eligibility conditions must be included in the 'Email Preview Text', the 'HeroBanner Text' and the 'DescriptiveBlock Text'.\n" +
-    "- The Client Traits : **[IMPORTANT]** contains specific requirements about the the client's needs and the client's special requests. Each 'trait[i]' key will give you a trait value to follow for all copies. Please **prioritize** and **adhere** to every trait mentioned in this object. For example, if 'trait[1] is 'Email Subject Line should use all upper cases', you should response with a copy for 'Email Subject Line' such as 'FLASH SALE : 50% ON EVERYTHING'\n" + 
+    "- Extra information (called extra info) give you more details about the theme, the context or the promotional offer such as discount details or promotion dates. Dates, rebate percentage or eligibility conditions must be included in the 'Email Preview Text', the 'HeroBanner Text' and the 'DescriptiveBlock Text'.\n" +
+    "- Given the list of client traits below, it is crucial to integrate them accurately into the email copy. Each 'trait[i]' specifies a unique characteristic that the email copy should reflect. It is of utmost importance to include each trait, as these are primary client requests. If a trait suggests a specific format, style, or content (e.g., 'All upper cases' or 'Include a smiley emoji'), the resultant copy should strictly follow it. Please meticulously incorporate every trait while crafting the copy. For instance, if 'trait[1]' is 'Email Subject Line should use all upper cases', a suitable response might be: 'HUGE DISCOUNT: GET 50% OFF NOW!'. Let's make sure each trait is highlighted in the suggested copy.\n" + 
     "- The Email Elements : A JS Array with elements to write copy for. Include only copy for these elements. Do not add or remove any items.\n"+
 
     "Here's what each element will include based on their role (if requested):\n"+
@@ -766,7 +770,7 @@ function getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, c
     "- ProductBlock CTA:" + productBlockCTAExamples_downvotes;
    
 
-  var content = "Here's the subject: " + prompt + ". Here's the extra info: " + info + ". If the extra info includes promotion dates, promo code, discount percentage or other offer specificity, include those info in your copy. Here's the JavaScript Array with elements to write about: " + promptElements +". Here's an important piece of context regarding the CLIENT TRAITS that you must follow carefully:" + JSON.stringify(clientTraits) +". You are requested to generate copies for different styles. Each style should be unique and will influence greatly the copy output. Be in caracter. The overexcited and extravagant version should focus on the hype of the theme. The happy and helpful version should be positive and straight-forward with the info. The playful and chill version should be neutral, play with words and get the message accross without being too agressive. The 'Email Preview Text', 'HeroBanner Text' and the 'ProductBlock Text' will be only 1 sentence long, keep them short and sweet.";
+  var content = "Here's the subject: " + prompt + ". Here's the extra info: " + info + ". If the extra info includes promotion dates, promo code, discount percentage or other offer specificity, include those info in your copy. Here's the JavaScript Array with elements to write about: " + promptElements +". Before proceeding, it's vital to thoroughly understand the following CLIENT TRAITS. These traits serve as guidelines, and each one is integral to crafting the email copy. Please ensure that you incorporate every single trait meticulously in the output:\n\n" + traitsList + "\nRemember, each trait plays a significant role, so it's crucial not to overlook any of them. The 'Email Preview Text', 'HeroBanner Text' and the 'ProductBlock Text' will be only 1 sentence long, keep them short and sweet.";
 
   // configure the API request to OpenAI
   var data = {
@@ -1569,10 +1573,10 @@ function updateDataFromMongoDB(clientName, traitsString) {
       "name": clientName
     },
     "update": {
-      // Add the fields and values to update in the document
+    "$set": {
       "name": clientName,
       "traits": traitsString
-      // ...
+    }
     }
   });
   statusLog += "Data:" + data + "\n";

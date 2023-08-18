@@ -141,10 +141,10 @@ handleFindAllMongoClick.addEventListener("click", function() {
 
 // findOneData
 function findOneData(clientName) {
-    console.log(clientName);
+    //console.log(clientName);
     google.script.run
   .withSuccessHandler(response => {
-    console.log("Success:", response); 
+    //console.log("Success:", response); 
   })
   .withFailureHandler(error => {
     console.log("Error:", error);
@@ -293,7 +293,10 @@ handleGptMagicButtonClick.addEventListener("click", function() {
     return clientTraits;
     }).then(clientTraits => {
     return new Promise((resolve, reject) => {
-        google.script.run
+      console.log(traitsArray);
+      console.log(traits);
+      console.log(JSON.stringify(clientTraits));
+      google.script.run
         .withSuccessHandler((response) => {
         //console.log("Success:", response.result);  // Only logs the 'result' part of the response
         //console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
@@ -304,7 +307,8 @@ handleGptMagicButtonClick.addEventListener("click", function() {
         .withFailureHandler((error) => {
         console.log("Error:", error);
         reject(error);
-        }).getGPTCorrection(subject, lang, info, promptElements, traitsArray, clientTraits, storedFinalObjectResult);
+        }).getGPTCorrection(subject, lang, info, promptElements, traits, clientTraits, storedFinalObjectResult);
+        resetVoteButtons()
         //get date and time of gpt request    
         var prompt = getSubject();
         var timeStamp = getDateAndTime();
@@ -312,7 +316,7 @@ handleGptMagicButtonClick.addEventListener("click", function() {
         //make the api call
         google.script.run
         .withSuccessHandler((response) => {
-          console.log("statusLog:", response);
+          //console.log("statusLog:", response);
         })
         .logUsageOnServer(prompt, timeStamp, version, lang, info, requestedCorrections, clientName);
     })
@@ -324,11 +328,11 @@ handleGptMagicButtonClick.addEventListener("click", function() {
         } else {
         // Proceed with requestTranslation
         return new Promise((resolve, reject) => {
-            console.log("Success:", result);
+            //console.log("Success:", result);
             google.script.run
             .withSuccessHandler((response) => {
-                console.log("Success:", response.result);
-                console.log("Success:", response.statusLog);
+                //console.log("Success:", response.result);
+                //console.log("Success:", response.statusLog);
                 globalApiResponse = response.result;
                 resolve(response.result);
             })
@@ -349,8 +353,6 @@ handleGptMagicButtonClick.addEventListener("click", function() {
         })
     }).then((result) => {
         return new Promise((resolve, reject) => {
-        //console.log(traits);
-        //console.log(clientTraits2);
         google.script.run
         .withSuccessHandler((response) => {
         //console.log("Success:", response.result);  // the response.result is an object with the preferences
@@ -373,7 +375,6 @@ handleGptMagicButtonClick.addEventListener("click", function() {
         if (traitsString) {
         resolve(traitsString);
         } else {
-        console.log("not yet, rechecking...");
         setTimeout(checkCondition, 500);  // Check again after a delay
         }
         };
@@ -397,6 +398,23 @@ handleGptMagicButtonClick.addEventListener("click", function() {
     })
 });
 
+function resetVoteButtons() {
+  var upvoteButtons = document.getElementsByClassName('upvote-button');
+  var downvoteButtons = document.getElementsByClassName('downvote-button');
+
+  for (let button of upvoteButtons) {
+      button.style.fontSize = "12px";
+      button.style.color = "black";
+      button.setAttribute("data-upvoted", "0");
+  }
+
+  for (let button of downvoteButtons) {
+      button.style.fontSize = "12px";
+      button.style.color = "black";
+      button.setAttribute("data-downvoted", "0");
+  }
+}
+
 const handleMongoDisplayClick = document.getElementById("mongoDisplayButton");
 
 handleMongoDisplayClick.addEventListener("click", function() {
@@ -417,7 +435,7 @@ handleMongoDisplayClick.addEventListener("click", function() {
     .then(response => {
       //console.log("Success949:", response);
       foundOneData = response
-      console.log("foundOneData:" +JSON.stringify(foundOneData))
+      //console.log("foundOneData:" +JSON.stringify(foundOneData))
       return response; // Return the response to use it further if needed
     })
     .then(foundOneData => {

@@ -52,7 +52,7 @@ window.addEventListener('load', function() {
     elementButtons[i].addEventListener('click', function() {
       if (chosenSection.contains(this)) {
         // Move from chosen to recommended
-        moveElementButton1(this, chosenSection, recommendedSection);
+        moveElementButton(this, chosenSection, recommendedSection);
       } else if (recommendedSection.contains(this)) {
         // Move from recommended to chosen
         moveElementButton(this, recommendedSection, chosenSection);
@@ -305,7 +305,7 @@ document.getElementById("loadTags").addEventListener("click", function() {
   });
   setTimeout(() => {}, 1000)
   
-  console.log(tags);
+  //console.log(tags);
   // Step 2
   processTags(tags);
   
@@ -680,7 +680,7 @@ function processTags(tags) {
           try {
             await createTablesInDoc();
             finalObjectResult = {};
-            console.log("this ran once when adding listeners to the updatebutton")
+            //console.log("this ran once when adding listeners to the updatebutton")
             finalObjectResult = await updateStoredFinalObjectResult();
             await updateDocumentPromise(finalObjectResult);
           } catch (error) {
@@ -706,7 +706,7 @@ function processTags(tags) {
           try {
             // await updateEnglishFinalObjectResult();
             await createTablesInDoc();
-            console.log("this ran once when adding listeners to the updatebilingualbutton")
+            //console.log("this ran once when adding listeners to the updatebilingualbutton")
             //finalObjectResult = {};
             finalObjectResult = await updateStoredFinalObjectResult();
             await updateDocumentPromise(finalObjectResult);
@@ -1078,7 +1078,7 @@ function combineTraits(preferenceObject, clientTraits2) {
     new Promise((resolve, reject) => {
         google.script.run
         .withSuccessHandler((response) => {
-        console.log("Success:", response.result);  // Only logs the 'result' part of the response
+        //console.log("Success:", response.result);  // Only logs the 'result' part of the response
         //console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
         resolve(response.result);  // Only resolve the 'result' part of the response
         })
@@ -1087,7 +1087,7 @@ function combineTraits(preferenceObject, clientTraits2) {
         reject(error);
         }).cleanUpTraits(traitsArray);
     }).then((result) => {
-        console.log(result);
+        //console.log(result);
         let preferenceObjectParsed = JSON.parse(result);
         let firstKey = Object.keys(preferenceObjectParsed)[0];
         let firstKeyValue = preferenceObjectParsed[firstKey];
@@ -1095,11 +1095,11 @@ function combineTraits(preferenceObject, clientTraits2) {
         for(let i = 0; i < firstKeyValue.length; i++) {
           simplifiedTraitsArray.push(firstKeyValue[i]);
         }
-        console.log(simplifiedTraitsArray);
+        //console.log(simplifiedTraitsArray);
         return simplifiedTraitsArray
       }).then((simplifiedTraitsArray) => {
         traitsString = simplifiedTraitsArray.join(", ");
-        console.log(traitsString);
+        //console.log(traitsString);
         return traitsString
       });
   } else {
@@ -1230,8 +1230,8 @@ gptRequest.addEventListener("submit", (e) => {
   var statusMessage = document.getElementById("statusMessage");
   // Set the message to indicate the running state
   statusMessage.textContent = "Talking to ChatGPT...";
-  console.log("storedPromptElements: " + storedPromptElements);
-  console.log("ok prompt: " + prompt + " and ok prompt elements: " + promptElements) + "and ok lang: " + lang;
+  //console.log("storedPromptElements: " + storedPromptElements);
+  //console.log("ok prompt: " + prompt + " and ok prompt elements: " + promptElements) + "and ok lang: " + lang;
 
   new Promise((resolve, reject) => {
   // Add your condition based on gpt-request-status here
@@ -1285,12 +1285,13 @@ gptRequest.addEventListener("submit", (e) => {
             elementCopyExamples[element + "_downvotes"] = lastFiveExamples;
         }
       }  
-    }).then(result => {    
+    }).then(result => {
+      console.log(clientTraits);    
     // Run getGPTResponse
     google.script.run
     .withSuccessHandler((response) => {
       //console.log("Success:", response.result);  // Only logs the 'result' part of the response
-      console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
+      //console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
       globalApiResponse = response.result;  // Only use the 'result' part of the response
       updateStoredFinalObjectResult()
       resolve(response.result);  // Only resolve the 'result' part of the response
@@ -1305,7 +1306,7 @@ gptRequest.addEventListener("submit", (e) => {
     //make the api call
     google.script.run
     .withSuccessHandler((response) => {
-      console.log("statusLog:", response);
+      //console.log("statusLog:", response);
     })
     .logUsageOnServer(prompt, timeStamp, version, lang, info, requestedCorrections, clientName);
   });
@@ -1313,7 +1314,7 @@ gptRequest.addEventListener("submit", (e) => {
     // Run getGPTDesignResponse
     google.script.run
       .withSuccessHandler((response) => {
-        console.log("Success:", response.result);
+        //console.log("Success:", response.result);
         resolve(response.result);
       })
       .withFailureHandler((error) => {
@@ -1331,11 +1332,11 @@ gptRequest.addEventListener("submit", (e) => {
     } else {
       // Proceed with requestTranslation
       return new Promise((resolve, reject) => {
-        console.log("Success:", result);
+        //console.log("Success:", result);
         google.script.run
           .withSuccessHandler((response) => {
-            console.log("Success:", response.result);
-            console.log("Success:", response.statusLog);
+            //console.log("Success:", response.result);
+            //console.log("Success:", response.statusLog);
             globalApiResponse = response.result;
             resolve(response.result);
           })
@@ -1440,7 +1441,7 @@ document.getElementById("goNextButton").addEventListener('click', function() {
 
   if ((currentSection < totalSections) && (currentSection !== 4)) {
     var clientName = document.getElementById("clients").value;
-    console.log(clientName)
+    //console.log(clientName)
     if ((currentSection === 1) && ((clientName === "INVALID") || (clientName ===""))){
       var statusMessage = document.getElementById("statusMessage");
       statusMessage.textContent = "Please select a client or create a new one first";
@@ -1495,7 +1496,6 @@ document.getElementById("goNextButton").addEventListener('click', function() {
         storedEmailSubject = emailSubjectLineField.textContent;
         document.getElementById('step' + currentSection).style.display = 'block';
       } else {
-        console.log("Not yet, rechecking...");
 
         if (retryCount < maxRetries) {
           setTimeout(() => checkCondition(retryCount + 1), 500); // Check again after a delay
