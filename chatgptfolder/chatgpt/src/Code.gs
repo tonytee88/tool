@@ -331,6 +331,12 @@ function getApiKey() {
   return apiKey;
 }
 
+function getAsanaApiKey() {
+  var scriptProperties = PropertiesService.getScriptProperties();
+  var apiKey = scriptProperties.getProperty('asanakey');
+  return apiKey;
+}
+
 function getAIReponse(prompt,promptElements){
   var body = DocumentApp.getActiveDocument()
       .getBody();
@@ -1823,4 +1829,35 @@ function logUsageOnServer(prompt, timeStamp, version, lang, info, requestedCorre
   // Process the response data as needed
 
   return statusLog
+}
+
+function createBugReportAsanaTask(title, text, logs, bugReporter) {
+  var asanaAccessToken = getAsanaApiKey(); 
+  var workspaceId = '456872174481206'; 
+  var projectId = '1205269472499229'; 
+
+  var taskDetails = {
+    name: `[bug report] ${title}`,
+    notes: `Bug report by ${bugReporter}\n\n${text}\n\nLogs:\n${logs}`,
+    projects: [projectId],
+    "due_on": new Date().toISOString().split('T')[0],
+    "assignee": "1200208858135731"
+  };
+
+  var options = {
+    method: 'post',
+    headers: {
+      'Authorization': `Bearer ${asanaAccessToken}`,
+      'Content-Type': 'application/json'
+    },
+    payload: JSON.stringify({
+      data: {
+        ...taskDetails,
+        workspace: workspaceId
+      }
+    })
+  };
+  
+  var response = UrlFetchApp.fetch('https://app.asana.com/api/1.0/tasks', options);
+  return JSON.parse(response.getContentText());
 }

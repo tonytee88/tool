@@ -12,10 +12,6 @@
     <script>
       //Explicitly console.logging the window error to be able to capture them for bug reporting :
       window.addEventListener("error", function(event) {
-        //console.log("Message: " + event.message);
-        //console.log("Source: " + event.filename);
-        //console.log("Line number: " + event.lineno);
-        //console.log("Column number: " + event.colno);
         if (event.error && event.error.stack) {
             console.log("Error stack: " + event.error.stack);
         } else {
@@ -167,7 +163,14 @@
           <div class="note">This is for advanced users only, don't click anything if you don't know what these buttons do!</div>
           <input type="text" id="newClientName" class="form-control" placeholder="Client Name, e.g : ONT">
           <button class="option-button spacedButtons mongoMagic" id="createMongo" type="submit">Create Mongo</button>
-          
+        </div>
+        <div id="step7">
+          <h1 class="titles">Report a bug to squish</h1>
+          <div class="note">This is for advanced users only, don't click anything if you don't know what these buttons do!</div>
+          <input type="text" id="bugReporter" class="form-control" placeholder="Enter your name">
+          <input type="text" id="bugTitle" class="form-control" placeholder="Enter a meaningful title">
+          <textarea id="bugInfo" class="form-control large-input" placeholder="What were you trying to do? Give me as much details as possible : which steps, what objectives, what button was clicked and what did you expect to see versus what you actually saw."></textarea>
+          <button class="option-button spacedButtons" id="sendBugReport" type="submit">Send</button>
         </div>
         </div>
       </div>

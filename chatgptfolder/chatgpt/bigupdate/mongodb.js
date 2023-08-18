@@ -39,9 +39,51 @@ function storeLog(type, ...data) {
 // 2. Creating a "Bug Report" Button:
 
 document.getElementById('goBugReport').addEventListener('click', function() {
-    // For demonstration, just show logs in an alert
-    // In a real scenario, you might want to send these logs to a server
-    console.log(JSON.stringify(logs));
+  step1.style.display = 'none';
+  step2.style.display = 'none';
+  step3.style.display = 'none';
+  step4.style.display = 'none';
+  step5.style.display = 'none';
+  step6.style.display = 'none';
+  step7.style.display = 'block';
+})
+
+document.getElementById('sendBugReport').addEventListener('click', function() {
+  function sendBugReport(logs) {
+    var title = document.getElementById("bugTitle").value;
+    var text = document.getElementById("bugInfo").value;
+    var bugReporter = document.getElementById("bugReporter").value;
+
+    var formattedLogs = '';
+    for (var i = 0; i < logs.length; i++) {
+        var logEntry = logs[i];
+        
+        var logData;
+        if (logEntry.data && Array.isArray(logEntry.data)) {
+            logData = logEntry.data.join(' ');
+        } else if (logEntry.data) {
+            logData = String(logEntry.data);
+        } else {
+            logData = JSON.stringify(logEntry);  // Default to stringifying the whole log entry
+        }
+    
+        formattedLogs += logEntry.timestamp + ' [' + logEntry.type + '] ' + logData + '\n';
+    }
+
+    // Using google.script.run to call the server-side function
+    google.script.run
+      .withSuccessHandler(function(response) {
+        // Handle successful task creation (maybe show a confirmation message to the user)
+      })
+      .withFailureHandler(function(error) {
+        // Handle errors
+        console.error(error);
+      })
+      .createBugReportAsanaTask(title, text, formattedLogs, bugReporter);
+      console.log("task created");
+  }
+
+  sendBugReport(logs);
 });
 
 var clientTraits2;

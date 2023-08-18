@@ -52,7 +52,7 @@ window.addEventListener('load', function() {
     elementButtons[i].addEventListener('click', function() {
       if (chosenSection.contains(this)) {
         // Move from chosen to recommended
-        moveElementButton(this, chosenSection, recommendedSection);
+        moveElementButton1(this, chosenSection, recommendedSection);
       } else if (recommendedSection.contains(this)) {
         // Move from recommended to chosen
         moveElementButton(this, recommendedSection, chosenSection);
@@ -177,7 +177,6 @@ document.getElementById("clients").addEventListener("change", function() {
   document.getElementById("clientNameStep5").value = selectedClientName;
   var statusMessage = document.getElementById("statusMessage");
   statusMessage.textContent = "";
-  console.log(selectedClientName);
 });  
 
 function updateDocumentPromise(result) {
@@ -1456,7 +1455,6 @@ document.getElementById("goNextButton").addEventListener('click', function() {
           storedEmailSubject = emailSubjectLineField.textContent;
           document.getElementById('step' + currentSection).style.display = 'block';
         } else {
-        console.log("not yet, rechecking...");
         setTimeout(checkCondition, 500);  // Check again after a delay
         }
         };
