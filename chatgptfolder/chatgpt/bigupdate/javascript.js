@@ -202,6 +202,8 @@ function getDropListNames() {
   selectOneOption.value = "INVALID"; // You might want to set a specific value for this option
   dropdown.add(selectOneOption);
 
+  namesArray.sort();
+
   namesArray.forEach(function(name) {
   var option = document.createElement('option');
   option.text = name;
@@ -1291,7 +1293,7 @@ gptRequest.addEventListener("submit", (e) => {
     google.script.run
     .withSuccessHandler((response) => {
       //console.log("Success:", response.result);  // Only logs the 'result' part of the response
-      //console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
+      console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
       globalApiResponse = response.result;  // Only use the 'result' part of the response
       updateStoredFinalObjectResult()
       resolve(response.result);  // Only resolve the 'result' part of the response

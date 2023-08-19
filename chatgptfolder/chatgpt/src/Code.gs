@@ -583,6 +583,7 @@ function getGPTResponseWeather(prompt, promptElements, optionsTotal, lang, info)
 function getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, clientTraits, elementCopyExamples, numberOfExamples){
   var apiKey = getApiKey();
   var statusLog = "start of getGPTResponseSuper \n";
+
   var emailSubjectLineExamples_upvotes;
   var emailPreviewTextExamples_upvotes;
   var heroBannerTitleExamples_upvotes;
@@ -613,98 +614,112 @@ function getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, c
       traitsList += key + ": " + clientTraits[key] + "\n";
     }
   }
+
+  function formatExamples(examplesArray) {
+      var formatted = "";
+      
+      for (var i = 0; i < examplesArray.length; i++) {
+        formatted += "- Example " + (i + 1) + ": " + examplesArray[i].trim() + "\n";
+      }
+
+      return formatted;
+  }
   
   if (elementCopyExamples["Email Subject Line_upvotes"]){
-  emailSubjectLineExamples_upvotes = elementCopyExamples["Email Subject Line_upvotes"]
+    emailSubjectLineExamples_upvotes = formatExamples(elementCopyExamples["Email Subject Line_upvotes"]);
   }
 
   if (elementCopyExamples["Email Preview Text_upvotes"]){
-  emailPreviewTextExamples_upvotes = elementCopyExamples["Email Preview Text_upvotes"]
+    emailPreviewTextExamples_upvotes = formatExamples(elementCopyExamples["Email Preview Text_upvotes"]);
   }
 
   if (elementCopyExamples["HeroBanner Title_upvotes"]){
-  heroBannerTitleExamples_upvotes = elementCopyExamples["HeroBanner Title_upvotes"]
+    heroBannerTitleExamples_upvotes = formatExamples(elementCopyExamples["HeroBanner Title_upvotes"]);
   }
 
   if (elementCopyExamples["HeroBanner Text_upvotes"]){
-  heroBannerTextExamples_upvotes = elementCopyExamples["HeroBanner Text_upvotes"]
+    heroBannerTextExamples_upvotes = formatExamples(elementCopyExamples["HeroBanner Text_upvotes"]);
   }
 
   if (elementCopyExamples["HeroBanner CTA_upvotes"]){
-  heroBannerCTAExamples_upvotes = elementCopyExamples["HeroBanner CTA_upvotes"]
+    heroBannerCTAExamples_upvotes = formatExamples(elementCopyExamples["HeroBanner CTA_upvotes"]);
   }
 
   if (elementCopyExamples["DescriptiveBlock Title_upvotes"]){
-  descriptiveBlockTitleExamples_upvotes = elementCopyExamples["DescriptiveBlock Title_upvotes"]
+    descriptiveBlockTitleExamples_upvotes = formatExamples(elementCopyExamples["DescriptiveBlock Title_upvotes"]);
   }
 
   if (elementCopyExamples["DescriptiveBlock Text_upvotes"]){
-  descriptiveBlockTextExamples_upvotes = elementCopyExamples["DescriptiveBlock Text_upvotes"]
+    descriptiveBlockTextExamples_upvotes = formatExamples(elementCopyExamples["DescriptiveBlock Text_upvotes"]);
   }
 
   if (elementCopyExamples["DescriptiveBlock CTA_upvotes"]){
-  descriptiveBlockCTAExamples_upvotes = elementCopyExamples["DescriptiveBlock CTA_upvotes"]
+    descriptiveBlockCTAExamples_upvotes = formatExamples(elementCopyExamples["DescriptiveBlock CTA_upvotes"]);
   }
 
   if (elementCopyExamples["ProductBlock Title_upvotes"]){
-  productBlockTitleExamples_upvotes = elementCopyExamples["ProductBlock Title_upvotes"]
+    productBlockTitleExamples_upvotes = formatExamples(elementCopyExamples["ProductBlock Title_upvotes"]);
   }
 
   if (elementCopyExamples["ProductBlock Text_upvotes"]){
-  productBlockTextExamples_upvotes = elementCopyExamples["ProductBlock Text_upvotes"]
+    productBlockTextExamples_upvotes = formatExamples(elementCopyExamples["ProductBlock Text_upvotes"]);
   }
 
   if (elementCopyExamples["ProductBlock CTA_upvotes"]){
-  productBlockCTAExamples_upvotes = elementCopyExamples["ProductBlock CTA_upvotes"]
+    productBlockCTAExamples_upvotes = formatExamples(elementCopyExamples["ProductBlock CTA_upvotes"]);
   }
+
 
 //DOWNVOTES
 
   if (elementCopyExamples["Email Subject Line_downvotes"]){
-  emailSubjectLineExamples_downvotes = elementCopyExamples["Email Subject Line_downvotes"]
+  emailSubjectLineExamples_downvotes = formatExamples(elementCopyExamples["Email Subject Line_downvotes"]);
   }
 
   if (elementCopyExamples["Email Preview Text_downvotes"]){
-  emailPreviewTextExamples_downvotes = elementCopyExamples["Email Preview Text_downvotes"]
+    emailPreviewTextExamples_downvotes = formatExamples(elementCopyExamples["Email Preview Text_downvotes"]);
   }
 
   if (elementCopyExamples["HeroBanner Title_downvotes"]){
-  heroBannerTitleExamples_downvotes = elementCopyExamples["HeroBanner Title_downvotes"]
+    heroBannerTitleExamples_downvotes = formatExamples(elementCopyExamples["HeroBanner Title_downvotes"]);
   }
 
   if (elementCopyExamples["HeroBanner Text_downvotes"]){
-  heroBannerTextExamples_downvotes = elementCopyExamples["HeroBanner Text_downvotes"]
+    heroBannerTextExamples_downvotes = formatExamples(elementCopyExamples["HeroBanner Text_downvotes"]);
   }
 
   if (elementCopyExamples["HeroBanner CTA_downvotes"]){
-  heroBannerCTAExamples_downvotes = elementCopyExamples["HeroBanner CTA_downvotes"]
+    heroBannerCTAExamples_downvotes = formatExamples(elementCopyExamples["HeroBanner CTA_downvotes"]);
   }
 
   if (elementCopyExamples["DescriptiveBlock Title_downvotes"]){
-  descriptiveBlockTitleExamples_downvotes = elementCopyExamples["DescriptiveBlock Title_downvotes"]
+    descriptiveBlockTitleExamples_downvotes = formatExamples(elementCopyExamples["DescriptiveBlock Title_downvotes"]);
   }
 
   if (elementCopyExamples["DescriptiveBlock Text_downvotes"]){
-  descriptiveBlockTextExamples_downvotes = elementCopyExamples["DescriptiveBlock Text_downvotes"]
+    descriptiveBlockTextExamples_downvotes = formatExamples(elementCopyExamples["DescriptiveBlock Text_downvotes"]);
   }
 
   if (elementCopyExamples["DescriptiveBlock CTA_downvotes"]){
-  descriptiveBlockCTAExamples_downvotes = elementCopyExamples["DescriptiveBlock CTA_downvotes"]
+    descriptiveBlockCTAExamples_downvotes = formatExamples(elementCopyExamples["DescriptiveBlock CTA_downvotes"]);
   }
 
   if (elementCopyExamples["ProductBlock Title_downvotes"]){
-  productBlockTitleExamples_downvotes = elementCopyExamples["ProductBlock Title_downvotes"]
+    productBlockTitleExamples_downvotes = formatExamples(elementCopyExamples["ProductBlock Title_downvotes"]);
   }
 
   if (elementCopyExamples["ProductBlock Text_downvotes"]){
-  productBlockTextExamples_downvotes = elementCopyExamples["ProductBlock Text_downvotes"]
+    productBlockTextExamples_downvotes = formatExamples(elementCopyExamples["ProductBlock Text_downvotes"]);
   }
 
   if (elementCopyExamples["ProductBlock CTA_downvotes"]){
-  productBlockCTAExamples_downvotes = elementCopyExamples["ProductBlock CTA_downvotes"]
+    productBlockCTAExamples_downvotes = formatExamples(elementCopyExamples["ProductBlock CTA_downvotes"]);
   }
 
-  //statusLog += "productBlockTextExamples: " + productBlockTextExamples + "\n";
+
+  statusLog += "heroBannerTitleExamples_upvotes:\n" + heroBannerTitleExamples_upvotes +  "\n";
+  //statusLog += "all examples: " + JSON.stringify(elementCopyExamples) + "\n";
+  //statusLog += typeof(heroBannerTitleExamples_upvotes) +  "\n";
   
   var systemContent = 
     
@@ -743,31 +758,33 @@ function getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, c
     "- Step 4: Act as a veteran Conversion Rate Optimization Expert and revise the email copy. Ensure that it generates a high number of clicks and frames the readers' mindset to click, shop, and convert. Maximize the conversion rate by optimizing the tag copies.\n"+
     "- Step 5: Follow the instructions from the Client Traits and make sure every element copy respect the instructions\n"+
 
-    "Here are concrete examples of my favorites copies that are very effective in our emails. You should use these as a guideline to craft the copies There are examples for each elements:\n"+
-    "- Email Subject Line:" + emailSubjectLineExamples_upvotes + "\n"+
-    "- Email Preview Text:" + emailPreviewTextExamples_upvotes + "\n"+
-    "- HeroBanner Title:" + heroBannerTitleExamples_upvotes + "\n"+
-    "- HeroBanner Text:" + heroBannerTextExamples_upvotes + "\n"+
-    "- HeroBanner CTA:" + heroBannerCTAExamples_upvotes + "\n"+
-    "- DescriptiveBlock Title:" + descriptiveBlockTitleExamples_upvotes + "\n"+
-    "- DescriptiveBlock Text:" + descriptiveBlockTextExamples_upvotes + "\n"+
-    "- DescriptiveBlock CTA:" + descriptiveBlockCTAExamples_upvotes + "\n"+
-    "- ProductBlock Title:" + productBlockTitleExamples_upvotes + "\n"+
-    "- ProductBlock Text:" + productBlockTextExamples_upvotes + "\n"+
-    "- ProductBlock CTA:" + productBlockCTAExamples_upvotes +
+    "Here are concrete examples of my favorite copies that have proven very effective in our emails. Please use these as a reference and inspiration to craft your copies. Below are the examples for each email element:\n\n"+
 
-     "Here are concrete examples of bad copies that we've compiled over time. You will avoid crafting copies that are similar to these. They are unwanted and don't convert well. There are bad examples to avoid for each elements:\n"+
-    "- Email Subject Line:" + emailSubjectLineExamples_downvotes + "\n"+
-    "- Email Preview Text:" + emailPreviewTextExamples_downvotes + "\n"+
-    "- HeroBanner Title:" + heroBannerTitleExamples_downvotes + "\n"+
-    "- HeroBanner Text:" + heroBannerTextExamples_downvotes + "\n"+
-    "- HeroBanner CTA:" + heroBannerCTAExamples_downvotes + "\n"+
-    "- DescriptiveBlock Title:" + descriptiveBlockTitleExamples_downvotes + "\n"+
-    "- DescriptiveBlock Text:" + descriptiveBlockTextExamples_downvotes + "\n"+
-    "- DescriptiveBlock CTA:" + descriptiveBlockCTAExamples_downvotes + "\n"+
-    "- ProductBlock Title:" + productBlockTitleExamples_downvotes + "\n"+
-    "- ProductBlock Text:" + productBlockTextExamples_downvotes + "\n"+
-    "- ProductBlock CTA:" + productBlockCTAExamples_downvotes;
+    "- Email Subject Line:\n" + emailSubjectLineExamples_upvotes + "\n"+
+    "- Email Preview Text:\n" + emailPreviewTextExamples_upvotes + "\n"+
+    "- HeroBanner Title:\n" + heroBannerTitleExamples_upvotes + "\n"+
+    "- HeroBanner Text:\n" + heroBannerTextExamples_upvotes + "\n"+
+    "- HeroBanner CTA:\n" + heroBannerCTAExamples_upvotes + "\n"+
+    "- DescriptiveBlock Title:\n" + descriptiveBlockTitleExamples_upvotes + "\n"+
+    "- DescriptiveBlock Text:\n" + descriptiveBlockTextExamples_upvotes + "\n"+
+    "- DescriptiveBlock CTA:\n" + descriptiveBlockCTAExamples_upvotes + "\n"+
+    "- ProductBlock Title:\n" + productBlockTitleExamples_upvotes + "\n"+
+    "- ProductBlock Text:\n" + productBlockTextExamples_upvotes + "\n"+
+    "- ProductBlock CTA:\n" + productBlockCTAExamples_upvotes +
+
+     "Here's a list of copy examples that have proven to be ineffective and have received negative feedback. It's crucial that future copies do not resemble these. Kindly steer clear from creating anything similar. Avoid these examples for each element:\n" +
+
+    "- Email Subject Line (Avoid these):\n" + emailSubjectLineExamples_downvotes + "\n"+
+    "- Email Preview Text (Avoid these):\n" + emailPreviewTextExamples_downvotes + "\n"+
+    "- HeroBanner Title (Avoid these):\n" + heroBannerTitleExamples_downvotes + "\n"+
+    "- HeroBanner Text (Avoid these):\n" + heroBannerTextExamples_downvotes + "\n"+
+    "- HeroBanner CTA (Avoid these):\n" + heroBannerCTAExamples_downvotes + "\n"+
+    "- DescriptiveBlock Title (Avoid these):\n" + descriptiveBlockTitleExamples_downvotes + "\n"+
+    "- DescriptiveBlock Text (Avoid these):\n" + descriptiveBlockTextExamples_downvotes + "\n"+
+    "- DescriptiveBlock CTA (Avoid these):\n" + descriptiveBlockCTAExamples_downvotes + "\n"+
+    "- ProductBlock Title (Avoid these):\n" + productBlockTitleExamples_downvotes + "\n"+
+    "- ProductBlock Text (Avoid these):\n" + productBlockTextExamples_downvotes + "\n"+
+    "- ProductBlock CTA (Avoid these):\n" + productBlockCTAExamples_downvotes;
    
 
   var content = "Here's the subject: " + prompt + ". Here's the extra info: " + info + ". If the extra info includes promotion dates, promo code, discount percentage or other offer specificity, include those info in your copy. Here's the JavaScript Array with elements to write about: " + promptElements +". Before proceeding, it's vital to thoroughly understand the following CLIENT TRAITS. These traits serve as guidelines, and each one is integral to crafting the email copy. Please ensure that you incorporate every single trait meticulously in the output:\n\n" + traitsList + "\nRemember, each trait plays a significant role, so it's crucial not to overlook any of them. The 'Email Preview Text', 'HeroBanner Text' and the 'ProductBlock Text' will be only 1 sentence long, keep them short and sweet.";
@@ -890,24 +907,24 @@ function getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, c
   if(responseData['choices'][0]['message']['function_call']){
     // Function call handling
     var replyContent = responseData['choices'][0]['message'];
-    statusLog += "replyContent: " + JSON.stringify(replyContent) + "\n";
+    //statusLog += "replyContent: " + JSON.stringify(replyContent) + "\n";
 
     var rawArguments = replyContent['function_call']['arguments'];
-    statusLog += "Raw 'function_call' arguments: " + rawArguments + "\n";
-    statusLog += "Type of 'function_call' arguments: " + typeof rawArguments + "\n";
+    //statusLog += "Raw 'function_call' arguments: " + rawArguments + "\n";
+    //statusLog += "Type of 'function_call' arguments: " + typeof rawArguments + "\n";
 
     try {
       // Replace all double backslashes with single ones, then parse the arguments
       //var responseOptions = JSON.parse(rawArguments.replace(/\\n/g, "").replace(/\\"/g, "\""));
       var responseOptions = JSON.parse(replyContent['function_call']['arguments']);
     } catch (error) {
-      statusLog += "Error parsing 'function_call' arguments: " + error + "\n";
-      statusLog += "'function_call' arguments value after error: " + rawArguments + "\n";
+      //statusLog += "Error parsing 'function_call' arguments: " + error + "\n";
+      //statusLog += "'function_call' arguments value after error: " + rawArguments + "\n";
     }
 
   
     //statusLog += "responseOptions: " + JSON.stringify(responseOptions) + "\n";
-    statusLog += "clientTraits: " + JSON.stringify(clientTraits) + "\n";
+    //statusLog += "clientTraits: " + JSON.stringify(clientTraits) + "\n";
   
 
     var result = {};
