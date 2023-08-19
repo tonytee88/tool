@@ -1865,3 +1865,40 @@ function createBugReportAsanaTask(title, text, logs, bugReporter) {
   var response = UrlFetchApp.fetch('https://app.asana.com/api/1.0/tasks', options);
   return JSON.parse(response.getContentText());
 }
+
+function doesClientExist(clientName) {
+  const apiKey = getMongoApiKey();
+  const url = 'https://us-east-1.aws.data.mongodb-api.com/app/data-gkvfy/endpoint/data/v1/action/findOne';
+  const data = JSON.stringify({
+    "collection": "clientsCollection",
+    "database": "clientsDB",
+    "dataSource": "Cluster0",
+    "filter": {
+      "name": clientName
+    },
+    "projection": {
+      "_id": 1,
+      "name": 1
+    }
+  });
+
+  const config = {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Request-Headers': '*',
+      'api-key': apiKey
+    },
+    payload: data
+  };
+
+  const response = UrlFetchApp.fetch(url, config);
+  const responseData = JSON.parse(response.getContentText());
+
+  // Check if "document" key is present and is not null
+  if (responseData.document !== null) {
+    return true;  // Client exists
+  }
+  
+  return false; // Client does not exist
+}

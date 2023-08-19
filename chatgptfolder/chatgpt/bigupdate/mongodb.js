@@ -87,6 +87,7 @@ document.getElementById('sendBugReport').addEventListener('click', function() {
   statusMessage.textContent = "Bug reported via Asana. Thank you!";
   step7.style.display = 'none';
   step1.style.display = 'block';
+  currentSection = 1;
 });
 
 var clientTraits2;
@@ -185,14 +186,26 @@ handleUpdateMongoClick.addEventListener("click", function() {
 // createData
 function createDataPromise(clientName) {
   return new Promise((resolve, reject) => {
-      google.script.run
-          .withSuccessHandler(response => {
+    google.script.run
+      .withSuccessHandler(exists => {
+        if (exists) {
+          reject("Error: Client with this name already exists.");
+          statusMessage.textContent = "Client already exist. If you need to edit existing client, report a bug!";
+        } else {
+          google.script.run
+            .withSuccessHandler(response => {
               resolve(response);
-          })
-          .withFailureHandler(error => {
+            })
+            .withFailureHandler(error => {
               reject(error);
-          })
-          .createDataFromMongoDB(clientName);
+            })
+            .createDataFromMongoDB(clientName);
+        }
+      })
+      .withFailureHandler(error => {
+        reject("Error while checking if client exists: " + error);
+      })
+      .doesClientExist(clientName);
   });
 }
 
@@ -220,6 +233,7 @@ handleCreateMongoClick.addEventListener("click", async function() {
       statusMessage.textContent = "New client created: " + clientName + ".";
       step6.style.display = 'none';
       step1.style.display = 'block';
+      currentSection = 1;
   } catch (error) {
       console.log("Error:", error);
   }
