@@ -235,7 +235,7 @@ handleCreateMongoClick.addEventListener("click", async function() {
       step1.style.display = 'block';
       currentSection = 1;
       document.getElementById('goBackButton').disabled = true;
-      document.getElementById('goNextButton').disabled = true;
+      document.getElementById('goNextButton').disabled = false;
       document.getElementById('goBackButton').style.backgroundColor = '#f1f1f1';
       document.getElementById('goNextButton').style.backgroundColor = '#3498db';
   } catch (error) {
