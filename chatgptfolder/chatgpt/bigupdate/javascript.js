@@ -34,7 +34,7 @@ const numberOfExamples = 5;
 var documentNamesObj;
 var namesArray = [];
 var processTagsAddedListeners = 0;
-const version = "1.17.1";
+const version = "1.7.1";
 
 window.addEventListener('load', function() {
   sidebarInit();
