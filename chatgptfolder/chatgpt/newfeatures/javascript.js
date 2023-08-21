@@ -17,7 +17,7 @@
 // }
 
 // sequentialSteps();
-console.log("js file successfully overwritten");
+console.log("BIGUPDATE/JAVASCRIPT.JS v1.7.1");
 var optionsCount = 1;
 const optionsTotal = 3;
 const designOptions = 3; // Number of design options
@@ -34,6 +34,7 @@ const numberOfExamples = 5;
 var documentNamesObj;
 var namesArray = [];
 var processTagsAddedListeners = 0;
+const version = "1.7.1";
 
 window.addEventListener('load', function() {
   sidebarInit();
@@ -176,7 +177,6 @@ document.getElementById("clients").addEventListener("change", function() {
   document.getElementById("clientNameStep5").value = selectedClientName;
   var statusMessage = document.getElementById("statusMessage");
   statusMessage.textContent = "";
-  console.log(selectedClientName);
 });  
 
 function updateDocumentPromise(result) {
@@ -191,11 +191,18 @@ function updateDocumentPromise(result) {
 function getDropListNames() {
   var dropdown = document.getElementById('clients');
   
+  // Clear existing options from dropdown
+  while (dropdown.firstChild) {
+    dropdown.removeChild(dropdown.firstChild);
+  }
+  
   // Create and add the "Select One" option
   var selectOneOption = document.createElement('option');
   selectOneOption.text = "Select One";
   selectOneOption.value = "INVALID"; // You might want to set a specific value for this option
   dropdown.add(selectOneOption);
+
+  namesArray.sort();
 
   namesArray.forEach(function(name) {
   var option = document.createElement('option');
@@ -300,7 +307,7 @@ document.getElementById("loadTags").addEventListener("click", function() {
   });
   setTimeout(() => {}, 1000)
   
-  console.log(tags);
+  //console.log(tags);
   // Step 2
   processTags(tags);
   
@@ -675,7 +682,7 @@ function processTags(tags) {
           try {
             await createTablesInDoc();
             finalObjectResult = {};
-            console.log("this ran once when adding listeners to the updatebutton")
+            //console.log("this ran once when adding listeners to the updatebutton")
             finalObjectResult = await updateStoredFinalObjectResult();
             await updateDocumentPromise(finalObjectResult);
           } catch (error) {
@@ -701,7 +708,7 @@ function processTags(tags) {
           try {
             // await updateEnglishFinalObjectResult();
             await createTablesInDoc();
-            console.log("this ran once when adding listeners to the updatebilingualbutton")
+            //console.log("this ran once when adding listeners to the updatebilingualbutton")
             //finalObjectResult = {};
             finalObjectResult = await updateStoredFinalObjectResult();
             await updateDocumentPromise(finalObjectResult);
@@ -1073,7 +1080,7 @@ function combineTraits(preferenceObject, clientTraits2) {
     new Promise((resolve, reject) => {
         google.script.run
         .withSuccessHandler((response) => {
-        console.log("Success:", response.result);  // Only logs the 'result' part of the response
+        //console.log("Success:", response.result);  // Only logs the 'result' part of the response
         //console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
         resolve(response.result);  // Only resolve the 'result' part of the response
         })
@@ -1082,7 +1089,7 @@ function combineTraits(preferenceObject, clientTraits2) {
         reject(error);
         }).cleanUpTraits(traitsArray);
     }).then((result) => {
-        console.log(result);
+        //console.log(result);
         let preferenceObjectParsed = JSON.parse(result);
         let firstKey = Object.keys(preferenceObjectParsed)[0];
         let firstKeyValue = preferenceObjectParsed[firstKey];
@@ -1090,11 +1097,11 @@ function combineTraits(preferenceObject, clientTraits2) {
         for(let i = 0; i < firstKeyValue.length; i++) {
           simplifiedTraitsArray.push(firstKeyValue[i]);
         }
-        console.log(simplifiedTraitsArray);
+        //console.log(simplifiedTraitsArray);
         return simplifiedTraitsArray
       }).then((simplifiedTraitsArray) => {
         traitsString = simplifiedTraitsArray.join(", ");
-        console.log(traitsString);
+        //console.log(traitsString);
         return traitsString
       });
   } else {
@@ -1225,8 +1232,8 @@ gptRequest.addEventListener("submit", (e) => {
   var statusMessage = document.getElementById("statusMessage");
   // Set the message to indicate the running state
   statusMessage.textContent = "Talking to ChatGPT...";
-  console.log("storedPromptElements: " + storedPromptElements);
-  console.log("ok prompt: " + prompt + " and ok prompt elements: " + promptElements) + "and ok lang: " + lang;
+  //console.log("storedPromptElements: " + storedPromptElements);
+  //console.log("ok prompt: " + prompt + " and ok prompt elements: " + promptElements) + "and ok lang: " + lang;
 
   new Promise((resolve, reject) => {
   // Add your condition based on gpt-request-status here
@@ -1280,7 +1287,8 @@ gptRequest.addEventListener("submit", (e) => {
             elementCopyExamples[element + "_downvotes"] = lastFiveExamples;
         }
       }  
-    }).then(result => {    
+    }).then(result => {
+      //console.log(clientTraits);    
     // Run getGPTResponse
     google.script.run
     .withSuccessHandler((response) => {
@@ -1295,13 +1303,20 @@ gptRequest.addEventListener("submit", (e) => {
       reject(error);
     })
     .getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, clientTraits, elementCopyExamples, numberOfExamples);
-   // });
+    //get date and time of gpt request    
+    var timeStamp = getDateAndTime();
+    //make the api call
+    google.script.run
+    .withSuccessHandler((response) => {
+      //console.log("statusLog:", response);
+    })
+    .logUsageOnServer(prompt, timeStamp, version, lang, info, requestedCorrections, clientName);
   });
   } else {
     // Run getGPTDesignResponse
     google.script.run
       .withSuccessHandler((response) => {
-        console.log("Success:", response.result);
+        //console.log("Success:", response.result);
         resolve(response.result);
       })
       .withFailureHandler((error) => {
@@ -1319,11 +1334,11 @@ gptRequest.addEventListener("submit", (e) => {
     } else {
       // Proceed with requestTranslation
       return new Promise((resolve, reject) => {
-        console.log("Success:", result);
+        //console.log("Success:", result);
         google.script.run
           .withSuccessHandler((response) => {
-            console.log("Success:", response.result);
-            console.log("Success:", response.statusLog);
+            //console.log("Success:", response.result);
+            //console.log("Success:", response.statusLog);
             globalApiResponse = response.result;
             resolve(response.result);
           })
@@ -1428,7 +1443,7 @@ document.getElementById("goNextButton").addEventListener('click', function() {
 
   if ((currentSection < totalSections) && (currentSection !== 4)) {
     var clientName = document.getElementById("clients").value;
-    console.log(clientName)
+    //console.log(clientName)
     if ((currentSection === 1) && ((clientName === "INVALID") || (clientName ===""))){
       var statusMessage = document.getElementById("statusMessage");
       statusMessage.textContent = "Please select a client or create a new one first";
@@ -1448,7 +1463,6 @@ document.getElementById("goNextButton").addEventListener('click', function() {
           storedEmailSubject = emailSubjectLineField.textContent;
           document.getElementById('step' + currentSection).style.display = 'block';
         } else {
-        console.log("not yet, rechecking...");
         setTimeout(checkCondition, 500);  // Check again after a delay
         }
         };
@@ -1484,12 +1498,13 @@ document.getElementById("goNextButton").addEventListener('click', function() {
         storedEmailSubject = emailSubjectLineField.textContent;
         document.getElementById('step' + currentSection).style.display = 'block';
       } else {
-        console.log("Not yet, rechecking...");
 
         if (retryCount < maxRetries) {
           setTimeout(() => checkCondition(retryCount + 1), 500); // Check again after a delay
         } else {
           console.log("Max reached, displaying answers")
+          var statusMessage = document.getElementById("statusMessage");
+          statusMessage.textContent = "Max waiting delay reached, displaying copy";
           storedEmailSubject = emailSubjectLineField.textContent;
           document.getElementById('step' + currentSection).style.display = 'block';
         }
@@ -1568,3 +1583,4 @@ function simulateGptMagicButtonClick() {
   var gptMagicButton = document.getElementById("gptMagicButton");
   gptMagicButton.click(); // Simulate a click event on the addElementButton
 }
+
