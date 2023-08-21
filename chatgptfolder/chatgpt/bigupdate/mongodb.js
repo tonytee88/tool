@@ -1,4 +1,4 @@
-console.log("BIGUPDATE/MONGODB.JS");
+console.log("BIGUPDATE/MONGODB.JS V1.7.1");
 
 // 1. Overriding the console.log and window.onerror methods:
 
@@ -311,9 +311,9 @@ handleGptMagicButtonClick.addEventListener("click", function() {
     return clientTraits;
     }).then(clientTraits => {
     return new Promise((resolve, reject) => {
-      console.log(traitsArray);
-      console.log(traits);
-      console.log(JSON.stringify(clientTraits));
+      //console.log(traitsArray);
+      //console.log(traits);
+      //console.log(JSON.stringify(clientTraits));
       google.script.run
         .withSuccessHandler((response) => {
         //console.log("Success:", response.result);  // Only logs the 'result' part of the response

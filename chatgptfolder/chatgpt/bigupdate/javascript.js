@@ -17,7 +17,7 @@
 // }
 
 // sequentialSteps();
-console.log("BIGUPDATE/JAVASCRIPT.JS");
+console.log("BIGUPDATE/JAVASCRIPT.JS v1.7.1");
 var optionsCount = 1;
 const optionsTotal = 3;
 const designOptions = 3; // Number of design options
@@ -1288,7 +1288,7 @@ gptRequest.addEventListener("submit", (e) => {
         }
       }  
     }).then(result => {
-      console.log(clientTraits);    
+      //console.log(clientTraits);    
     // Run getGPTResponse
     google.script.run
     .withSuccessHandler((response) => {

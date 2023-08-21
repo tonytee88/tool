@@ -66,7 +66,7 @@
     transition: background-color 0.3s ease;
   }
   
-  #goStep5 {
+  #goStep5, #goBugReport {
     display: inline-block;
     background-color: #f1f1f1;
     color: #fff;
@@ -242,7 +242,7 @@ textarea.large-input {
   margin-bottom: 10px;
 }
 
-#step2, #step3, #step4, #step5, #step6, .mongoMagic, #goButton, .hideButton {
+#step2, #step3, #step4, #step5, #step6, #step7, .mongoMagic, #goButton, .hideButton {
   display:none;
 }
 
