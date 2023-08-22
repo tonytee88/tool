@@ -35,6 +35,9 @@ var documentNamesObj;
 var namesArray = [];
 var processTagsAddedListeners = 0;
 const version = "1.7.1";
+var notifText = "Release v1.7.2 - Aug 23rd \n"+
+"Afaf \n" +
+"aaa";
 
 window.addEventListener('load', function() {
   sidebarInit();
@@ -138,6 +141,47 @@ function getNamesArray() {
   return doc.name;
   })
 }
+
+//notification management system
+function setupNotification() {
+  // Create new div with id = notification
+  var notificationDiv = document.createElement('div');
+  notificationDiv.id = 'notification';
+
+  // Set the initial content as the bell icon
+  notificationDiv.innerHTML = "☼";
+  
+  // Find div with id = topContainer and append notificationDiv
+  document.getElementById('topContainer').appendChild(notificationDiv);
+
+  // Create new div with id = notifOnHover
+  var notifOnClickDiv = document.createElement('div');
+  notifOnClickDiv.id = 'notifOnClick';
+
+  // Set var NotifText = "HELLO WORLD"
+
+  notifOnClickDiv.innerText = notifText;
+
+  // Append notifOnHoverDiv to topContainer
+  document.getElementById('topContainer').appendChild(notifOnClickDiv);
+
+  // Function to handle the click event
+  notificationDiv.addEventListener('click', function() {
+    if (notifOnClickDiv.style.display === 'block') {
+      // If notifOnHoverDiv is showing, hide it and change the icon to a bell
+      notifOnClickDiv.style.display = 'none';
+      notificationDiv.innerHTML = "☼";
+    } else {
+      // If notifOnHoverDiv is hidden, show it and change the icon to an X
+      notifOnClickDiv.style.display = 'block';
+      notificationDiv.innerHTML = "×";
+    }
+  });
+}
+
+// Call the function to setup everything.
+setupNotification();
+
 
 async function sidebarInit() {
     try {
