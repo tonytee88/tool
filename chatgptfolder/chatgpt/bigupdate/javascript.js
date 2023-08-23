@@ -184,40 +184,54 @@ setupNotification();
 
 //Setup tooltip system
 
-function createTooltip(name, parentDiv, tooltipMessageVar) {
+function createTooltip(name, targetElementId, tooltipMessageVar) {
+  var targetElement = document.getElementById(targetElementId);
+
   var tooltipDiv = document.createElement('div');
-  var tooltipDivId = "tooltip"+name;
+  var tooltipDivId = "tooltip" + name;
   tooltipDiv.id = tooltipDivId;
   tooltipDiv.className = "tooltipDiv";
 
   tooltipDiv.innerHTML = "⊕";
+
+  var rect = targetElement.getBoundingClientRect();
+
+  // Set the position for the tooltip icon (⊕)
+  tooltipDiv.style.position = 'absolute';
+  tooltipDiv.style.left = rect.right + 'px';  // position it at the left of the textarea
+  tooltipDiv.style.top = (rect.top + (rect.height / 2) - 10) + 'px';  // roughly center it vertically, adjust if needed
   
-  document.getElementById(parentDiv).appendChild(tooltipDiv);
-  document.getElementById(parentDiv).style.display = 'flex';
+  document.body.appendChild(tooltipDiv); // append the tooltip icon to the body
 
   var tooltipOnHoverDiv = document.createElement('div');
-  var tooltipOnHoverDivId = "tooltip"+ name +"OnHover";
+  var tooltipOnHoverDivId = "tooltip" + name + "OnHover";
   tooltipOnHoverDiv.id = tooltipOnHoverDivId;
   tooltipOnHoverDiv.className = "tooltip";
 
   tooltipOnHoverDiv.innerText = tooltipMessageVar;
   tooltipOnHoverDiv.style.fontSize = "12px";
+  tooltipOnHoverDiv.style.display = 'none';
 
-  document.getElementById(parentDiv).appendChild(tooltipOnHoverDiv);
+  document.body.appendChild(tooltipOnHoverDiv); // append the tooltip to the body
 
   tooltipDiv.addEventListener('mouseover', function(event) {
-    tooltipOnHoverDiv.style.display = 'block'; // Show the hover div
-    //tooltipOnHoverDiv.style.left = event.clientX + 'px';  // X position of mouse
-    tooltipOnHoverDiv.style.top = (event.clientY + 20) + 'px';  // Y position of mouse + 10px below
+    tooltipOnHoverDiv.style.display = 'block';
+    tooltipOnHoverDiv.style.right = rect.left + 'px';  // align to the left of the textarea
+    tooltipOnHoverDiv.style.top = (rect.bottom + 10) + 'px';  // position it just below the textarea
   });
+
   tooltipDiv.addEventListener('mouseout', function() {
-    tooltipOnHoverDiv.style.display = 'none'; // Hide the hover div
+    tooltipOnHoverDiv.style.display = 'none';
   });
 }
 
-// Create each tooltips
-createTooltip("pickClient", "clientDiv", "Be as descriptive as possible. Be as descriptive as possible. Be as descriptive as possible. Be as descriptive as possible. Be as descriptive as possible.");
 
+// Create each tooltips
+var tooltipPickClient = "If your client is not here, create a new one! Go to 🧠 --> CREATE NEW CLIENT."
+createTooltip("pickClient", "clientDiv", tooltipPickClient);
+
+var tooltipMoreInfo = "Until I add the 'industry' feature to the brain for each client, please include more info about the client: \n 'On est dans l'industrie des vêtements et accessoires pour enfants entre 0-2 ans. Le ton a utilisé est amical. Le lancement du nouveau produit s'adresse aux parents qui veulent donner du confort et de la qualité à leur enfant... etc."
+createTooltip("extraInfo", "info", tooltipMoreInfo);
 
 async function sidebarInit() {
     try {

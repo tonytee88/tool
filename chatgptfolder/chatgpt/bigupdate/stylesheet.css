@@ -52,8 +52,6 @@
     /*box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);*/
   }
   
-
-
   /* Button Styles */
   .option-button {
     display: inline-block;
@@ -291,6 +289,7 @@ textarea.large-input {
 .tooltipDiv {
   display: flex;
   align-items: center;
+  z-index: 10;
 }
 
 .tooltip {
