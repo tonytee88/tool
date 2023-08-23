@@ -198,8 +198,13 @@ function createTooltip(name, targetElementId, tooltipMessageVar) {
 
   // Set the position for the tooltip icon (⊕)
   tooltipDiv.style.position = 'absolute';
-  tooltipDiv.style.left = rect.right + 'px';  // position it at the left of the textarea
-  tooltipDiv.style.top = (rect.top + (rect.height / 2) - 10) + 'px';  // roughly center it vertically, adjust if needed
+  if (Math.round(rect.right) < 280) {
+    tooltipDiv.style.left = rect.right + 'px';  // position it at the left of the textarea
+  } else {
+    tooltipDiv.style.left = "280px"
+  }
+  console.log((rect.right));
+  tooltipDiv.style.top = rect.top + 'px';  // roughly center it vertically, adjust if needed
   
   document.body.appendChild(tooltipDiv); // append the tooltip icon to the body
 

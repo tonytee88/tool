@@ -240,6 +240,10 @@ textarea.large-input {
   margin-bottom: 10px;
 }
 
+#clientDiv {
+  width: 185px;
+}
+
 #step2, #step3, #step4, #step5, #step6, #step7, .mongoMagic, #goButton, .hideButton {
   display:none;
 }
