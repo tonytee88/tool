@@ -244,7 +244,7 @@ textarea.large-input {
   width: 185px;
 }
 
-#step2, #step3, #step4, #step5, #step6, #step7, .mongoMagic, #goButton, .hideButton {
+.mongoMagic, #goButton, .hideButton {
   display:none;
 }
 

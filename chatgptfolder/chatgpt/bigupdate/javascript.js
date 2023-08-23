@@ -34,6 +34,8 @@ const numberOfExamples = 5;
 var documentNamesObj;
 var namesArray = [];
 var processTagsAddedListeners = 0;
+let currentSection = 1;
+const totalSections = 5;
 const version = "1.7.1";
 var notifText = "Release v1.7.2 - Aug 23rd \n"+
 "Afaf \n" +
@@ -41,9 +43,20 @@ var notifText = "Release v1.7.2 - Aug 23rd \n"+
 
 window.addEventListener('load', function() {
   sidebarInit();
+  initUIAndTooltips();
   function moveElementButton(button, fromSection, toSection) {
     fromSection.removeChild(button);
     toSection.appendChild(button);
+  }
+
+async function initUIAndTooltips() {
+  try {
+    var step1 = await initTooltips();
+    var step2 = initUISteps();
+
+  } catch (error) {
+  console.error('An error occurred:', error);
+      }
   }
 
   // Add event listeners to element buttons
@@ -184,15 +197,21 @@ setupNotification();
 
 //Setup tooltip system
 
-function createTooltip(name, targetElementId, tooltipMessageVar) {
+function createTooltip(name, targetElementId, tooltipMessageVar, step) {
   var targetElement = document.getElementById(targetElementId);
+  console.log("Target Element for ID:", targetElementId, "is:", targetElement);
 
   var tooltipDiv = document.createElement('div');
   var tooltipDivId = "tooltip" + name;
   tooltipDiv.id = tooltipDivId;
-  tooltipDiv.className = "tooltipDiv";
+  tooltipDiv.className = "tooltipDiv tooltipStep"+step;
 
   tooltipDiv.innerHTML = "⊕";
+  if (currentSection !== parseInt(step)) {
+    tooltipDiv.style.display = 'none';
+  } else {
+    tooltipDiv.style.display = 'block';
+  }
 
   var rect = targetElement.getBoundingClientRect();
 
@@ -203,10 +222,13 @@ function createTooltip(name, targetElementId, tooltipMessageVar) {
   } else {
     tooltipDiv.style.left = "280px"
   }
-  console.log((rect.right));
-  tooltipDiv.style.top = rect.top + 'px';  // roughly center it vertically, adjust if needed
+  let absoluteTop = rect.top + window.pageYOffset;
+  //tooltipDiv.style.top = rect.top + 'px';  // roughly center it vertically, adjust if needed
+  //console.log('NUMBER UNO: '+ rect.top + 'px');
+  tooltipDiv.style.top = absoluteTop + 'px';  
+  console.log('NUMBER UNO: '+ absoluteTop + 'px');
   
-  document.body.appendChild(tooltipDiv); // append the tooltip icon to the body
+  document.getElementById(targetElementId).appendChild(tooltipDiv); // append the tooltip icon to the body
 
   var tooltipOnHoverDiv = document.createElement('div');
   var tooltipOnHoverDivId = "tooltip" + name + "OnHover";
@@ -217,14 +239,15 @@ function createTooltip(name, targetElementId, tooltipMessageVar) {
   tooltipOnHoverDiv.style.fontSize = "12px";
   tooltipOnHoverDiv.style.display = 'none';
 
+  
   document.body.appendChild(tooltipOnHoverDiv); // append the tooltip to the body
 
   tooltipDiv.addEventListener('mouseover', function(event) {
     tooltipOnHoverDiv.style.display = 'block';
     tooltipOnHoverDiv.style.right = rect.left + 'px';  // align to the left of the textarea
-    tooltipOnHoverDiv.style.top = (rect.bottom + 10) + 'px';  // position it just below the textarea
+    tooltipOnHoverDiv.style.top = (rect.bottom) + 'px';  // position it just below the textarea
   });
-
+  console.log('NUMBER UNO: '+ (rect.bottom) + 'px');
   tooltipDiv.addEventListener('mouseout', function() {
     tooltipOnHoverDiv.style.display = 'none';
   });
@@ -232,11 +255,39 @@ function createTooltip(name, targetElementId, tooltipMessageVar) {
 
 
 // Create each tooltips
-var tooltipPickClient = "If your client is not here, create a new one! Go to 🧠 --> CREATE NEW CLIENT."
-createTooltip("pickClient", "clientDiv", tooltipPickClient);
+function initTooltips() {
+  return new Promise((resolve, reject) => {
+    try {
+      var tooltipPickClient = "If your client is not here, create a new one! Go to 🧠 --> CREATE NEW CLIENT.";
+      createTooltip("PickClient", "clientDiv", tooltipPickClient, "1");
+      console.log("tooltipPickClient done");
 
-var tooltipMoreInfo = "Until I add the 'industry' feature to the brain for each client, please include more info about the client: \n 'On est dans l'industrie des vêtements et accessoires pour enfants entre 0-2 ans. Le ton a utilisé est amical. Le lancement du nouveau produit s'adresse aux parents qui veulent donner du confort et de la qualité à leur enfant... etc."
-createTooltip("extraInfo", "info", tooltipMoreInfo);
+      var tooltipMoreInfo = "Until I add the 'industry' feature to the brain, please include more info about the client: \n 'On est dans l'industrie des vêtements et accessoires pour enfants entre 0-2 ans. Le ton a utilisé est amical. Le lancement du nouveau produit s'adresse aux parents qui veulent donner du confort et de la qualité à leur enfant... etc.";
+      createTooltip("ExtraInfo", "info", tooltipMoreInfo, "1");
+      console.log("tooltipMoreInfo done");
+
+      var tooltipChosen = "test123";
+      createTooltip("Chosen", "chosen", tooltipChosen, "2");
+      console.log("chosen done");
+
+      resolve("Tooltips initialized");
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+
+//init UI for steps
+function initUISteps() {
+  
+  let numberOfStepsToHide = 7;
+  for (var i = 1; i < 8; i++) {
+  document.getElementById("step"+[i]).style.display = 'none';
+  console.log("step"+[i]+" has been hidden");
+  }
+  document.getElementById("step1").style.display = 'block';
+}
 
 async function sidebarInit() {
     try {
@@ -1535,12 +1586,12 @@ inputFieldTraits.addEventListener("keypress", function(event) {
   }
 });
 
-let currentSection = 1;
-const totalSections = 5;
+
 
 document.getElementById("goNextButton").addEventListener('click', function() {
-
   if ((currentSection < totalSections) && (currentSection !== 4)) {
+    //Check if client is selected
+    
     var clientName = document.getElementById("clients").value;
     //console.log(clientName)
     if ((currentSection === 1) && ((clientName === "INVALID") || (clientName ===""))){
@@ -1548,10 +1599,22 @@ document.getElementById("goNextButton").addEventListener('click', function() {
       statusMessage.textContent = "Please select a client or create a new one first";
 
     } else {
+      //if client is selected, display next step
     document.getElementById('step' + currentSection).style.display = 'none';
-    currentSection++;
-    if ((currentSection === 3) && (firstTimeStep3 === 0)) {
+    var fixedStepNumberForTooltips = currentSection + 1;
+    var getAllTooltipOfNextStep = document.getElementsByClassName("tooltipStep"+fixedStepNumberForTooltips)
+    for (var i = 0; i < getAllTooltipOfNextStep.length; i++) {
+      getAllTooltipOfNextStep[i].style.display = "block";
+    }
   
+    var getAllTooltipOfCurrentStep = document.getElementsByClassName("tooltipStep"+currentSection)
+    for (var i = 0; i < getAllTooltipOfCurrentStep.length; i++) {
+      getAllTooltipOfCurrentStep[i].style.display = "none";
+    }
+    currentSection++;
+
+    if ((currentSection === 3) && (firstTimeStep3 === 0)) {
+      //show button refresh is first time step3
       simulateQaButtonkButtonClick()
       firstTimeStep3 = 1;
       var qaButton = document.getElementById("qaButton");
