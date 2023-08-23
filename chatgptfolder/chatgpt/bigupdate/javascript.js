@@ -182,6 +182,42 @@ function setupNotification() {
 // Call the function to setup everything.
 setupNotification();
 
+//Setup tooltip system
+
+function createTooltip(name, parentDiv, tooltipMessageVar) {
+  var tooltipDiv = document.createElement('div');
+  var tooltipDivId = "tooltip"+name;
+  tooltipDiv.id = tooltipDivId;
+  tooltipDiv.className = "tooltipDiv";
+
+  tooltipDiv.innerHTML = "⊕";
+  
+  document.getElementById(parentDiv).appendChild(tooltipDiv);
+  document.getElementById(parentDiv).style.display = 'flex';
+
+  var tooltipOnHoverDiv = document.createElement('div');
+  var tooltipOnHoverDivId = "tooltip"+ name +"OnHover";
+  tooltipOnHoverDiv.id = tooltipOnHoverDivId;
+  tooltipOnHoverDiv.className = "tooltip";
+
+  tooltipOnHoverDiv.innerText = tooltipMessageVar;
+  tooltipOnHoverDiv.style.fontSize = "10px";
+
+  document.getElementById(parentDiv).appendChild(tooltipOnHoverDiv);
+
+  tooltipDiv.addEventListener('mouseover', function(event) {
+    tooltipOnHoverDiv.style.display = 'block'; // Show the hover div
+    //tooltipOnHoverDiv.style.left = event.clientX + 'px';  // X position of mouse
+    tooltipOnHoverDiv.style.top = (event.clientY + 20) + 'px';  // Y position of mouse + 10px below
+  });
+  tooltipDiv.addEventListener('mouseout', function() {
+    tooltipOnHoverDiv.style.display = 'none'; // Hide the hover div
+  });
+}
+
+// Create each tooltips
+createTooltip("pickClient", "clientDiv", "Be as descriptive as possible. Be as descriptive as possible. Be as descriptive as possible. Be as descriptive as possible. Be as descriptive as possible.");
+
 
 async function sidebarInit() {
     try {
