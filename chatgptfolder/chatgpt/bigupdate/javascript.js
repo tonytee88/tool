@@ -201,7 +201,7 @@ function createTooltip(name, parentDiv, tooltipMessageVar) {
   tooltipOnHoverDiv.className = "tooltip";
 
   tooltipOnHoverDiv.innerText = tooltipMessageVar;
-  tooltipOnHoverDiv.style.fontSize = "10px";
+  tooltipOnHoverDiv.style.fontSize = "12px";
 
   document.getElementById(parentDiv).appendChild(tooltipOnHoverDiv);
 

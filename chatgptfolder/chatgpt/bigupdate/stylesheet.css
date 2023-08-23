@@ -276,7 +276,8 @@ textarea.large-input {
 #notifOnClick {
   position: absolute; /* Absolute positioning to overlay on top of other elements */
   top: 50px; /* Position it below the bell icon, adjust this value as needed */
-  left: 0; /* Align to the left */
+  left: 50%; /* Set it to the middle of the container */
+  transform: translateX(-50%);
   z-index: 10; /* To be on top of other elements */
   background-color: #F5F5DC; /* Beige background */
   border: 1px solid black; /* Black fine line border */
@@ -290,16 +291,17 @@ textarea.large-input {
 .tooltipDiv {
   display: flex;
   align-items: center;
-  cursor: pointer;
 }
 
 .tooltip {
   position: absolute; /* Absolute positioning to overlay on top of other elements */
-  opacity: 0.5;
-  left: 0; /* Align to the left */
+  opacity: 1;
+  left: 50%; /* Set it to the middle of the container */
+  transform: translateX(-50%);
   z-index: 10; /* To be on top of other elements */
   background-color: #F5F5DC; /* Beige background */
   border: 1px solid black; /* Black fine line border */
   display: none; /* Initially set to hidden */
   padding: 10px;
+  width: 255px;
 }
