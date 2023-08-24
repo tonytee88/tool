@@ -72,7 +72,6 @@
             <h1 class="titles">Step2 : What's inside your email?</h1>
             <div class="section" id="chosenContainer">
               <div class="label" id="chosen">Chosen Elements:</div>
-              <div class="note">The order of the elements displayed here will be the order used to create the brief tables</div>
               <button class="element-button">Email Subject Line</button>
               <button class="element-button">Email Preview Text</button>
               <button class="element-button">HeroBanner Title</button>
@@ -97,8 +96,7 @@
           
           
             <div class="section">
-              <div class="label">Other Elements:</div>
-              <div class="note">The characters BEFORE the first SPACE will be the category of the elements, be mindful.</div>
+              <div id="otherElements" class="label">Other Elements:</div>
               <div id="otherSection"></div>
               <div class="input-field">
                 <form action="">
@@ -130,9 +128,12 @@
           <div id="clientLabel">Pick a client:</div>
           <select id="clients" name="clients"></select>
           </div>
-          <input type="text" id="subject" class="form-control" placeholder="Enter your subject..." value="Telescope Flash Sale">
-          <input type="text" id="lang" class="form-control" placeholder="Enter the language" value="English">
-          <textarea id="info" class="form-control large-input" placeholder="Add details to the prompt here"></textarea>
+          <div class="label">Subject</div>
+          <input type="text" id="subject" class="form-control" placeholder="Gab's Candlefest tickets now available!" value="Telescope Flash Sale">
+          <div class="label">Language</div>
+          <input type="text" id="lang" class="form-control" placeholder="Français (Québec)" value="English">
+          <div id="infoTitle" class="label">Extra info</div>
+          <textarea id="info" class="form-control large-input" placeholder="On est dans l'industrie des chandelles pour les sorcières. Le ton à utiliser est malin et comique. Le lancement de l'événement s'adresse aux nouveaux-parents qui veulent la paix."></textarea>
           <button id="goButton" class="option-button" type="submit">GO!</button>
           </form>
         </div>

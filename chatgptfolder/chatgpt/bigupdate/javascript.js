@@ -197,38 +197,40 @@ setupNotification();
 
 //Setup tooltip system
 
-function createTooltip(name, targetElementId, tooltipMessageVar, step) {
+function createTooltip(name, targetElementId, tooltipMessageVar, step, offsetX, offsetY, effect) {
   var targetElement = document.getElementById(targetElementId);
-  console.log("Target Element for ID:", targetElementId, "is:", targetElement);
+
+  // Create a wrapper div
+  var wrapperDiv = document.createElement('div');
+  wrapperDiv.style.position = 'relative';
+  wrapperDiv.style.display = 'inline-block'; // Assuming you want to keep the element inline. Change if required.
+
+  // Wrap the targetElement with the wrapperDiv
+  targetElement.parentNode.insertBefore(wrapperDiv, targetElement);
+  wrapperDiv.appendChild(targetElement);
 
   var tooltipDiv = document.createElement('div');
   var tooltipDivId = "tooltip" + name;
   tooltipDiv.id = tooltipDivId;
-  tooltipDiv.className = "tooltipDiv tooltipStep"+step;
+  tooltipDiv.className = "tooltipDiv tooltipStep" + step;
+  if (effect !== "noeffect") {
+  tooltipDiv.classList.add(effect);
+  }
 
   tooltipDiv.innerHTML = "⊕";
+
   if (currentSection !== parseInt(step)) {
-    tooltipDiv.style.display = 'none';
+      tooltipDiv.style.display = 'none';
   } else {
-    tooltipDiv.style.display = 'block';
+      tooltipDiv.style.display = 'block';
   }
 
-  var rect = targetElement.getBoundingClientRect();
-
-  // Set the position for the tooltip icon (⊕)
+  // Position the tooltip icon to the top-right corner of the wrapper
   tooltipDiv.style.position = 'absolute';
-  if (Math.round(rect.right) < 280) {
-    tooltipDiv.style.left = rect.right + 'px';  // position it at the left of the textarea
-  } else {
-    tooltipDiv.style.left = "280px"
-  }
-  let absoluteTop = rect.top + window.pageYOffset;
-  //tooltipDiv.style.top = rect.top + 'px';  // roughly center it vertically, adjust if needed
-  //console.log('NUMBER UNO: '+ rect.top + 'px');
-  tooltipDiv.style.top = absoluteTop + 'px';  
-  console.log('NUMBER UNO: '+ absoluteTop + 'px');
-  
-  document.getElementById(targetElementId).appendChild(tooltipDiv); // append the tooltip icon to the body
+  tooltipDiv.style.right = offsetX + "px";
+  tooltipDiv.style.top = offsetY + "px";
+
+  wrapperDiv.appendChild(tooltipDiv);
 
   var tooltipOnHoverDiv = document.createElement('div');
   var tooltipOnHoverDivId = "tooltip" + name + "OnHover";
@@ -239,19 +241,28 @@ function createTooltip(name, targetElementId, tooltipMessageVar, step) {
   tooltipOnHoverDiv.style.fontSize = "12px";
   tooltipOnHoverDiv.style.display = 'none';
 
-  
-  document.body.appendChild(tooltipOnHoverDiv); // append the tooltip to the body
+  document.body.appendChild(tooltipOnHoverDiv);
 
   tooltipDiv.addEventListener('mouseover', function(event) {
+    // Positioning the hover tooltip below the icon and centered on the x-axis
+    var rect = tooltipDiv.getBoundingClientRect();
+
+    // Calculate the center position for the tooltipOnHover
+    var viewportWidth = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+    var tooltipWidth = tooltipOnHoverDiv.offsetWidth;
+    var centeredLeft = (viewportWidth - tooltipWidth) / 2;
+
+    tooltipOnHoverDiv.style.left = centeredLeft + 'px';  // Center it on the x-axis
+    tooltipOnHoverDiv.style.top = rect.bottom + 'px';
     tooltipOnHoverDiv.style.display = 'block';
-    tooltipOnHoverDiv.style.right = rect.left + 'px';  // align to the left of the textarea
-    tooltipOnHoverDiv.style.top = (rect.bottom) + 'px';  // position it just below the textarea
   });
-  console.log('NUMBER UNO: '+ (rect.bottom) + 'px');
+
   tooltipDiv.addEventListener('mouseout', function() {
-    tooltipOnHoverDiv.style.display = 'none';
+      tooltipOnHoverDiv.style.display = 'none';
   });
 }
+
+
 
 
 // Create each tooltips
@@ -259,16 +270,25 @@ function initTooltips() {
   return new Promise((resolve, reject) => {
     try {
       var tooltipPickClient = "If your client is not here, create a new one! Go to 🧠 --> CREATE NEW CLIENT.";
-      createTooltip("PickClient", "clientDiv", tooltipPickClient, "1");
-      console.log("tooltipPickClient done");
+      createTooltip("PickClient", "clientDiv", tooltipPickClient, "1","-5","5","noeffect");
 
-      var tooltipMoreInfo = "Until I add the 'industry' feature to the brain, please include more info about the client: \n 'On est dans l'industrie des vêtements et accessoires pour enfants entre 0-2 ans. Le ton a utilisé est amical. Le lancement du nouveau produit s'adresse aux parents qui veulent donner du confort et de la qualité à leur enfant... etc.";
-      createTooltip("ExtraInfo", "info", tooltipMoreInfo, "1");
-      console.log("tooltipMoreInfo done");
+      var tooltipMoreInfo = "**THIS IS THE MOST IMPORTANT FIELD : Take your time and add as much info as possible.**\n\n Note Aug 24th : \n\n Until I add the 'industry' feature to the brain, please include more info about the client: \n\n - L'industrie\n - La clientèle cible \n- Le ton \n- L'objectif de l'email";
+      createTooltip("ExtraInfo", "infoTitle", tooltipMoreInfo, "1","-15","0","pulse-effect");
 
-      var tooltipChosen = "test123";
-      createTooltip("Chosen", "chosen", tooltipChosen, "2");
-      console.log("chosen done");
+      var tooltipChosen = "The order of the elements displayed here will be the order used to create the brief tables.";
+      createTooltip("Chosen", "chosen", tooltipChosen, "2","-15","10","noeffect");
+
+      var tooltipOtherElements = "The characters BEFORE the first SPACE will be the category of the elements, be mindful.";
+      createTooltip("OtherElements", "otherElements", tooltipOtherElements, "2","-15","10","noeffect");
+
+      var tooltipRefreshButton = "Make another request to GPT for new copies, if you are not satisfied with the whole thing, click this!";
+      createTooltip("RefreshButton", "qaButton", tooltipRefreshButton, "3","-10","0","noeffect");
+
+      var tooltipUpdateButton = "This will create the tables and transpose your current copies. If you also want the French version, check the next button below.";
+      createTooltip("UpdateButton", "update", tooltipUpdateButton, "3","-10","0","noeffect");
+
+      var tooltipUpdateFRButton = "Create tables + transpose current text and will make another request for a French (Québec) version of the email";
+      createTooltip("UpdateFRButton", "updateBilingual", tooltipUpdateFRButton, "3","-10","0","noeffect");
 
       resolve("Tooltips initialized");
     } catch (error) {
@@ -284,7 +304,6 @@ function initUISteps() {
   let numberOfStepsToHide = 7;
   for (var i = 1; i < 8; i++) {
   document.getElementById("step"+[i]).style.display = 'none';
-  console.log("step"+[i]+" has been hidden");
   }
   document.getElementById("step1").style.display = 'block';
 }
@@ -1684,6 +1703,18 @@ document.getElementById("goNextButton").addEventListener('click', function() {
 
 document.getElementById('goBackButton').addEventListener('click', function() {
   if (currentSection > 1) {
+    //show tooltips for right steps
+    var fixedStepNumberForTooltips = currentSection - 1;
+    var getAllTooltipOfNextStep = document.getElementsByClassName("tooltipStep"+fixedStepNumberForTooltips)
+    for (var i = 0; i < getAllTooltipOfNextStep.length; i++) {
+      getAllTooltipOfNextStep[i].style.display = "block";
+    }
+  
+    var getAllTooltipOfCurrentStep = document.getElementsByClassName("tooltipStep"+currentSection)
+    for (var i = 0; i < getAllTooltipOfCurrentStep.length; i++) {
+      getAllTooltipOfCurrentStep[i].style.display = "none";
+    }
+    //show content for right steps
     document.getElementById('step' + currentSection).style.display = 'none';
     currentSection--;
     document.getElementById('step' + currentSection).style.display = 'block';
