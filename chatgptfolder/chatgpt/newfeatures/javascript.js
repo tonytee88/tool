@@ -34,13 +34,30 @@ const numberOfExamples = 5;
 var documentNamesObj;
 var namesArray = [];
 var processTagsAddedListeners = 0;
-const version = "1.7.1";
+let currentSection = 1;
+const totalSections = 5;
+const version = "1.7.2";
+var notifText = "Release v1.7.2 - Aug 25th \n"+
+"- New notification system implemented! \n" +
+"- New tooltip system added to help you use the tool (hover the ⊕) \n" +
+"- From your feedback: please make sure to use the 'Extra Info' as much as you can. See its tooltip for more info! \n";
 
 window.addEventListener('load', function() {
   sidebarInit();
+  initUIAndTooltips();
   function moveElementButton(button, fromSection, toSection) {
     fromSection.removeChild(button);
     toSection.appendChild(button);
+  }
+
+async function initUIAndTooltips() {
+  try {
+    var step1 = await initTooltips();
+    var step2 = initUISteps();
+
+  } catch (error) {
+  console.error('An error occurred:', error);
+      }
   }
 
   // Add event listeners to element buttons
@@ -137,6 +154,161 @@ function getNamesArray() {
   namesArray = documentNamesObj.documents.map(function(doc) {
   return doc.name;
   })
+}
+
+//notification management system
+function setupNotification() {
+  // Create new div with id = notification
+  var notificationDiv = document.createElement('div');
+  notificationDiv.id = 'notification';
+
+  // Set the initial content as the bell icon
+  notificationDiv.innerHTML = "☼";
+  
+  // Find div with id = topContainer and append notificationDiv
+  document.getElementById('topContainer').appendChild(notificationDiv);
+
+  // Create new div with id = notifOnHover
+  var notifOnClickDiv = document.createElement('div');
+  notifOnClickDiv.id = 'notifOnClick';
+
+  // Set var NotifText = "HELLO WORLD"
+
+  notifOnClickDiv.innerText = notifText;
+
+  // Append notifOnHoverDiv to topContainer
+  document.getElementById('topContainer').appendChild(notifOnClickDiv);
+
+  // Function to handle the click event
+  notificationDiv.addEventListener('click', function() {
+    if (notifOnClickDiv.style.display === 'block') {
+      // If notifOnHoverDiv is showing, hide it and change the icon to a bell
+      notifOnClickDiv.style.display = 'none';
+      notificationDiv.innerHTML = "☼";
+    } else {
+      // If notifOnHoverDiv is hidden, show it and change the icon to an X
+      notifOnClickDiv.style.display = 'block';
+      notificationDiv.innerHTML = "×";
+    }
+  });
+}
+
+// Call the function to setup everything.
+setupNotification();
+
+//Setup tooltip system
+
+function createTooltip(name, targetElementId, tooltipMessageVar, step, offsetX, offsetY, effect) {
+  var targetElement = document.getElementById(targetElementId);
+
+  // Create a wrapper div
+  var wrapperDiv = document.createElement('div');
+  wrapperDiv.style.position = 'relative';
+  wrapperDiv.style.display = 'inline-block'; // Assuming you want to keep the element inline. Change if required.
+
+  // Wrap the targetElement with the wrapperDiv
+  targetElement.parentNode.insertBefore(wrapperDiv, targetElement);
+  wrapperDiv.appendChild(targetElement);
+
+  var tooltipDiv = document.createElement('div');
+  var tooltipDivId = "tooltip" + name;
+  tooltipDiv.id = tooltipDivId;
+  tooltipDiv.className = "tooltipDiv tooltipStep" + step;
+  if (effect !== "noeffect") {
+  tooltipDiv.classList.add(effect);
+  }
+
+  tooltipDiv.innerHTML = "⊕";
+
+  if (currentSection !== parseInt(step)) {
+      tooltipDiv.style.display = 'none';
+  } else {
+      tooltipDiv.style.display = 'block';
+  }
+
+  // Position the tooltip icon to the top-right corner of the wrapper
+  tooltipDiv.style.position = 'absolute';
+  tooltipDiv.style.right = offsetX + "px";
+  tooltipDiv.style.top = offsetY + "px";
+
+  wrapperDiv.appendChild(tooltipDiv);
+
+  var tooltipOnHoverDiv = document.createElement('div');
+  var tooltipOnHoverDivId = "tooltip" + name + "OnHover";
+  tooltipOnHoverDiv.id = tooltipOnHoverDivId;
+  tooltipOnHoverDiv.className = "tooltip";
+
+  tooltipOnHoverDiv.innerText = tooltipMessageVar;
+  tooltipOnHoverDiv.style.fontSize = "12px";
+  tooltipOnHoverDiv.style.display = 'none';
+
+  document.body.appendChild(tooltipOnHoverDiv);
+
+  tooltipDiv.addEventListener('mouseover', function(event) {
+    // Get current position of the tooltipDiv
+    var rect = wrapperDiv.getBoundingClientRect();
+
+    // Calculate the center position for the tooltipOnHover
+    var viewportWidth = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+    var tooltipWidth = tooltipOnHoverDiv.offsetWidth;
+    var centeredLeft = (viewportWidth - tooltipWidth) / 2;
+
+    tooltipOnHoverDiv.style.left = centeredLeft + 'px';  // Center it on the x-axis
+    tooltipOnHoverDiv.style.top = (rect.bottom + 10) + 'px';  // Position it 10px below the tooltipDiv
+    console.log("tooltipOnHoverDiv.style.top: " + tooltipOnHoverDiv.style.top);
+    
+    tooltipOnHoverDiv.style.display = 'block';
+});
+
+  tooltipDiv.addEventListener('mouseout', function() {
+      tooltipOnHoverDiv.style.display = 'none';
+  });
+}
+
+
+
+
+// Create each tooltips
+function initTooltips() {
+  return new Promise((resolve, reject) => {
+    try {
+      var tooltipPickClient = "If your client is not here, create a new one! Go to 🧠 --> CREATE NEW CLIENT.";
+      createTooltip("PickClient", "clientDiv", tooltipPickClient, "1","-5","5","noeffect");
+
+      var tooltipMoreInfo = "**THIS IS THE MOST IMPORTANT FIELD : Take your time and add as much info as possible.**\n\n Note Aug 24th : \n\n Until I add the 'industry' feature to the brain, please include more info about the client: \n\n - L'industrie\n - La clientèle cible \n- Le ton \n- L'objectif de l'email";
+      createTooltip("ExtraInfo", "infoTitle", tooltipMoreInfo, "1","-15","0","pulse-effect");
+
+      var tooltipChosen = "The order of the elements displayed here will be the order used to create the brief tables.";
+      createTooltip("Chosen", "chosen", tooltipChosen, "2","-15","10","noeffect");
+
+      var tooltipOtherElements = "The characters BEFORE the first SPACE will be the category of the elements, be mindful.";
+      createTooltip("OtherElements", "otherElements", tooltipOtherElements, "2","-15","10","noeffect");
+
+      var tooltipRefreshButton = "Make another request to GPT for new copies, if you are not satisfied with the whole thing, click this!";
+      createTooltip("RefreshButton", "qaButton", tooltipRefreshButton, "3","-10","0","noeffect");
+
+      var tooltipUpdateButton = "This will create the tables and transpose your current copies. If you also want the French version, check the next button below.";
+      createTooltip("UpdateButton", "update", tooltipUpdateButton, "3","-10","0","noeffect");
+
+      var tooltipUpdateFRButton = "Create tables + transpose current text and will make another request for a French (Québec) version of the email";
+      createTooltip("UpdateFRButton", "updateBilingual", tooltipUpdateFRButton, "3","-10","0","noeffect");
+
+      resolve("Tooltips initialized");
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+
+//init UI for steps
+function initUISteps() {
+  
+  let numberOfStepsToHide = 7;
+  for (var i = 1; i < 8; i++) {
+  document.getElementById("step"+[i]).style.display = 'none';
+  }
+  document.getElementById("step1").style.display = 'block';
 }
 
 async function sidebarInit() {
@@ -1436,12 +1608,12 @@ inputFieldTraits.addEventListener("keypress", function(event) {
   }
 });
 
-let currentSection = 1;
-const totalSections = 5;
+
 
 document.getElementById("goNextButton").addEventListener('click', function() {
-
   if ((currentSection < totalSections) && (currentSection !== 4)) {
+    //Check if client is selected
+    
     var clientName = document.getElementById("clients").value;
     //console.log(clientName)
     if ((currentSection === 1) && ((clientName === "INVALID") || (clientName ===""))){
@@ -1449,10 +1621,22 @@ document.getElementById("goNextButton").addEventListener('click', function() {
       statusMessage.textContent = "Please select a client or create a new one first";
 
     } else {
+      //if client is selected, display next step
     document.getElementById('step' + currentSection).style.display = 'none';
-    currentSection++;
-    if ((currentSection === 3) && (firstTimeStep3 === 0)) {
+    var fixedStepNumberForTooltips = currentSection + 1;
+    var getAllTooltipOfNextStep = document.getElementsByClassName("tooltipStep"+fixedStepNumberForTooltips)
+    for (var i = 0; i < getAllTooltipOfNextStep.length; i++) {
+      getAllTooltipOfNextStep[i].style.display = "block";
+    }
   
+    var getAllTooltipOfCurrentStep = document.getElementsByClassName("tooltipStep"+currentSection)
+    for (var i = 0; i < getAllTooltipOfCurrentStep.length; i++) {
+      getAllTooltipOfCurrentStep[i].style.display = "none";
+    }
+    currentSection++;
+
+    if ((currentSection === 3) && (firstTimeStep3 === 0)) {
+      //show button refresh is first time step3
       simulateQaButtonkButtonClick()
       firstTimeStep3 = 1;
       var qaButton = document.getElementById("qaButton");
@@ -1522,6 +1706,18 @@ document.getElementById("goNextButton").addEventListener('click', function() {
 
 document.getElementById('goBackButton').addEventListener('click', function() {
   if (currentSection > 1) {
+    //show tooltips for right steps
+    var fixedStepNumberForTooltips = currentSection - 1;
+    var getAllTooltipOfNextStep = document.getElementsByClassName("tooltipStep"+fixedStepNumberForTooltips)
+    for (var i = 0; i < getAllTooltipOfNextStep.length; i++) {
+      getAllTooltipOfNextStep[i].style.display = "block";
+    }
+  
+    var getAllTooltipOfCurrentStep = document.getElementsByClassName("tooltipStep"+currentSection)
+    for (var i = 0; i < getAllTooltipOfCurrentStep.length; i++) {
+      getAllTooltipOfCurrentStep[i].style.display = "none";
+    }
+    //show content for right steps
     document.getElementById('step' + currentSection).style.display = 'none';
     currentSection--;
     document.getElementById('step' + currentSection).style.display = 'block';
