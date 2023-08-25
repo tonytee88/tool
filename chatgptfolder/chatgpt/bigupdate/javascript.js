@@ -16,8 +16,7 @@
 //   }
 // }
 
-// sequentialSteps();
-console.log("BIGUPDATE/JAVASCRIPT.JS v1.7.2");
+
 var optionsCount = 1;
 const optionsTotal = 3;
 const designOptions = 3; // Number of design options
@@ -41,6 +40,8 @@ var notifText = "Release v1.7.2 - Aug 25th \n"+
 "- New notification system implemented! \n" +
 "- New tooltip system added to help you use the tool (hover the ⊕) \n" +
 "- From your feedback: please make sure to use the 'Extra Info' as much as you can. See its tooltip for more info! \n";
+
+console.log("v"+version);
 
 window.addEventListener('load', function() {
   sidebarInit();
@@ -1573,13 +1574,6 @@ function createDeleteTableHandler(index) {
     }
   };
 }
-//-------
-
-window.onload = function() {
-  // Function to move an element button between sections
-  //aaaa CODE COUCOU
-
-};
 
 var inputFieldOtherElement = document.getElementById("otherElementInput");
 
@@ -1609,6 +1603,7 @@ inputFieldTraits.addEventListener("keypress", function(event) {
 });
 
 
+///Menu navigation code
 
 document.getElementById("goNextButton").addEventListener('click', function() {
   if ((currentSection < totalSections) && (currentSection !== 4)) {
