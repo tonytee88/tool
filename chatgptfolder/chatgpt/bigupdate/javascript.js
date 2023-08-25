@@ -36,10 +36,11 @@ var namesArray = [];
 var processTagsAddedListeners = 0;
 let currentSection = 1;
 const totalSections = 5;
-const version = "1.7.1";
-var notifText = "Release v1.7.2 - Aug 23rd \n"+
-"Afaf \n" +
-"aaa";
+const version = "1.7.2";
+var notifText = "Release v1.7.2 - Aug 25th \n"+
+"- New notification system implemented! \n" +
+"- New tooltip system added to help you use the tool (hover the ⊕) \n" +
+"- From your feedback: please make sure to use the 'Extra Info' as much as you can. See its tooltip for more info! \n";
 
 window.addEventListener('load', function() {
   sidebarInit();
@@ -244,8 +245,8 @@ function createTooltip(name, targetElementId, tooltipMessageVar, step, offsetX, 
   document.body.appendChild(tooltipOnHoverDiv);
 
   tooltipDiv.addEventListener('mouseover', function(event) {
-    // Positioning the hover tooltip below the icon and centered on the x-axis
-    var rect = tooltipDiv.getBoundingClientRect();
+    // Get current position of the tooltipDiv
+    var rect = wrapperDiv.getBoundingClientRect();
 
     // Calculate the center position for the tooltipOnHover
     var viewportWidth = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
@@ -253,9 +254,11 @@ function createTooltip(name, targetElementId, tooltipMessageVar, step, offsetX, 
     var centeredLeft = (viewportWidth - tooltipWidth) / 2;
 
     tooltipOnHoverDiv.style.left = centeredLeft + 'px';  // Center it on the x-axis
-    tooltipOnHoverDiv.style.top = rect.bottom + 'px';
+    tooltipOnHoverDiv.style.top = (rect.bottom + 10) + 'px';  // Position it 10px below the tooltipDiv
+    console.log("tooltipOnHoverDiv.style.top: " + tooltipOnHoverDiv.style.top);
+    
     tooltipOnHoverDiv.style.display = 'block';
-  });
+});
 
   tooltipDiv.addEventListener('mouseout', function() {
       tooltipOnHoverDiv.style.display = 'none';
