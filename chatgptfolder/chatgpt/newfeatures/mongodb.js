@@ -1,4 +1,4 @@
-console.log("BIGUPDATE/MONGODB.JS V1.7.1");
+console.log("BIGUPDATE/MONGODB.JS V1.7.2");
 
 // 1. Overriding the console.log and window.onerror methods:
 
