@@ -17,7 +17,7 @@
 // }
 
 // sequentialSteps();
-console.log("BIGUPDATE/JAVASCRIPT.JS v1.7.1");
+console.log("BIGUPDATE/JAVASCRIPT.JS v1.7.2");
 var optionsCount = 1;
 const optionsTotal = 3;
 const designOptions = 3; // Number of design options
