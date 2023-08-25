@@ -52,8 +52,6 @@
     /*box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);*/
   }
   
-
-
   /* Button Styles */
   .option-button {
     display: inline-block;
@@ -200,6 +198,22 @@ textarea.large-input {
   100% { font-size: inherit; }
 }
 
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.pulse-effect {
+  animation: pulse 1s infinite;
+}
+
 #addDesignTips {
   margin-top : 12px;
 }
@@ -242,7 +256,11 @@ textarea.large-input {
   margin-bottom: 10px;
 }
 
-#step2, #step3, #step4, #step5, #step6, #step7, .mongoMagic, #goButton, .hideButton {
+#clientDiv {
+  width: 185px;
+}
+
+.mongoMagic, #goButton, .hideButton {
   display:none;
 }
 
@@ -266,4 +284,47 @@ textarea.large-input {
 #clientDiv {
   display: flex;
 }
- 
+
+#notification {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+#notifOnClick {
+  position: absolute; /* Absolute positioning to overlay on top of other elements */
+  top: 50px; /* Position it below the bell icon, adjust this value as needed */
+  left: 50%; /* Set it to the middle of the container */
+  transform: translateX(-50%);
+  z-index: 10; /* To be on top of other elements */
+  background-color: #F5F5DC; /* Beige background */
+  border: 1px solid black; /* Black fine line border */
+  display: none; /* Initially set to hidden */
+  width: 255px;
+  height: 300px;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.tooltipDiv {
+  display: flex;
+  align-items: center;
+  z-index: 10;
+  position: absolute;
+  right: -10px; /* this will position the tooltip 10px to the left of the parent element's right boundary */
+  top: 50%; /* this positions the tooltip at the vertical center */
+  transform: translateY(-50%); /
+}
+
+.tooltip {
+  position: absolute; /* Absolute positioning to overlay on top of other elements */
+  opacity: 1;
+  left: 50%; /* Set it to the middle of the container */
+  transform: translateX(-50%);
+  z-index: 10; /* To be on top of other elements */
+  background-color: #F5F5DC; /* Beige background */
+  border: 1px solid black; /* Black fine line border */
+  display: none; /* Initially set to hidden */
+  padding: 10px;
+  width: 240px;
+}
