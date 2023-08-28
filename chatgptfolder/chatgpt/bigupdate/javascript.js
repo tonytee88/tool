@@ -46,6 +46,7 @@ console.log("v"+version);
 window.addEventListener('load', function() {
   sidebarInit();
   initUIAndTooltips();
+  createPlatformSelection();
   function moveElementButton(button, fromSection, toSection) {
     fromSection.removeChild(button);
     toSection.appendChild(button);
@@ -149,6 +150,39 @@ async function initUIAndTooltips() {
   }
   });
 });
+
+// create the platform selection screen
+function createPlatformSelection() {
+  // Create main container
+  const container = document.createElement('div');
+
+  // Define platforms
+  const platforms = ['Platform 1', 'Platform 2', 'Platform 3'];
+
+  platforms.forEach((platform) => {
+      const platformDiv = document.createElement('div');
+      platformDiv.className = "platformCard";
+      platformDiv.textContent = platform;
+
+      // Event listener to start workflow
+      platformDiv.addEventListener('click', function() {
+          startWorkflow(platform);
+      });
+
+      container.appendChild(platformDiv);
+  });
+
+  let midContainer = document.getElementById('midContainer');
+  midContainer.insertBefore(container, midContainer.firstChild);
+}
+
+function startWorkflow(platform) {
+  // Your workflow logic here
+  console.log("Selected Platform: " + platform);
+}
+
+// Call the function to create platform selection UI
+
 
 function getNamesArray() {
   //console.log("documentNamesObj: " + documentNamesObj)
@@ -309,7 +343,6 @@ function initUISteps() {
   for (var i = 1; i < 8; i++) {
   document.getElementById("step"+[i]).style.display = 'none';
   }
-  document.getElementById("step1").style.display = 'block';
 }
 
 async function sidebarInit() {
