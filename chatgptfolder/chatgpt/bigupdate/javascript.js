@@ -154,10 +154,19 @@ async function initUIAndTooltips() {
 // create the platform selection screen
 function createPlatformSelection() {
   // Create main container
-  const container = document.createElement('div');
+  const containerCard = document.createElement('div');
+  containerCard.id = "platformCardContainer";
+
+  const containerTitle = document.createElement('div');
+  containerTitle.id = "titleContainer";
+
+  // Add a title above the platform cards
+  const title = document.createElement('h1');
+  title.textContent = "What platform do you require copy for?";
+  containerTitle.appendChild(title); // Appending title to the container
 
   // Define platforms
-  const platforms = ['Platform 1', 'Platform 2', 'Platform 3'];
+  const platforms = ['Email', 'Facebook', 'Google'];
 
   platforms.forEach((platform) => {
       const platformDiv = document.createElement('div');
@@ -169,15 +178,17 @@ function createPlatformSelection() {
           startWorkflow(platform);
       });
 
-      container.appendChild(platformDiv);
+      containerCard.appendChild(platformDiv);
   });
 
   let midContainer = document.getElementById('midContainer');
-  midContainer.insertBefore(container, midContainer.firstChild);
+  midContainer.insertBefore(containerCard, midContainer.firstChild);
+  midContainer.insertBefore(containerTitle, midContainer.firstChild);
+  
 }
 
 function startWorkflow(platform) {
-  // Your workflow logic here
+  document.getElementById("navigation").style.display = 'block';
   console.log("Selected Platform: " + platform);
 }
 
