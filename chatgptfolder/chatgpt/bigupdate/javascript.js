@@ -35,6 +35,7 @@ var namesArray = [];
 var processTagsAddedListeners = 0;
 let currentSection = 1;
 const totalSections = 5;
+let platformToServe = "";
 const version = "1.7.2";
 var notifText = "Release v1.7.2 - Aug 25th \n"+
 "- New notification system implemented! \n" +
@@ -192,11 +193,13 @@ function startWorkflow(platform) {
   if (platform === "Email") {
     initNavSystemEmail()
     initStep1()
+    platformToServe = "Email";
   }
   if (platform === "Facebook") {
     initStep1()
     addThemeDropdown()
     initNavSystemFacebook()
+    platformToServe = "Facebook";
   }
   console.log("Selected Platform: " + platform);
 }
@@ -543,22 +546,27 @@ qaButtonClick.addEventListener("click", function() {
 
 // Setup "LoadTags" to execute ProcessTags
 document.getElementById("loadTags").addEventListener("click", function() {
-  var chosenDiv = document.getElementById("chosenContainer");
-  var elementButtons = chosenDiv.getElementsByClassName("element-button");
-  var tags = [];
+  if (platformToServe === "Emailing") {
+    var chosenDiv = document.getElementById("chosenContainer");
+    var elementButtons = chosenDiv.getElementsByClassName("element-button");
+    var tags = [];
 
-  // Convert HTMLCollection to array using spread operator
-  buttonArray = [...elementButtons];
+    // Convert HTMLCollection to array using spread operator
+    buttonArray = [...elementButtons];
 
-  buttonArray.forEach(function(button) {
-    tags.push(button.textContent);
-  });
-  setTimeout(() => {}, 1000)
-  
-  //console.log(tags);
-  // Step 2
-  processTags(tags);
-  
+    buttonArray.forEach(function(button) {
+      tags.push(button.textContent);
+    });
+    setTimeout(() => {}, 1000)
+    
+    //console.log(tags);
+    // Step 2
+    processTags(tags);
+  } else if (platformToServe === "Facebook") {
+    var tags = ["Primary Text", "Headline", "Description"];
+    processTags(tags);
+  }
+  // add else if for Google
 });
   
 function createTablesInDoc() { 
@@ -1915,10 +1923,10 @@ function initNavSystemFacebook() {
 )};
 
 const checkCondition = (retryCount = 0, maxRetries = 30) => {
-  var emailSubjectLineField = document.getElementById("Email-Subject-Line");
-  
-  if (emailSubjectLineField.textContent !== storedEmailSubject) {
-    storedEmailSubject = emailSubjectLineField.textContent;
+  var primaryText = document.getElementById("Primary-Text");
+
+  if (primaryText.textContent !== storedEmailSubject) {
+    storedEmailSubject = primaryText.textContent;
     showSectionAndTooltips(currentSection);
   } else {
 
@@ -1928,16 +1936,16 @@ const checkCondition = (retryCount = 0, maxRetries = 30) => {
       console.log("Max reached, displaying answers")
       var statusMessage = document.getElementById("statusMessage");
       statusMessage.textContent = "Max waiting delay reached, displaying copy";
-      storedEmailSubject = emailSubjectLineField.textContent;
+      storedEmailSubject = primaryText.textContent;
       showSectionAndTooltips(currentSection);
     }
   }
 }
 
 const checkConditionBeforeDisplayStep3 = () => {
-  var emailSubjectLineField = document.getElementById("Email-Subject-Line");
-  if (emailSubjectLineField.textContent !== "Email Subject Line") {
-    storedEmailSubject = emailSubjectLineField.textContent;
+  var primaryText = document.getElementById("Primary-Text");
+  if (primaryText.textContent !== "Primary Text") {
+    storedEmailSubject = primaryText.textContent;
     showSectionAndTooltips(currentSection);
   } else {
   setTimeout(checkConditionBeforeDisplayStep3, 500);  // Check again after a delay
