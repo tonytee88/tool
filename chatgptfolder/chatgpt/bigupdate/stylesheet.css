@@ -265,7 +265,7 @@ textarea.large-input {
 }
 
 .sticky {
-  position: absolute;
+  position: fixed;
   left: 0;   /* Ensures it starts at the very left */
   right: 0; /* Ensures it spans to the very right */
   bottom: 0;
@@ -284,6 +284,7 @@ textarea.large-input {
 
 #clientDiv {
   display: flex;
+  gap: 2px;
 }
 
 #notification {
@@ -367,3 +368,17 @@ textarea.large-input {
   width: 100%;
   flex-wrap: wrap; 
 }
+
+#adType {
+  display:flex;
+  justify-content: baseline;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 10px;
+
+}
+
+#labelText {
+  font-weight:lighter;
+}
+

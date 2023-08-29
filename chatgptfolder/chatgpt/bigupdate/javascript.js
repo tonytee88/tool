@@ -189,11 +189,67 @@ function createPlatformSelection() {
 
 function startWorkflow(platform) {
   document.getElementById("navigation").style.display = 'block';
+  if (platform === "Email") {
+    initNavSystemEmail()
+    initStep1()
+  }
+  if (platform === "Facebook") {
+    initNavSystemEmail()
+    initStep1()
+    addThemeDropdown()
+  }
   console.log("Selected Platform: " + platform);
 }
 
-// Call the function to create platform selection UI
+function addThemeDropdown() {
+  // Declare themeList
+  const themeList = ["BFCM", "VIP", "post-BFCM"];
 
+  // Create the container div with id="adType"
+  const adTypeDiv = document.createElement('div');
+  adTypeDiv.id = "adType";
+
+  // Create div with class="label"
+  const labelDiv = document.createElement('div');
+  labelDiv.className = "label";
+  labelDiv.id="labelText";
+  labelDiv.textContent = "Theme : ";
+  
+  // Append label to adTypeDiv
+  adTypeDiv.appendChild(labelDiv);
+
+  // Create dropdown div with id="themeDropdown"
+  const dropdownDiv = document.createElement('div');
+  dropdownDiv.id = "themeDropdown";
+
+  // Create the dropdown list (select element)
+  const selectList = document.createElement('select');
+
+  // Populate the selectList with themeList
+  themeList.forEach(theme => {
+    const option = document.createElement('option');
+    option.value = theme;
+    option.textContent = theme;
+    selectList.appendChild(option);
+  });
+
+  // Append selectList to dropdownDiv
+  dropdownDiv.appendChild(selectList);
+
+  // Append dropdownDiv to adTypeDiv
+  adTypeDiv.appendChild(dropdownDiv);
+
+  // Insert adTypeDiv right before the div with id=subjectLabel
+  const subjectLabelDiv = document.getElementById('subjectLabel');
+  subjectLabelDiv.parentNode.insertBefore(adTypeDiv, subjectLabelDiv);
+}
+
+// Call the function to create platform selection UI
+function initStep1() {
+  document.getElementById("step1").style.display = 'block';
+  document.getElementById("platformCardContainer").style.display = 'none';
+  document.getElementById("titleContainer").style.display = 'none';
+}
 
 function getNamesArray() {
   //console.log("documentNamesObj: " + documentNamesObj)
@@ -319,7 +375,7 @@ function initTooltips() {
   return new Promise((resolve, reject) => {
     try {
       var tooltipPickClient = "If your client is not here, create a new one! Go to 🧠 --> CREATE NEW CLIENT.";
-      createTooltip("PickClient", "clientDiv", tooltipPickClient, "1","-5","5","noeffect");
+      createTooltip("PickClient", "clientDiv", tooltipPickClient, "1","-10","5","noeffect");
 
       var tooltipMoreInfo = "**THIS IS THE MOST IMPORTANT FIELD : Take your time and add as much info as possible.**\n\n Note Aug 24th : \n\n Until I add the 'industry' feature to the brain, please include more info about the client: \n\n - L'industrie\n - La clientèle cible \n- Le ton \n- L'objectif de l'email";
       createTooltip("ExtraInfo", "infoTitle", tooltipMoreInfo, "1","-15","0","pulse-effect");
@@ -452,31 +508,6 @@ var heroBannerTitle;
 var heroBannerText;
 var heroBannerCTA;
 var designTips;
-
-// const testFunctionClick = document.getElementById("testFunction");
-
-// testFunctionClick.addEventListener("click", function() {
-//   new Promise(function(resolve, reject) {
-//     google.script.run
-//       .withSuccessHandler((result) => {
-//         console.log("Success:", result);
-//         resolve(result);
-//       })
-//       .withFailureHandler((error) => {
-//         console.log("Error:", error);
-//         reject(error);
-//       })
-//       .getGPTResponseSuper("Benjamin's first Olympic Season", "email subject line, email preview text, hero banner title, hero banner text, hero banner cta, descriptive bloc title, descriptive bloc text, descriptive bloc cta", 3, "English", "20% off early bird price, valid from June 22nd to June 25th only.");
-//   })
-//     .then(function(result) {
-//       // Handle the resolved result here
-//       console.log("Promise resolved:", result);
-//     })
-//     .catch(function(error) {
-//       // Handle the rejected error here
-//       console.log("Promise rejected:", error);
-//     });
-// });
 
 const qaButtonClick = document.getElementById("qaButton");
 
@@ -1648,131 +1679,132 @@ inputFieldTraits.addEventListener("keypress", function(event) {
 
 
 ///Menu navigation code
+function initNavSystemEmail() {
+  document.getElementById("goNextButton").addEventListener('click', function() {
+    if ((currentSection < totalSections) && (currentSection !== 4)) {
+      //Check if client is selected
+      
+      var clientName = document.getElementById("clients").value;
+      //console.log(clientName)
+      if ((currentSection === 1) && ((clientName === "INVALID") || (clientName ===""))){
+        var statusMessage = document.getElementById("statusMessage");
+        statusMessage.textContent = "Please select a client or create a new one first";
 
-document.getElementById("goNextButton").addEventListener('click', function() {
-  if ((currentSection < totalSections) && (currentSection !== 4)) {
-    //Check if client is selected
+      } else {
+        //if client is selected, display next step
+      document.getElementById('step' + currentSection).style.display = 'none';
+      var fixedStepNumberForTooltips = currentSection + 1;
+      var getAllTooltipOfNextStep = document.getElementsByClassName("tooltipStep"+fixedStepNumberForTooltips)
+      for (var i = 0; i < getAllTooltipOfNextStep.length; i++) {
+        getAllTooltipOfNextStep[i].style.display = "block";
+      }
     
-    var clientName = document.getElementById("clients").value;
-    //console.log(clientName)
-    if ((currentSection === 1) && ((clientName === "INVALID") || (clientName ===""))){
-      var statusMessage = document.getElementById("statusMessage");
-      statusMessage.textContent = "Please select a client or create a new one first";
+      var getAllTooltipOfCurrentStep = document.getElementsByClassName("tooltipStep"+currentSection)
+      for (var i = 0; i < getAllTooltipOfCurrentStep.length; i++) {
+        getAllTooltipOfCurrentStep[i].style.display = "none";
+      }
+      currentSection++;
 
-    } else {
-      //if client is selected, display next step
-    document.getElementById('step' + currentSection).style.display = 'none';
-    var fixedStepNumberForTooltips = currentSection + 1;
-    var getAllTooltipOfNextStep = document.getElementsByClassName("tooltipStep"+fixedStepNumberForTooltips)
-    for (var i = 0; i < getAllTooltipOfNextStep.length; i++) {
-      getAllTooltipOfNextStep[i].style.display = "block";
-    }
-  
-    var getAllTooltipOfCurrentStep = document.getElementsByClassName("tooltipStep"+currentSection)
-    for (var i = 0; i < getAllTooltipOfCurrentStep.length; i++) {
-      getAllTooltipOfCurrentStep[i].style.display = "none";
-    }
-    currentSection++;
+      if ((currentSection === 3) && (firstTimeStep3 === 0)) {
+        //show button refresh is first time step3
+        simulateQaButtonkButtonClick()
+        firstTimeStep3 = 1;
+        var qaButton = document.getElementById("qaButton");
+        qaButton.classList.remove("hideButton");
+        const checkCondition = () => {
+          var emailSubjectLineField = document.getElementById("Email-Subject-Line");
+          if (emailSubjectLineField.textContent !== "Email Subject Line") {
+            storedEmailSubject = emailSubjectLineField.textContent;
+            document.getElementById('step' + currentSection).style.display = 'block';
+          } else {
+          setTimeout(checkCondition, 500);  // Check again after a delay
+          }
+          };
+          checkCondition();
+      } else {
+        document.getElementById('step' + currentSection).style.display = 'block';
 
-    if ((currentSection === 3) && (firstTimeStep3 === 0)) {
-      //show button refresh is first time step3
-      simulateQaButtonkButtonClick()
-      firstTimeStep3 = 1;
-      var qaButton = document.getElementById("qaButton");
-      qaButton.classList.remove("hideButton");
-      const checkCondition = () => {
+      }
+    }
+      if (currentSection === totalSections) {
+        this.disabled = true;
+        this.style.backgroundColor = '#f1f1f1'; 
+      }
+      
+      if (currentSection > 1) {
+        document.getElementById('goBackButton').disabled = false;
+        document.getElementById('goBackButton').style.backgroundColor = '#3498db'; 
+      }
+    }
+    else if (currentSection === 4) {
+      var traits = document.getElementById("traits").value;
+      if (traits !== "") {
+        simulateGptMagicButtonClick()
+        document.getElementById('step' + currentSection).style.display = 'none';
+        currentSection--;
+            
+        const checkCondition = (retryCount = 0, maxRetries = 30) => {
         var emailSubjectLineField = document.getElementById("Email-Subject-Line");
-        if (emailSubjectLineField.textContent !== "Email Subject Line") {
+        //console.log("emailSubjectLineField: " + emailSubjectLineField.textContent);
+        //console.log("storedEmailSubject: " + storedEmailSubject);
+        
+        if (emailSubjectLineField.textContent !== storedEmailSubject) {
           storedEmailSubject = emailSubjectLineField.textContent;
           document.getElementById('step' + currentSection).style.display = 'block';
         } else {
-        setTimeout(checkCondition, 500);  // Check again after a delay
-        }
-        };
-        checkCondition();
-    } else {
-      document.getElementById('step' + currentSection).style.display = 'block';
 
+          if (retryCount < maxRetries) {
+            setTimeout(() => checkCondition(retryCount + 1), 500); // Check again after a delay
+          } else {
+            console.log("Max reached, displaying answers")
+            var statusMessage = document.getElementById("statusMessage");
+            statusMessage.textContent = "Max waiting delay reached, displaying copy";
+            storedEmailSubject = emailSubjectLineField.textContent;
+            document.getElementById('step' + currentSection).style.display = 'block';
+          }
+        }
+      };
+
+      checkCondition();
+        // document.getElementById('step' + currentSection).style.display = 'block';
+      } else {
+        var statusMessage = document.getElementById("statusMessage");
+        statusMessage.textContent = "Please input valid corrections";
+      }
     }
-  }
-    if (currentSection === totalSections) {
-      this.disabled = true;
-      this.style.backgroundColor = '#f1f1f1'; 
-    }
-    
+  });
+
+  document.getElementById('goBackButton').addEventListener('click', function() {
     if (currentSection > 1) {
-      document.getElementById('goBackButton').disabled = false;
-      document.getElementById('goBackButton').style.backgroundColor = '#3498db'; 
-    }
-  }
-  else if (currentSection === 4) {
-    var traits = document.getElementById("traits").value;
-    if (traits !== "") {
-      simulateGptMagicButtonClick()
+      //show tooltips for right steps
+      var fixedStepNumberForTooltips = currentSection - 1;
+      var getAllTooltipOfNextStep = document.getElementsByClassName("tooltipStep"+fixedStepNumberForTooltips)
+      for (var i = 0; i < getAllTooltipOfNextStep.length; i++) {
+        getAllTooltipOfNextStep[i].style.display = "block";
+      }
+    
+      var getAllTooltipOfCurrentStep = document.getElementsByClassName("tooltipStep"+currentSection)
+      for (var i = 0; i < getAllTooltipOfCurrentStep.length; i++) {
+        getAllTooltipOfCurrentStep[i].style.display = "none";
+      }
+      //show content for right steps
       document.getElementById('step' + currentSection).style.display = 'none';
       currentSection--;
-          
-      const checkCondition = (retryCount = 0, maxRetries = 30) => {
-      var emailSubjectLineField = document.getElementById("Email-Subject-Line");
-      //console.log("emailSubjectLineField: " + emailSubjectLineField.textContent);
-      //console.log("storedEmailSubject: " + storedEmailSubject);
+      document.getElementById('step' + currentSection).style.display = 'block';
+      goNextButton.innerText = "Next"
       
-      if (emailSubjectLineField.textContent !== storedEmailSubject) {
-        storedEmailSubject = emailSubjectLineField.textContent;
-        document.getElementById('step' + currentSection).style.display = 'block';
-      } else {
-
-        if (retryCount < maxRetries) {
-          setTimeout(() => checkCondition(retryCount + 1), 500); // Check again after a delay
-        } else {
-          console.log("Max reached, displaying answers")
-          var statusMessage = document.getElementById("statusMessage");
-          statusMessage.textContent = "Max waiting delay reached, displaying copy";
-          storedEmailSubject = emailSubjectLineField.textContent;
-          document.getElementById('step' + currentSection).style.display = 'block';
-        }
+      if (currentSection === 1) {
+        this.disabled = true;
+        this.style.backgroundColor = '#f1f1f1'; 
       }
-    };
 
-    checkCondition();
-      // document.getElementById('step' + currentSection).style.display = 'block';
-    } else {
-      var statusMessage = document.getElementById("statusMessage");
-      statusMessage.textContent = "Please input valid corrections";
+      if (currentSection < totalSections) {
+        document.getElementById('goNextButton').disabled = false;
+        document.getElementById('goNextButton').style.backgroundColor = '#3498db'; 
+      }
     }
-  }
-});
-
-document.getElementById('goBackButton').addEventListener('click', function() {
-  if (currentSection > 1) {
-    //show tooltips for right steps
-    var fixedStepNumberForTooltips = currentSection - 1;
-    var getAllTooltipOfNextStep = document.getElementsByClassName("tooltipStep"+fixedStepNumberForTooltips)
-    for (var i = 0; i < getAllTooltipOfNextStep.length; i++) {
-      getAllTooltipOfNextStep[i].style.display = "block";
-    }
-  
-    var getAllTooltipOfCurrentStep = document.getElementsByClassName("tooltipStep"+currentSection)
-    for (var i = 0; i < getAllTooltipOfCurrentStep.length; i++) {
-      getAllTooltipOfCurrentStep[i].style.display = "none";
-    }
-    //show content for right steps
-    document.getElementById('step' + currentSection).style.display = 'none';
-    currentSection--;
-    document.getElementById('step' + currentSection).style.display = 'block';
-    goNextButton.innerText = "Next"
-    
-    if (currentSection === 1) {
-      this.disabled = true;
-      this.style.backgroundColor = '#f1f1f1'; 
-    }
-
-    if (currentSection < totalSections) {
-      document.getElementById('goNextButton').disabled = false;
-      document.getElementById('goNextButton').style.backgroundColor = '#3498db'; 
-    }
-  }
-});
+  });
+}
 
 // document.getElementById("goNextButton").addEventListener('click', function() {
 //   if (currentSection === 3) {
