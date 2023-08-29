@@ -194,16 +194,16 @@ function startWorkflow(platform) {
     initStep1()
   }
   if (platform === "Facebook") {
-    initNavSystemEmail()
     initStep1()
     addThemeDropdown()
+    initNavSystemFacebook()
   }
   console.log("Selected Platform: " + platform);
 }
 
 function addThemeDropdown() {
   // Declare themeList
-  const themeList = ["BFCM", "VIP", "post-BFCM"];
+  const themeList = ["NONE", "BFCM", "VIP", "post-BFCM"];
 
   // Create the container div with id="adType"
   const adTypeDiv = document.createElement('div');
@@ -220,10 +220,10 @@ function addThemeDropdown() {
 
   // Create dropdown div with id="themeDropdown"
   const dropdownDiv = document.createElement('div');
-  dropdownDiv.id = "themeDropdown";
-
+  
   // Create the dropdown list (select element)
   const selectList = document.createElement('select');
+  selectList.id = "themeDropdown";
 
   // Populate the selectList with themeList
   themeList.forEach(theme => {
@@ -1678,7 +1678,8 @@ inputFieldTraits.addEventListener("keypress", function(event) {
 });
 
 
-///Menu navigation code
+///Menu navigation code - email
+
 function initNavSystemEmail() {
   document.getElementById("goNextButton").addEventListener('click', function() {
     if ((currentSection < totalSections) && (currentSection !== 4)) {
@@ -1805,6 +1806,115 @@ function initNavSystemEmail() {
     }
   });
 }
+
+// navigation system - facebook
+
+function hideSectionAndTooltips(step) {
+  document.getElementById('step' + step).style.display = 'none';
+  let tooltips = document.getElementsByClassName("tooltipStep" + step);
+  for (let tooltip of tooltips) {
+    tooltip.style.display = "none";
+  }
+}
+
+function showSectionAndTooltips(step) {
+  console.log("trying to show step" + step)
+  document.getElementById('step' + step).style.display = 'block';
+  let tooltips = document.getElementsByClassName("tooltipStep" + step);
+  for (let tooltip of tooltips) {
+    tooltip.style.display = "block";
+  }
+}
+
+function setStatusMessage(message) {
+  document.getElementById("statusMessage").textContent = message;
+}
+
+function initNavSystemFacebook() {
+  document.getElementById("goNextButton").addEventListener('click', function() {
+    if (currentSection >= totalSections) {
+      return;
+    }
+
+    switch (currentSection) {
+      //subject to generate copy
+      case 1:
+        let clientName = document.getElementById("clients").value;
+        let adTheme = document.getElementById("themeDropdown").value;
+        console.log(adTheme);
+        if (clientName === "INVALID" || clientName === "")  {
+          setStatusMessage("Please select a client or create a new one first");
+          return; // Exit the function early
+        } else if (adTheme === "NONE" || adTheme === "") {
+          setStatusMessage("Please select a theme to start");
+          return; // Exit the function early
+        }
+        hideSectionAndTooltips(currentSection);
+        if (firstTimeStep3 === 0) {
+          simulateQaButtonkButtonClick();
+          firstTimeStep3 = 1;
+          document.getElementById("qaButton").classList.remove("hideButton");
+          // Your checkCondition function here
+          currentSection = 3;
+          showSectionAndTooltips(currentSection);
+        } else {
+          currentSection = 3;
+          showSectionAndTooltips(currentSection);
+        }
+        break;
+      //generated copy to correction  
+      case 3:
+        hideSectionAndTooltips(currentSection);
+        currentSection++;
+        showSectionAndTooltips(currentSection);
+        break;
+      case 4:
+        let traits = document.getElementById("traits").value;
+        if (traits !== "") {
+          hideSectionAndTooltips(currentSection);
+          simulateGptMagicButtonClick();
+          currentSection--;
+          showSectionAndTooltips(currentSection);
+        } else {
+          setStatusMessage("Please input valid corrections");
+        }
+        break;
+
+        default:
+        // For all other cases (this is a safe guard, might not be necessary depending on your totalSections)
+        console.error("Invalid section!");
+    }
+
+    // The rest of your general logic, like disabling buttons, can stay outside of the switch
+    if (currentSection === totalSections) {
+      this.disabled = true;
+      this.style.backgroundColor = '#f1f1f1'; 
+    }
+    if (currentSection > 1) {
+      document.getElementById('goBackButton').disabled = false;
+      document.getElementById('goBackButton').style.backgroundColor = '#3498db'; 
+    }
+  });
+
+  document.getElementById('goBackButton').addEventListener('click', function() {
+    console.log("current section: "+currentSection)
+    switch (currentSection) {
+      //generate copy to subject
+      case 3:
+        hideSectionAndTooltips(currentSection);
+        currentSection = 1;
+        showSectionAndTooltips(currentSection);
+        document.getElementById('goBackButton').disabled = true;
+        document.getElementById('goBackButton').style.backgroundColor = '#f1f1f1'; 
+        break;
+      case 4:
+        hideSectionAndTooltips(currentSection);
+        currentSection--;
+        showSectionAndTooltips(currentSection);
+        break;
+    }
+  }
+)};
 
 // document.getElementById("goNextButton").addEventListener('click', function() {
 //   if (currentSection === 3) {
