@@ -1746,8 +1746,6 @@ function initNavSystemEmail() {
             
         const checkCondition = (retryCount = 0, maxRetries = 30) => {
         var emailSubjectLineField = document.getElementById("Email-Subject-Line");
-        //console.log("emailSubjectLineField: " + emailSubjectLineField.textContent);
-        //console.log("storedEmailSubject: " + storedEmailSubject);
         
         if (emailSubjectLineField.textContent !== storedEmailSubject) {
           storedEmailSubject = emailSubjectLineField.textContent;
@@ -1818,7 +1816,6 @@ function hideSectionAndTooltips(step) {
 }
 
 function showSectionAndTooltips(step) {
-  console.log("trying to show step" + step)
   document.getElementById('step' + step).style.display = 'block';
   let tooltips = document.getElementsByClassName("tooltipStep" + step);
   for (let tooltip of tooltips) {
@@ -1841,7 +1838,6 @@ function initNavSystemFacebook() {
       case 1:
         let clientName = document.getElementById("clients").value;
         let adTheme = document.getElementById("themeDropdown").value;
-        console.log(adTheme);
         if (clientName === "INVALID" || clientName === "")  {
           setStatusMessage("Please select a client or create a new one first");
           return; // Exit the function early
@@ -1854,12 +1850,13 @@ function initNavSystemFacebook() {
           simulateQaButtonkButtonClick();
           firstTimeStep3 = 1;
           document.getElementById("qaButton").classList.remove("hideButton");
-          // Your checkCondition function here
           currentSection = 3;
-          showSectionAndTooltips(currentSection);
+          checkConditionBeforeDisplayStep3();
+          break;
         } else {
           currentSection = 3;
           showSectionAndTooltips(currentSection);
+          break;
         }
         break;
       //generated copy to correction  
@@ -1874,15 +1871,17 @@ function initNavSystemFacebook() {
           hideSectionAndTooltips(currentSection);
           simulateGptMagicButtonClick();
           currentSection--;
-          showSectionAndTooltips(currentSection);
+          checkCondition();
+          break;
         } else {
           setStatusMessage("Please input valid corrections");
+          break;
         }
-        break;
-
+        
         default:
         // For all other cases (this is a safe guard, might not be necessary depending on your totalSections)
         console.error("Invalid section!");
+        break;
     }
 
     // The rest of your general logic, like disabling buttons, can stay outside of the switch
@@ -1897,7 +1896,6 @@ function initNavSystemFacebook() {
   });
 
   document.getElementById('goBackButton').addEventListener('click', function() {
-    console.log("current section: "+currentSection)
     switch (currentSection) {
       //generate copy to subject
       case 3:
@@ -1916,12 +1914,36 @@ function initNavSystemFacebook() {
   }
 )};
 
-// document.getElementById("goNextButton").addEventListener('click', function() {
-//   if (currentSection === 3) {
-//     simulateQaButtonkButtonClick()
+const checkCondition = (retryCount = 0, maxRetries = 30) => {
+  var emailSubjectLineField = document.getElementById("Email-Subject-Line");
+  
+  if (emailSubjectLineField.textContent !== storedEmailSubject) {
+    storedEmailSubject = emailSubjectLineField.textContent;
+    showSectionAndTooltips(currentSection);
+  } else {
 
-//   }
-// });
+    if (retryCount < maxRetries) {
+      setTimeout(() => checkCondition(retryCount + 1), 500); // Check again after a delay
+    } else {
+      console.log("Max reached, displaying answers")
+      var statusMessage = document.getElementById("statusMessage");
+      statusMessage.textContent = "Max waiting delay reached, displaying copy";
+      storedEmailSubject = emailSubjectLineField.textContent;
+      showSectionAndTooltips(currentSection);
+    }
+  }
+}
+
+const checkConditionBeforeDisplayStep3 = () => {
+  var emailSubjectLineField = document.getElementById("Email-Subject-Line");
+  if (emailSubjectLineField.textContent !== "Email Subject Line") {
+    storedEmailSubject = emailSubjectLineField.textContent;
+    showSectionAndTooltips(currentSection);
+  } else {
+  setTimeout(checkConditionBeforeDisplayStep3, 500);  // Check again after a delay
+  }
+};
+
 
 document.getElementById("goStep5").addEventListener('click', function() {
   document.getElementById('step' + currentSection).style.display = 'none';
