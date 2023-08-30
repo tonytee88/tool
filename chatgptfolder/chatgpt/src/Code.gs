@@ -952,6 +952,274 @@ function getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, c
   }
 }
 
+function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info, clientTraits, elementCopyExamples, numberOfExamples, theme){
+  var apiKey = getApiKey();
+  var statusLog = "start of getGPTResponseSuper \n";
+
+  var primaryTextExamples_upvotes;
+  var headlineExamples_upvotes;
+  var descriptionExamples_upvotes;
+
+  var primaryTextExamples_downvotes;
+  var headlineExamples_downvotes;
+  var descriptionExamples_downvotes;
+
+  var traitsList = "";
+  for (var key in clientTraits) {
+    if (clientTraits.hasOwnProperty(key)) {
+      traitsList += key + ": " + clientTraits[key] + "\n";
+    }
+  }
+
+  function formatExamples(examplesArray) {
+      var formatted = "";
+      
+      for (var i = 0; i < examplesArray.length; i++) {
+        formatted += "- Example " + (i + 1) + ": " + examplesArray[i].trim() + "\n";
+      }
+
+      return formatted;
+  }
+  
+  if (elementCopyExamples["Primary Text_upvotes"]){
+    primaryTextExamples_upvotes = formatExamples(elementCopyExamples["Primary Text_upvotes"]);
+  }
+
+  if (elementCopyExamples["Headline_upvotes"]){
+    headlineExamples_upvotes = formatExamples(elementCopyExamples["Headline_upvotes"]);
+  }
+
+  if (elementCopyExamples["Description_upvotes"]){
+    descriptionExamples_upvotes = formatExamples(elementCopyExamples["Description_upvotes"]);
+  }
+
+//DOWNVOTES
+
+  if (elementCopyExamples["Primary Text_downvotes"]){
+  primaryTextExamples_downvotes = formatExamples(elementCopyExamples["Primary Text_downvotes"]);
+  }
+
+  if (elementCopyExamples["Headline_downvotes"]){
+    headlineExamples_downvotes = formatExamples(elementCopyExamples["Headline_downvotes"]);
+  }
+
+  if (elementCopyExamples["Description_downvotes"]){
+    descriptionExamples_downvotes = formatExamples(elementCopyExamples["Description_downvotes"]);
+  }
+
+  statusLog += "primaryTextExamples_upvotes:\n" + primaryTextExamples_upvotes +  "\n";
+  statusLog += "all examples: " + JSON.stringify(elementCopyExamples) + "\n";
+  //statusLog += typeof(heroBannerTitleExamples_upvotes) +  "\n";
+  
+  var systemContent = 
+    
+  "We will work together to write a highly engaging Facebook Ad for my client's ecommerce store.\n" +
+
+     "Here's a list of details I will provide you with for this task:\n" +
+    "- The subject that dictates the main hooks of the Facebook Ad\n" +
+    "- The theme which is the occasion why the Facebook Ad is made for. It can be Valentine's Day, for Black Friday, for Christmas or simply for Spring Season. This will help you put context around the copy.\n" +
+    "- Extra information (called extra info) give you more details about the context or the promotional offer such as discount details or promotion dates. Dates, rebate percentage or eligibility conditions must be included in the 'Primary Text'\n" +
+    "- Given the list of client traits below, it is crucial to integrate them accurately into the ad copy. Each 'trait[i]' specifies a unique characteristic that the ad copy should reflect. It is of utmost importance to include each trait, as these are primary client requests. If a trait suggests a specific format, style, or content (e.g., 'All upper cases' or 'Include a smiley emoji'), the resultant copy should strictly follow it. Please meticulously incorporate every trait while crafting the copy. Let's make sure each trait is highlighted in the generated copy.\n" + 
+    "- The Facebook Ad Elements : A JS Array with elements to write copy for. Include only copy for these elements. Do not add or remove any items.\n"+
+
+    "Here's what each element will include based on their role (if requested):\n"+
+    "- The 'Primary Text': This is the first piece of content users see when they scroll past your ad. It should grab attention, be engaging, and reflect the core message or offer. Use action verbs and emphasize gains, desired result, or perceivable added-value. The 'Primary Text' should be concise, making the most out of 125 characters or fewer.\n" +
+        "Example: 'Unlock exclusive savings! 🔥 Hurry, limited time only.'\n"+
+        
+    "- The 'Headline': This appears right below the visual content (image or video) and is bolded. The 'Headline' should be short, direct, and highlight the main offer or call to action. It has around 25 characters to make an impact. Use action verbs such as 'GET', 'WIN', 'SAVE', 'DISCOVER', 'CLAIM'.\n" +
+        "Example: 'SAVE 50% Today!'\n"+
+        
+    "- The 'Description': This is a smaller text that appears below the 'Headline'. The 'Description' gives additional details about the offer or product. It should add urgency if possible or provide a touch of detail that will further entice the user. For promotions, indicate the discount percentage, dates, or time sensitivity. This should be concise with around 30 characters.\n" +
+        "Example: 'Ends midnight. Don't miss out!'\n"+
+
+
+    "Here's a list of instructions to applies to all of the element copies:\n"+
+    "- Follow the instructions from the Client Traits\n"+
+    "- Provide creative, engaging, and conversational copy\n"+
+    "- Avoid repeating the same information. For example, if the 'Primary Text' includes '30% off on product XYZ for 3 days only', the 'Headline' will not include '30% off on product XYZ'. It can include 'For a limited time' or 'While quantities last' or 'HURRY!'\n"+
+    "- Every element copy is short, engaging, and catchy. Remember that this is an ad, and the content should be easily readable on mobile devices.\n"+
+    "- Maintain a consistent tone throughout the copy, whether it's friendly, conversational, or persuasive. Ensure that the tone remains consistent and cohesive. Review and rewrite the targeted tag elements as needed.\n"+
+    "- Use the established and clear theme from Step 1. Identify the main theme or message of the ad and ensure that it is reflected in all tag elements. Consistency in theme helps reinforce the central idea and makes the email more impactful. Review and rewrite the targeted tag elements as needed.\n"+
+    "- Use a storytelling approach. Frame the copy within a narrative or storytelling framework. Connect the different tag elements by weaving a coherent story or progression that flows smoothly from one element to another. This approach maintains engagement and coherence. Review and rewrite the targeted tag elements as needed.\n"+
+  
+    "Here are concrete examples of my favorite copies that have proven very effective in our Facebook Ads. Please use these as a reference and inspiration to craft your copies. Below are the examples for each Ads element:\n\n"+
+
+    "- Primary Text:\n" + primaryTextExamples_upvotes + "\n"+
+    "- Headline:\n" + headlineExamples_upvotes + "\n"+
+    "- Description:\n" + descriptionExamples_upvotes + "\n"+
+    
+     "Here's a list of copy examples that have proven to be ineffective and have received negative feedback. It's crucial that future copies do not resemble these. Kindly steer clear from creating anything similar. Avoid these examples for each element:\n" +
+
+    "- Primary Text (Avoid these):\n" + primaryTextExamples_downvotes + "\n"+
+    "- Headline (Avoid these):\n" + headlineExamples_downvotes + "\n"+
+    "- Description (Avoid these):\n" + descriptionExamples_downvotes;
+   
+
+  var content = "Here's the subject: " + prompt + ". Here's the theme: " + theme + ". Here's the extra info: " + info + ". If the extra info includes promotion dates, promo code, discount percentage or other offer specificity, include those info in your copy. Here's the JavaScript Array with elements to write about: " + promptElements +". Before proceeding, it's vital to thoroughly understand the following CLIENT TRAITS. These traits serve as guidelines, and each one is integral to crafting the ad copy. Please ensure that you incorporate every single trait meticulously in the output:\n\n" + traitsList + "\nRemember, each trait plays a significant role, so it's crucial not to overlook any of them.";
+
+  // configure the API request to OpenAI
+  var data = {
+    "messages": [
+      {"role": "system", "content": systemContent},
+      {"role": "user", "content": content}
+    ],
+    "model": "gpt-3.5-turbo-0613",
+    "functions": [
+        {
+            "name": "get_varied_personality_responses",
+            "description": "ingest the various personality responses and provide a response for each personality",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "dumb_and_mean": {
+                        "type": "string",
+                        "description": "A dumb and mean version of the response to a user's query"
+                    },
+                    "happy_and_helpful": {
+                        "type": "string",
+                        "description": "A happy and helpful version of the response to a user's query"
+                    }
+                },
+                "required": ["dumb_and_mean", "happy_and_helpful"]
+            }
+        },
+        {
+            "name": "get_email_element_responses",
+            "description": "ingest the various copywriting style and for each element requested provide a response for each style. Each style should be unique and will influence greatly the copy output. Be in caracter.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                      "happy_and_helpful": {
+                        "type": "array",
+                        "description": "Style 2: A happy and helpful version of the email copy.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "element type": {"type": "string"},
+                                "content": {"type": "string"}
+                            },
+                            "required": ["element type", "content"]
+                        }
+                    }
+                },
+                "required": ["happy_and_helpful"]
+                //"required": ["overexcited_and_extravagant", "happy_and_helpful", "playful_and_chill"]
+            }
+        },
+        {
+            "name": "BACKUP",
+            "description": "ingest the various copywriting style and for each element requested provide a response for each style. Each style should be unique and will influence greatly the copy output. Be in caracter.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "overexcited_and_extravagant": {
+                        "type": "array",
+                        "description": "Style 1: A overexcited and extravagant version of the email copy.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "element type": {"type": "string"},
+                                "content": {"type": "string"}
+                            },
+                            "required": ["element type", "content"]
+                        }
+                    },
+                    "happy_and_helpful": {
+                        "type": "array",
+                        "description": "Style 2: A happy and helpful version of the email copy.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "element type": {"type": "string"},
+                                "content": {"type": "string"}
+                            },
+                            "required": ["element type", "content"]
+                        }
+                    },
+                        "playful_and_chill": {
+                        "type": "array",
+                        "description": "Style 3: A playful and chill version of the email copy.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "element type": {"type": "string"},
+                                "content": {"type": "string"}
+                            },
+                            "required": ["element type", "content"]
+                        }
+                    }
+                },
+                "required": ["overexcited_and_extravagant", "happy_and_helpful", "playful_and_chill"]
+            }
+        }
+    ],  
+    "function_call": {"name": "get_email_element_responses"},
+    };
+
+  var options = {
+    'method' : 'post',
+    'contentType': 'application/json',
+    'payload' : JSON.stringify(data),
+    'headers': {
+      Authorization: 'Bearer ' + apiKey,
+    },
+  };
+
+  var response = UrlFetchApp.fetch(
+    'https://api.openai.com/v1/chat/completions',
+    options
+  );
+
+  // Check if there is a function call in the response
+  var responseData = JSON.parse(response.getContentText());
+  if(responseData['choices'][0]['message']['function_call']){
+    // Function call handling
+    var replyContent = responseData['choices'][0]['message'];
+    //statusLog += "replyContent: " + JSON.stringify(replyContent) + "\n";
+
+    var rawArguments = replyContent['function_call']['arguments'];
+    //statusLog += "Raw 'function_call' arguments: " + rawArguments + "\n";
+    //statusLog += "Type of 'function_call' arguments: " + typeof rawArguments + "\n";
+
+    try {
+      // Replace all double backslashes with single ones, then parse the arguments
+      //var responseOptions = JSON.parse(rawArguments.replace(/\\n/g, "").replace(/\\"/g, "\""));
+      var responseOptions = JSON.parse(replyContent['function_call']['arguments']);
+    } catch (error) {
+      //statusLog += "Error parsing 'function_call' arguments: " + error + "\n";
+      //statusLog += "'function_call' arguments value after error: " + rawArguments + "\n";
+    }
+
+  
+    //statusLog += "responseOptions: " + JSON.stringify(responseOptions) + "\n";
+    //statusLog += "clientTraits: " + JSON.stringify(clientTraits) + "\n";
+  
+
+    var result = {};
+    var optionCount = 1;
+
+    for (var personality in responseOptions) {
+        var elements = responseOptions[personality];
+        for (var i = 0; i < elements.length; i++) {
+            var elementType = elements[i]["element type"];
+            var content = elements[i]["content"];
+            if (!result[elementType]) {
+                result[elementType] = {};
+            }
+            result[elementType]["option" + optionCount] = content;
+        }
+        optionCount++;
+    }
+
+      if (lang === "English") {
+        //return result;
+        return {result: result, statusLog: statusLog};
+      } else {
+        return {result: result, statusLog: statusLog};
+      }
+  }
+}
+
 
 
 
@@ -1518,7 +1786,8 @@ function findOneDataFromMongoDB(clientName) {
       "name": 1,
       "traits": 1,
       "upvotes":1,
-      "downvotes":1
+      "downvotes":1,
+      "traits_fb": 1
     }
   });
   statusLog += "Data:" + data +"\n";

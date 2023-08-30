@@ -546,7 +546,7 @@ qaButtonClick.addEventListener("click", function() {
 
 // Setup "LoadTags" to execute ProcessTags
 document.getElementById("loadTags").addEventListener("click", function() {
-  if (platformToServe === "Emailing") {
+  if (platformToServe === "Email") {
     var chosenDiv = document.getElementById("chosenContainer");
     var elementButtons = chosenDiv.getElementsByClassName("element-button");
     var tags = [];
@@ -627,6 +627,48 @@ function getCategory(tag) {
 
 function getElementName(tag) {
   return tag.trim(); // Remove leading and trailing whitespace
+}
+
+//Google Script Run function to simplify reading
+// for first field, put "functionName" in ""
+// for second field, input the var to use or null
+// for third field, input true if there's a promise, skip if no promise
+function GoogleScriptRun(functionName, varToPass = null, usePromise = false) {
+  if (usePromise) {
+    return new Promise((resolve, reject) => {
+      if (varToPass !== null) {
+        google.script.run
+        .withSuccessHandler(response => resolve(response))
+        .withFailureHandler(error => reject(error))
+        [functionName](varToPass);
+      } else {
+        google.script.run
+        .withSuccessHandler(response => resolve(response))
+        .withFailureHandler(error => reject(error))
+        [functionName]();
+      }
+    });
+  } 
+
+  if (varToPass !== null) {
+    google.script.run
+    .withSuccessHandler(response => {
+      // Do something with the response if needed
+    })
+    .withFailureHandler(error => {
+      // Handle error if needed
+    })
+    [functionName](varToPass);
+  } else {
+    google.script.run
+    .withSuccessHandler(response => {
+      // Do something with the response if needed
+    })
+    .withFailureHandler(error => {
+      // Handle error if needed
+    })
+    [functionName]();
+  }
 }
 
 function updateStoredFinalObjectResult() {
@@ -1267,47 +1309,84 @@ function updateTextContentCells(response, optionsCount) {
 
 // extract the traits from a specific client from MongoDB
 function extractTraits(response) {
-  if (response && response.document && response.document.traits) {
-    const traits = response.document.traits;
-    const traitArray = traits.split(',').map(trait => trait.trim());
+  if (platformToServe === "Email") {
+    if (response && response.document && response.document.traits) {
+      const traits = response.document.traits;
+      const traitArray = traits.split(',').map(trait => trait.trim());
+      
+      const clientTraits = {};
+      for (var i = 0; i < traitArray.length; i++) {
+        const key = 'trait' + (i + 1);
+        clientTraits[key] = i < traitArray.length ? traitArray[i] : '';
+      }
     
-    const clientTraits = {};
-    for (var i = 0; i < traitArray.length; i++) {
-      const key = 'trait' + (i + 1);
-      clientTraits[key] = i < traitArray.length ? traitArray[i] : '';
+      return clientTraits;
+    } else {
+      return {};
     }
-  
-    return clientTraits;
-  } else {
-    return {};
+  } else if (platformToServe === "Facebook") {
+    if (response && response.document && response.document.traits_fb) {
+      const traits = response.document.traits_fb;
+      const traitArray = traits.split(',').map(trait => trait.trim());
+      
+      const clientTraits = {};
+      for (var i = 0; i < traitArray.length; i++) {
+        const key = 'trait' + (i + 1);
+        clientTraits[key] = i < traitArray.length ? traitArray[i] : '';
+      }
+    
+      return clientTraits;
+    } else {
+      return {};
+    }
   }
 }
 
-// function extractUpvotes(response) {
-//   if (response && response.document && response.document.upvotes) {
-//     var upvotesObject = response.document.upvotes;
-//     return upvotesObject;
-//   } else {
-//     return null; // or some default value
-//   }
-// }
+function getUpvotesAndDownvotes() {
+  if (platformToServe === "Email") {
+    elementCopyExamples = {};
+    let clientMongoDocumentUpvotes = clientMongoDocument.document.upvotes;
+    let clientMongoDocumentDownvotes = clientMongoDocument.document.downvotes;
 
-// function extractTraits(response) {
-//   if (response && response.document && response.document.traits) {
-//     const traits = response.document.traits;
-//     const traitArray = traits.split(',').map(trait => trait.trim());
-    
-//     const clientTraits = {};
-//     for (var i = 0; i < traitArray.length; i++) {
-//       const key = 'trait' + (i + 1);
-//       clientTraits[key] = i < traitArray.length ? traitArray[i] : '';
-//     }
-  
-//     return clientTraits;
-//   } else {
-//     return {};
-//   }
-// }
+    for (let element of promptElements) {
+      if (clientMongoDocumentUpvotes && clientMongoDocumentUpvotes.hasOwnProperty(element + "_upvotes")) {
+        let examplesArray = clientMongoDocumentUpvotes[element + "_upvotes"];
+          let lastFiveExamples = examplesArray.slice(-numberOfExamples);
+          elementCopyExamples[element + "_upvotes"] = lastFiveExamples;
+      }
+    }
+    for (let element of promptElements) {
+      if (clientMongoDocumentDownvotes && clientMongoDocumentDownvotes.hasOwnProperty(element + "_downvotes")) {
+          let examplesArray = clientMongoDocumentDownvotes[element + "_downvotes"];
+          let lastFiveExamples = examplesArray.slice(-numberOfExamples);
+          elementCopyExamples[element + "_downvotes"] = lastFiveExamples;
+
+      }
+    }
+  } else if (platformToServe === "Facebook") {
+    elementCopyExamples = {};
+    let clientMongoDocumentUpvotes = clientMongoDocument.document.upvotes;
+    let clientMongoDocumentDownvotes = clientMongoDocument.document.downvotes;
+
+    for (let element of promptElements) {
+      if (clientMongoDocumentUpvotes && clientMongoDocumentUpvotes.hasOwnProperty(element + "_upvotes")) {
+        console.log("ok documents exists")  
+        let examplesArray = clientMongoDocumentUpvotes[element + "_upvotes"];
+        console.log("examplesArray: " + examplesArray)
+          let lastFiveExamples = examplesArray.slice(-numberOfExamples);
+          elementCopyExamples[element + "_upvotes"] = lastFiveExamples;
+          console.log("lastFiveExamples: " + lastFiveExamples)          
+      }
+    }
+    for (let element of promptElements) {
+      if (clientMongoDocumentDownvotes && clientMongoDocumentDownvotes.hasOwnProperty(element + "_downvotes")) {
+          let examplesArray = clientMongoDocumentDownvotes[element + "_downvotes"];
+          let lastFiveExamples = examplesArray.slice(-numberOfExamples);
+          elementCopyExamples[element + "_downvotes"] = lastFiveExamples;
+      }
+    }
+  }
+}
 
 function combineTraits(preferenceObject, clientTraits2) {
   // Get the first key name from the apiResponse object
@@ -1400,6 +1479,18 @@ function getInfo() {
   return info;
 }
 
+function getTheme() {
+  var themeInput = document.getElementById("themeDropdown");
+  var theme = themeInput.value;
+  return theme;
+}
+
+function getClient() {
+  var clientInput = document.getElementById("clients");
+  var client = clientInput.value;
+  return client;
+}
+
 function getPromptElements() {
   storedPromptElements = [];
   storedPromptElements = promptElements;
@@ -1455,177 +1546,232 @@ const gptRequest = document.getElementById("gptRequest");
 gptRequest.addEventListener("submit", (e) => {
   e.preventDefault();
 
-
-  //   var promptElements = [];
-  //   var searchPattern = /\{([^}]+)\}/g;
-  //   var inputs = document.querySelectorAll("#mainTable td.text-content-cell");
-
-  //      inputs.forEach(function (input) {
-  //     var tagText = input.textContent;
-  //     //console.log("Tag Text:", tagText); // Log the tag text for debugging
-
-  //     var matches = tagText.match(searchPattern);
-  //     //console.log("Matches:", matches); // Log the matches for debugging
-
-  //     if (matches) {
-  //       for (var i = 0; i < matches.length; i++) {
-  //         var tag = matches[i].replace('{', '').replace('}', '');
-  //         promptElements.push(tag);
-  //       }
-  //     }
-  //   });
-  //   return promptElements;
-  // }
-
   var prompt = getSubject();
   var lang = getLang();
   var info = getInfo();
-  //console.log(getPromptElements)
   promptElements = getPromptElements();
   var subject = getSubject();
+  if (platformToServe === "Facebook") {
+    var theme = getTheme();
+  }
+  var client = getClient();
 
-  // Make the API call
-  var statusMessage = document.getElementById("statusMessage");
-  // Set the message to indicate the running state
-  statusMessage.textContent = "Talking to ChatGPT...";
-  //console.log("storedPromptElements: " + storedPromptElements);
-  //console.log("ok prompt: " + prompt + " and ok prompt elements: " + promptElements) + "and ok lang: " + lang;
-
-  new Promise((resolve, reject) => {
-  // Add your condition based on gpt-request-status here
-  var topContainer = document.getElementById("topContainer");
-  var gptRequestStatus = topContainer.getAttribute("gpt-request-status");
-
-
-  if (gptRequestStatus === "generate-copy") {
-    clientTraits = "";
+  setStatusMessage("Talking to ChatGPT...")
   
-    // Find the right client traits
-    var clientName = document.getElementById("clients").value;
-    function findOneDataPromise(clientName) {
-      return new Promise((resolve, reject) => {
-        google.script.run
-          .withSuccessHandler(response => {
-            resolve(response);
-          })
-          .withFailureHandler(error => {
-            reject(error);
-          })
-          .findOneDataFromMongoDB(clientName);
-      });
-    }
-    var foundOneData = findOneDataPromise(clientName)
-    .then(response => {
-      //console.log("Success949:", response);
-      return response; // Return the response to use it further if needed
-    })
-    .then(foundOneData => {
-      clientTraits = extractTraits(foundOneData);
-      clientMongoDocument = foundOneData;
-      return clientTraits;
-    }).then(clientTraits => {
-      elementCopyExamples = {};
-      let clientMongoDocumentUpvotes = clientMongoDocument.document.upvotes;
-      let clientMongoDocumentDownvotes = clientMongoDocument.document.downvotes;
+  // For Email
+  if (platformToServe === "Email") {
+    new Promise((resolve, reject) => {
+    // Add your condition based on gpt-request-status here
+    var topContainer = document.getElementById("topContainer");
+    var gptRequestStatus = topContainer.getAttribute("gpt-request-status");
 
-      for (let element of promptElements) {
-        if (clientMongoDocumentUpvotes && clientMongoDocumentUpvotes.hasOwnProperty(element + "_upvotes")) {
-            let examplesArray = clientMongoDocumentUpvotes[element + "_upvotes"];
-            let lastFiveExamples = examplesArray.slice(-numberOfExamples);
-            elementCopyExamples[element + "_upvotes"] = lastFiveExamples;
-        }
-      }
-
-      for (let element of promptElements) {
-        if (clientMongoDocumentDownvotes && clientMongoDocumentDownvotes.hasOwnProperty(element + "_downvotes")) {
-            let examplesArray = clientMongoDocumentDownvotes[element + "_downvotes"];
-            let lastFiveExamples = examplesArray.slice(-numberOfExamples);
-            elementCopyExamples[element + "_downvotes"] = lastFiveExamples;
-        }
-      }  
-    }).then(result => {
-      //console.log(clientTraits);    
-    // Run getGPTResponse
-    google.script.run
-    .withSuccessHandler((response) => {
-      //console.log("Success:", response.result);  // Only logs the 'result' part of the response
-      console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
-      globalApiResponse = response.result;  // Only use the 'result' part of the response
-      updateStoredFinalObjectResult()
-      resolve(response.result);  // Only resolve the 'result' part of the response
-    })
-    .withFailureHandler((error) => {
-      console.log("Error:", error);
-      reject(error);
-    })
-    .getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, clientTraits, elementCopyExamples, numberOfExamples);
-    //get date and time of gpt request    
-    var timeStamp = getDateAndTime();
-    //make the api call
-    google.script.run
-    .withSuccessHandler((response) => {
-      //console.log("statusLog:", response);
-    })
-    .logUsageOnServer(prompt, timeStamp, version, lang, info, requestedCorrections, clientName);
-  });
-  } else {
-    // Run getGPTDesignResponse
-    google.script.run
+    if (gptRequestStatus === "generate-copy") {
+      clientTraits = "";
+      // Find the right client traits
+      var foundOneData = GoogleScriptRun("findOneDataFromMongoDB", client, true)
+      .then(response => {
+        //console.log("Success949:", response);
+        return response; // Return the response to use it further if needed
+      })
+      .then(foundOneData => {
+        clientTraits = extractTraits(foundOneData);
+        clientMongoDocument = foundOneData;
+        return clientTraits;
+      }).then(clientTraits => {
+        getUpvotesAndDownvotes()
+      }).then(result => {
+        //console.log(clientTraits);    
+      // Run getGPTResponse
+      google.script.run
       .withSuccessHandler((response) => {
-        //console.log("Success:", response.result);
-        resolve(response.result);
+        //console.log("Success:", response.result);  // Only logs the 'result' part of the response
+        console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
+        globalApiResponse = response.result;  // Only use the 'result' part of the response
+        updateStoredFinalObjectResult()
+        resolve(response.result);  // Only resolve the 'result' part of the response
       })
       .withFailureHandler((error) => {
         console.log("Error:", error);
         reject(error);
       })
-      .getGPTDesignResponse(lang, heroBannerTitle, heroBannerText, heroBannerCTA, subject, info);
-  }
-})
-  .then((result) => {
-    statusMessage.textContent = "Translating with ChatGPT...";
-    if (lang === "English") {
-      // Skip requestTranslation and continue to the next step
-      return Promise.resolve(result);
+      .getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, clientTraits, elementCopyExamples, numberOfExamples);
+      //get date and time of gpt request    
+      var timeStamp = getDateAndTime();
+      //make the api call
+      google.script.run
+      .withSuccessHandler((response) => {
+        //console.log("statusLog:", response);
+      })
+      .logUsageOnServer(prompt, timeStamp, version, lang, info, requestedCorrections, clientName);
+    });
     } else {
-      // Proceed with requestTranslation
+      // Run getGPTDesignResponse
+      google.script.run
+        .withSuccessHandler((response) => {
+          //console.log("Success:", response.result);
+          resolve(response.result);
+        })
+        .withFailureHandler((error) => {
+          console.log("Error:", error);
+          reject(error);
+        })
+        .getGPTDesignResponse(lang, heroBannerTitle, heroBannerText, heroBannerCTA, subject, info);
+    }
+  })
+    .then((result) => {
+      statusMessage.textContent = "Translating with ChatGPT...";
+      if (lang === "English") {
+        // Skip requestTranslation and continue to the next step
+        return Promise.resolve(result);
+      } else {
+        // Proceed with requestTranslation
+        return new Promise((resolve, reject) => {
+          //console.log("Success:", result);
+          google.script.run
+            .withSuccessHandler((response) => {
+              //console.log("Success:", response.result);
+              //console.log("Success:", response.statusLog);
+              globalApiResponse = response.result;
+              resolve(response.result);
+            })
+            .withFailureHandler((error) => {
+              console.log("Error:", error);
+              reject(error);
+            })
+            .requestTranslation1(result, lang);
+        });
+      }
+    })
+    .then((result) => {
+      statusMessage.textContent = "Negociation with Open AI servers...";
+      // Handle the API response
       return new Promise((resolve, reject) => {
-        //console.log("Success:", result);
+        updateTextContentCells(result, optionsCount);
+        resolve(result);
+      });
+    })
+    .then((result) => {
+      statusMessage.textContent = "Script completed.";
+      // Process each tag and call showOptionsOnHover
+      promptElements.forEach((tag) => {
+        showOptionsOnHover(tag, optionsCount);
+      });
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      statusMessage.textContent = "Script encountered an error.";
+    });
+
+  // For Facebook
+  } else if (platformToServe === "Facebook") {
+    new Promise((resolve, reject) => {
+      // Add your condition based on gpt-request-status here
+      var topContainer = document.getElementById("topContainer");
+      var gptRequestStatus = topContainer.getAttribute("gpt-request-status");
+  
+      if (gptRequestStatus === "generate-copy") {
+        clientTraits = "";
+        // Find the right client traits
+        var foundOneData = GoogleScriptRun("findOneDataFromMongoDB", client, true)
+        .then(response => {
+          //console.log("Success949:", response);
+          return response; // Return the response to use it further if needed
+        })
+        .then(foundOneData => {
+          // WORK PIPELINE 30 AUG DONE : Make sure extract traits grab the Facebook traits
+          clientTraits = extractTraits(foundOneData);
+          clientMongoDocument = foundOneData;
+          return clientTraits;
+        }).then(clientTraits => {
+          // WORK PIPELINE 30 AUG DONE : Create upvotes for FB and grab FB's ones
+          console.log("prompt elmements : " + promptElements)
+          getUpvotesAndDownvotes()
+        }).then(result => {
+        // Run getGPTResponse
+        google.script.run
+        .withSuccessHandler((response) => {
+          //console.log("Success:", response.result);  // Only logs the 'result' part of the response
+          console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
+          globalApiResponse = response.result;  // Only use the 'result' part of the response
+          updateStoredFinalObjectResult()
+          resolve(response.result);  // Only resolve the 'result' part of the response
+        })
+        .withFailureHandler((error) => {
+          console.log("Error:", error);
+          reject(error);
+        })
+        // WORK PIPELINE 30 AUG : Add theme, correct traits, copy examples, etc.
+        .getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info, clientTraits, elementCopyExamples, numberOfExamples, theme);
+        //get date and time of gpt request    
+        var timeStamp = getDateAndTime();
+        //make the api call
+        google.script.run
+        .withSuccessHandler((response) => {
+          //console.log("statusLog:", response);
+        })
+        // WORK PIPELINE 30 AUG : Add the facebook stuff to log
+        .logUsageOnServer(prompt, timeStamp, version, lang, info, requestedCorrections, clientName);
+      });
+      } else {
+        // Run getGPTDesignResponse
         google.script.run
           .withSuccessHandler((response) => {
             //console.log("Success:", response.result);
-            //console.log("Success:", response.statusLog);
-            globalApiResponse = response.result;
             resolve(response.result);
           })
           .withFailureHandler((error) => {
             console.log("Error:", error);
             reject(error);
           })
-          .requestTranslation1(result, lang);
+          .getGPTDesignResponse(lang, heroBannerTitle, heroBannerText, heroBannerCTA, subject, info);
+      }
+    })
+      .then((result) => {
+        statusMessage.textContent = "Translating with ChatGPT...";
+        if (lang === "English") {
+          // Skip requestTranslation and continue to the next step
+          return Promise.resolve(result);
+        } else {
+          // Proceed with requestTranslation
+          return new Promise((resolve, reject) => {
+            //console.log("Success:", result);
+            google.script.run
+              .withSuccessHandler((response) => {
+                //console.log("Success:", response.result);
+                //console.log("Success:", response.statusLog);
+                globalApiResponse = response.result;
+                resolve(response.result);
+              })
+              .withFailureHandler((error) => {
+                console.log("Error:", error);
+                reject(error);
+              })
+              // WORK PIPELINE 30 AUG : Make new function for FB... ??
+              .requestTranslation1(result, lang);
+          });
+        }
+      })
+      .then((result) => {
+        statusMessage.textContent = "Negociation with Open AI servers...";
+        // Handle the API response
+        return new Promise((resolve, reject) => {
+          // WORK PIPELINE 30 AUG : Fix function updatetext for FB
+          updateTextContentCells(result, optionsCount);
+          resolve(result);
+        });
+      })
+      .then((result) => {
+        statusMessage.textContent = "Script completed.";
+        // Process each tag and call showOptionsOnHover
+        promptElements.forEach((tag) => {
+          showOptionsOnHover(tag, optionsCount);
+        });
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        statusMessage.textContent = "Script encountered an error.";
       });
-    }
-  })
-  .then((result) => {
-    statusMessage.textContent = "Negociation with Open AI servers...";
-    // Handle the API response
-    return new Promise((resolve, reject) => {
-      updateTextContentCells(result, optionsCount);
-      resolve(result);
-    });
-  })
-  .then((result) => {
-    statusMessage.textContent = "Script completed.";
-    // Process each tag and call showOptionsOnHover
-    promptElements.forEach((tag) => {
-      showOptionsOnHover(tag, optionsCount);
-    });
-  })
-  .catch((error) => {
-    console.error("Error:", error);
-    statusMessage.textContent = "Script encountered an error.";
-  });
-
+  }
 });
 
 function getTopContainerStatus() {
@@ -1722,7 +1868,7 @@ function initNavSystemEmail() {
         qaButton.classList.remove("hideButton");
         const checkCondition = () => {
           var emailSubjectLineField = document.getElementById("Email-Subject-Line");
-          if (emailSubjectLineField.textContent !== "Email Subject Line") {
+            if (emailSubjectLineField.textContent !== "Email Subject Line") {
             storedEmailSubject = emailSubjectLineField.textContent;
             document.getElementById('step' + currentSection).style.display = 'block';
           } else {
