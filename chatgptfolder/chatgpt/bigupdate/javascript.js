@@ -452,13 +452,13 @@ async function sidebarInit() {
 function getThemeExamples(theme) {
   if (theme === "BF - Early Access VIP") {
       let primaryText_CopyExamples = [
-          `Notre Vente VIP du Black Friday est en cours! 😍...\n🚨 Offre d’une durée limitée. Magasinez nos rabais du Black Friday maintenant 👇`,
-          `Ton accès VIP à notre vente du Black Friday, c’est MAINTENANT!...\nClique ici pour magasiner nos meilleurs prix en primeur.`,
+          `Notre Vente VIP du Black Friday est en cours! 😍...\n🚨 Offre d'une durée limitée. Magasinez nos rabais du Black Friday maintenant 👇`,
+          `Ton accès VIP à notre vente du Black Friday, c'est MAINTENANT!...\nClique ici pour magasiner nos meilleurs prix en primeur.`,
           `👟BLACK FRIDAY VIP 👟...\nClique ici pour économiser dès maintenant. 👇`
       ];
       let headline_CopyExamples = [
           "X% pour les membres VIP",
-          "Profite de ton rabais VIP dès aujourd’hui!",
+          "Profite de ton rabais VIP dès aujourd'hui!",
           "Black Friday VIP en cours"
       ];
       let description_CopyExamples = [
@@ -474,18 +474,18 @@ function getThemeExamples(theme) {
 
   } else if (theme === "Black Friday week") {
       let primaryText_CopyExamples = [
-          `C’est le pré-Black Friday chez [NOM DU CLIENT]!...\nCliquez ici pour découvrir tous nos bas prix.👇`,
-          `⚡VENDREDI FOU À L’AVANCE ⚡...\nDécouvrez tous nos produits en promotion ici. 👇`
+          `C'est le pré-Black Friday chez [NOM DU CLIENT]!...\nCliquez ici pour découvrir tous nos bas prix.👇`,
+          `⚡VENDREDI FOU À L'AVANCE ⚡...\nDécouvrez tous nos produits en promotion ici. 👇`
       ];
       let headline_CopyExamples = [
-          "LE VENDREDI FOU À L’AVANCE | Jusqu’à -X% sur [produits]",
-          "Vente du Pré-Black Friday | [RABAIS] | Jusqu’au X novembre",
+          "LE VENDREDI FOU À L'AVANCE | Jusqu'à -X% sur [produits]",
+          "Vente du Pré-Black Friday | [RABAIS] | Jusqu'au X novembre",
           "Semaine du Black Friday | [RABAIS] | Code XXXX"
       ];
       let description_CopyExamples = [
           "Le Pré-Black Friday est commencé!",
           "Nos meilleures offres de 2023!",
-          "Semaine du Black Friday : Jusqu’à -X%"
+          "Semaine du Black Friday : Jusqu'à -X%"
       ];
       return {
           primary: primaryText_CopyExamples,
@@ -494,15 +494,15 @@ function getThemeExamples(theme) {
       }
   } else if (theme === "Black Friday") {
         let primaryText_CopyExamples = [
-            `🥳 BLACK FRIDAY 🥳...\nClique ici pour profiter des meilleurs prix de l’année maintenant. 👇`,
+            `🥳 BLACK FRIDAY 🥳...\nClique ici pour profiter des meilleurs prix de l'année maintenant. 👇`,
             `🤑 BLACK FRIDAY 🤑...\nCliquez ici pour profiter de notre méga vente!`,
-            `BLACK FRIDAY...\nCommandez vos [produits] favoris à bas prix sans plus attendre 👇\n*Jusqu’au X novembre seulement.`
+            `BLACK FRIDAY...\nCommandez vos [produits] favoris à bas prix sans plus attendre 👇\n*Jusqu'au X novembre seulement.`
         ];
         let headline_CopyExamples = [
             "Les plus gros rabais de 2023 sont là! 💸",
-            "Nos MEILLEURES offres de l’année! 😮",
-            "Jusqu’à -X% pour le Black Friday",
-            "BLACK FRIDAY : jusqu’à -X%!"
+            "Nos MEILLEURES offres de l'année! 😮",
+            "Jusqu'à -X% pour le Black Friday",
+            "BLACK FRIDAY : jusqu'à -X%!"
         ];
         let description_CopyExamples = [
             "Magasine maintenant",
@@ -517,13 +517,13 @@ function getThemeExamples(theme) {
 
     } else if (theme === "Cyber Monday") {
         let primaryText_CopyExamples = [
-            `LE CYBER MONDAY BAT SON PLEIN!...\nCliquez ici pour explorer nos rabais et profiter de notre plus grande vente de l’année. Les quantités sont limitées!`,
-            `🙌CYBER LUNDI 🙌...\nC’est votre toute dernière chance d’en profiter. Cliquez ici pour magasiner à bas prix avant que notre plus grande vente de l’année se termine 👇\n*Jusqu’au X novembre seulement.`
+            `LE CYBER MONDAY BAT SON PLEIN!...\nCliquez ici pour explorer nos rabais et profiter de notre plus grande vente de l'année. Les quantités sont limitées!`,
+            `🙌CYBER LUNDI 🙌...\nC'est votre toute dernière chance d'en profiter. Cliquez ici pour magasiner à bas prix avant que notre plus grande vente de l'année se termine 👇\n*Jusqu'au X novembre seulement.`
         ];
         let headline_CopyExamples = [
-            "Profitez des plus gros rabais de l’année!",
+            "Profitez des plus gros rabais de l'année!",
             "Nos meilleures offres de 2023 continuent!",
-            "Bas prix jusqu’au X novembre seulement"
+            "Bas prix jusqu'au X novembre seulement"
         ];
         let description_CopyExamples = [
             "Magasine maintenant",
@@ -539,18 +539,18 @@ function getThemeExamples(theme) {
     } else if (theme === "BFCM - Last Chance") {
         let primaryText_CopyExamples = [
             `🚨DERNIÈRE CHANCE 🚨...\nCliquez ici pour économiser dès maintenant!👇`,
-            `❗VENDREDI FOU - DERNIÈRE CHANCE❗...\nCommandez vos produits favoris en solde sans plus attendre 👇\n*Jusqu’au X novembre seulement.`
+            `❗VENDREDI FOU - DERNIÈRE CHANCE❗...\nCommandez vos produits favoris en solde sans plus attendre 👇\n*Jusqu'au X novembre seulement.`
         ];
         let headline_CopyExamples = [
             "DERNIÈRE CHANCE : -X% de rabais!",
             "Nos offres du Black Friday se terminent",
             "Derniers jours : promos du Black Friday",
-            "Jusqu’à X % de rabais"
+            "Jusqu'à X % de rabais"
         ];
         let description_CopyExamples = [
             "Économisez gros!",
             "Faites-vite avant la rupture de stock!",
-            "Offre d’une durée limitée"
+            "Offre d'une durée limitée"
         ];
         return {
             primary: primaryText_CopyExamples,
@@ -560,14 +560,14 @@ function getThemeExamples(theme) {
 
     } else if (theme === "BFCM Extended") {
         let primaryText_CopyExamples = [
-            `🙌LE CYBER MONDAY EST PROLONGÉ 🙌...\nClique ici pour commander aux meilleurs prix de l’année avant qu’il soit trop tard. 👇`,
+            `🙌LE CYBER MONDAY EST PROLONGÉ 🙌...\nClique ici pour commander aux meilleurs prix de l'année avant qu'il soit trop tard. 👇`,
             `🙌LE BLACK FRIDAY SE POURSUIT 🙌...\nCliquez ici pour profiter de nos promotions limitées!`
         ];
         let headline_CopyExamples = [
-            "Profitez des plus gros rabais de l’année!",
+            "Profitez des plus gros rabais de l'année!",
             "Le Black Friday/Cyber Monday continue! 🤑",
             "Nos MEILLEURES offres de 2023 continuent!",
-            "Bas prix jusqu’au X décembre seulement"
+            "Bas prix jusqu'au X décembre seulement"
         ];
         let description_CopyExamples = [
             "Magasine maintenant",
