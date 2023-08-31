@@ -952,7 +952,7 @@ function getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, c
   }
 }
 
-function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info, clientTraits, elementCopyExamples, numberOfExamples, theme){
+function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info, clientTraits, elementCopyExamples, numberOfExamples, theme, themeExamples){
   var apiKey = getApiKey();
   var statusLog = "start of getGPTResponseSuper \n";
 
@@ -981,6 +981,14 @@ function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info
       return formatted;
   }
   
+  var formattedPrimary = formatExamples(themeExamples.primary);
+  var formattedHeadline = formatExamples(themeExamples.headline);
+  var formattedDescription = formatExamples(themeExamples.description);
+
+  statusLog += "formattedPrimary:\n" + formattedPrimary + "\n";
+  statusLog += "formattedHeadline:\n" + formattedHeadline + "\n";
+  statusLog += "formattedDescription:\n" + formattedDescription + "\n";
+
   if (elementCopyExamples["Primary Text_upvotes"]){
     primaryTextExamples_upvotes = formatExamples(elementCopyExamples["Primary Text_upvotes"]);
   }
@@ -1007,8 +1015,8 @@ function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info
     descriptionExamples_downvotes = formatExamples(elementCopyExamples["Description_downvotes"]);
   }
 
-  statusLog += "primaryTextExamples_upvotes:\n" + primaryTextExamples_upvotes +  "\n";
-  statusLog += "all examples: " + JSON.stringify(elementCopyExamples) + "\n";
+  //statusLog += "primaryTextExamples_upvotes:\n" + primaryTextExamples_upvotes +  "\n";
+  //statusLog += "all examples: " + JSON.stringify(elementCopyExamples) + "\n";
   //statusLog += typeof(heroBannerTitleExamples_upvotes) +  "\n";
   
   var systemContent = 

@@ -452,9 +452,9 @@ async function sidebarInit() {
 function getThemeExamples(theme) {
   if (theme === "BF - Early Access VIP") {
       let primaryText_CopyExamples = [
-          `Notre Vente VIP du Black Friday est en cours! 😍...\n🚨 Offre d'une durée limitée. Magasinez nos rabais du Black Friday maintenant 👇`,
-          `Ton accès VIP à notre vente du Black Friday, c'est MAINTENANT!...\nClique ici pour magasiner nos meilleurs prix en primeur.`,
-          `👟BLACK FRIDAY VIP 👟...\nClique ici pour économiser dès maintenant. 👇`
+          `Notre Vente VIP du Black Friday est en cours! 😍\n\nProfitez dun rabais de X% sur [PRODUITS]… ou pour faire vos achats des Fêtes à l'avance!\n\nCODE: XXXX.\n\n🚨 Offre d'une durée limitée. Magasinez nos rabais du Black Friday maintenant 👇`,
+          `Ton accès VIP à notre vente du Black Friday, c'est MAINTENANT!\n\n- Profite d'un rabais privilégié de X% sur [PRODUITS] avec le code XXXX (optionnel)\n- (autre perk si applicable)\n\nDépêche-toi de mettre la main sur [PRODUIT] avant qu'il soit épuisé, il ne te reste que X heures (ou autre urgency).\n\nClique ici pour magasiner nos meilleurs prix en primeur.`,
+          `👟BLACK FRIDAY VIP 👟\nNos membres VIP économisent X% sur [PRODUITS] dès aujourd'hui!\n\nUtilise ton code promo exclusif XXXX (optionnel) pour profiter de notre meilleure offre de l'année avant tout le monde!\n\nTu éviteras les ruptures de stock et t'assureras de te procurer tes [PRODUITS] préférés. (ou autre phrase en lien avec le client)\n\nClique ici pour économiser dès maintenant. 👇`
       ];
       let headline_CopyExamples = [
           "X% pour les membres VIP",
@@ -474,8 +474,8 @@ function getThemeExamples(theme) {
 
   } else if (theme === "Black Friday week") {
       let primaryText_CopyExamples = [
-          `C'est le pré-Black Friday chez [NOM DU CLIENT]!...\nCliquez ici pour découvrir tous nos bas prix.👇`,
-          `⚡VENDREDI FOU À L'AVANCE ⚡...\nDécouvrez tous nos produits en promotion ici. 👇`
+          `C'est le pré-Black Friday chez [NOM DU CLIENT]!\n\nProfitez de rabais allant jusqu'à X% dès maintenant sur [PRODUITS] durant toute la semaine.\n\nPourquoi attendre à vendredi quand vous pouvez économiser dès aujourd'hui?\n\nCliquez ici pour découvrir tous nos bas prix.👇`,
+          `⚡VENDREDI FOU À L'AVANCE ⚡\nNos meilleures offres de 2022 sont commencées!\n\nProfitez-en pour mettre la main sur nos [PRODUITS] à X% de rabais jusqu'au X novembre.\n\n(Phrase sur les bénéfices des produits ou par rapport au client).\n\nDécouvrez tous nos produits en promotion ici. 👇`
       ];
       let headline_CopyExamples = [
           "LE VENDREDI FOU À L'AVANCE | Jusqu'à -X% sur [produits]",
@@ -494,9 +494,9 @@ function getThemeExamples(theme) {
       }
   } else if (theme === "Black Friday") {
         let primaryText_CopyExamples = [
-            `🥳 BLACK FRIDAY 🥳...\nClique ici pour profiter des meilleurs prix de l'année maintenant. 👇`,
-            `🤑 BLACK FRIDAY 🤑...\nCliquez ici pour profiter de notre méga vente!`,
-            `BLACK FRIDAY...\nCommandez vos [produits] favoris à bas prix sans plus attendre 👇\n*Jusqu'au X novembre seulement.`
+            `🥳 BLACK FRIDAY 🥳\nÉconomise jusqu'à X% sur [PRODUITS]!\n\n[Énumération des produits en solde + bénéfices ou phrase à propos de la marque/du client].\n\nFais vite, le code promo XXXX est valide jusqu'au X novembre seulement!\n\nClique ici pour profiter des meilleurs prix de l'année maintenant. 👇`,
+            `🤑 BLACK FRIDAY 🤑\nNos plus GROS rabais de l'année sont en cours!\n\n- [énumération des rabais/offres]\n- [énumération des rabais/offres]\n- [énumération des rabais/offres]\n\nC'est le moment idéal pour faire le plein de [produits + leurs bénéfices ou phrase inspirante qui donne envie d'acheter].\n\nCliquez ici pour profiter de notre méga vente!`,
+            `BLACK FRIDAY\nTous les [produits] sont à X% de rabais avec le code promo XXXX (optionnel)!\n\n[Produits + leurs bénéfices ou phrase inspirante qui donne envie d'acheter].\n\nCommandez vos [produits] favoris à bas prix sans plus attendre 👇\n\n*Jusqu'au X novembre seulement.`
         ];
         let headline_CopyExamples = [
             "Les plus gros rabais de 2023 sont là! 💸",
@@ -517,8 +517,8 @@ function getThemeExamples(theme) {
 
     } else if (theme === "Cyber Monday") {
         let primaryText_CopyExamples = [
-            `LE CYBER MONDAY BAT SON PLEIN!...\nCliquez ici pour explorer nos rabais et profiter de notre plus grande vente de l'année. Les quantités sont limitées!`,
-            `🙌CYBER LUNDI 🙌...\nC'est votre toute dernière chance d'en profiter. Cliquez ici pour magasiner à bas prix avant que notre plus grande vente de l'année se termine 👇\n*Jusqu'au X novembre seulement.`
+            `LE CYBER MONDAY BAT SON PLEIN!\n\nPour l'occasion, [NOS PRODUITS] sont offerts à prix imbattables.\n\n[Énumération de produits en rabais], etc., économisez jusqu'à X% sur les produits qui vous font de l'œil avec le code promo XXXX.\n\nCliquez ici pour explorer nos rabais et profiter de notre plus grande vente de l'année. Les quantités sont limitées!`,
+            `🙌CYBER LUNDI 🙌\nNos meilleures offres de 2022 se poursuivent!\n\nNos rabais allant jusqu'à X% sur une variété de produits sont encore valides jusqu'au X novembre.\n\n(Phrase par rapport au produit ou au client).\n\nC'est votre toute dernière chance d'en profiter. Cliquez ici pour magasiner à bas prix avant que notre plus grande vente de l'année se termine 👇\n\n*Jusqu'au X novembre seulement.`
         ];
         let headline_CopyExamples = [
             "Profitez des plus gros rabais de l'année!",
@@ -538,8 +538,8 @@ function getThemeExamples(theme) {
 
     } else if (theme === "BFCM - Last Chance") {
         let primaryText_CopyExamples = [
-            `🚨DERNIÈRE CHANCE 🚨...\nCliquez ici pour économiser dès maintenant!👇`,
-            `❗VENDREDI FOU - DERNIÈRE CHANCE❗...\nCommandez vos produits favoris en solde sans plus attendre 👇\n*Jusqu'au X novembre seulement.`
+            `🚨DERNIÈRE CHANCE 🚨\nOFFRE VENDREDI FOU : jusqu'à X % de rabais sur les articles sélectionnés 🎉\nC'est votre chance de profiter des meilleurs soldes de l'année sur une large sélection [PRODUITS DÉTAIL] et plus encore!\nCliquez ici pour économiser dès maintenant!👇`,
+            `🚨DERNIÈRE CHANCE 🚨\nOFFRE VENDREDI FOU : jusqu'à X % de rabais sur les articles sélectionnés 🎉\nC'est votre chance de profiter des meilleurs soldes de l'année sur une large sélection [PRODUITS DÉTAIL] et plus encore!\nCliquez ici pour économiser dès maintenant!👇`
         ];
         let headline_CopyExamples = [
             "DERNIÈRE CHANCE : -X% de rabais!",
@@ -560,8 +560,8 @@ function getThemeExamples(theme) {
 
     } else if (theme === "BFCM Extended") {
         let primaryText_CopyExamples = [
-            `🙌LE CYBER MONDAY EST PROLONGÉ 🙌...\nClique ici pour commander aux meilleurs prix de l'année avant qu'il soit trop tard. 👇`,
-            `🙌LE BLACK FRIDAY SE POURSUIT 🙌...\nCliquez ici pour profiter de nos promotions limitées!`
+            `🙌LE CYBER MONDAY EST PROLONGÉ 🙌\nLe code promo XXXX pour économiser X% sur [PRODUITS] est encore valide!\n\nNotre vente a été un tel succès qu'on a décidé de t'en faire profiter jusqu'au X décembre.\n\nC'est l'occasion de cocher quelques cadeaux sur ta liste de Noël ou de t'offrir un [produit vraiment cool + bénéfice].\n\nClique ici pour commander aux meilleurs prix de l'année avant qu'il soit trop tard. 👇`,
+            `🙌LE BLACK FRIDAY SE POURSUIT 🙌\nNos MEILLEURES offres de l'année sont prolongées jusqu'au X décembre!\n\nSi vous avez manqué notre vente, c'est le moment de vous rattraper et de mettre la main sur des économies de X% sur [PRODUITS].\n\nQue ce soit pour [bénéfice du produit] ou pour cocher quelques cadeaux sur votre liste des fêtes, c'est le meilleur moment pour faire le plein!\n\nCliquez ici pour profiter de nos promotions limitées!`
         ];
         let headline_CopyExamples = [
             "Profitez des plus gros rabais de l'année!",
@@ -1506,12 +1506,9 @@ function getUpvotesAndDownvotes() {
 
     for (let element of promptElements) {
       if (clientMongoDocumentUpvotes && clientMongoDocumentUpvotes.hasOwnProperty(element + "_upvotes")) {
-        console.log("ok documents exists")  
         let examplesArray = clientMongoDocumentUpvotes[element + "_upvotes"];
-        console.log("examplesArray: " + examplesArray)
           let lastFiveExamples = examplesArray.slice(-numberOfExamples);
-          elementCopyExamples[element + "_upvotes"] = lastFiveExamples;
-          console.log("lastFiveExamples: " + lastFiveExamples)          
+          elementCopyExamples[element + "_upvotes"] = lastFiveExamples;         
       }
     }
     for (let element of promptElements) {
@@ -1692,6 +1689,7 @@ gptRequest.addEventListener("submit", (e) => {
     var theme = getTheme();
   }
   var client = getClient();
+  var themeExamples = getThemeExamples(theme);
 
   setStatusMessage("Talking to ChatGPT...")
   
@@ -1825,7 +1823,6 @@ gptRequest.addEventListener("submit", (e) => {
           getUpvotesAndDownvotes()
         }).then(result => {
         // Run getGPTResponse
-        let examples = getThemeExamples(theme);
         google.script.run
         .withSuccessHandler((response) => {
           //console.log("Success:", response.result);  // Only logs the 'result' part of the response
@@ -1839,7 +1836,7 @@ gptRequest.addEventListener("submit", (e) => {
           reject(error);
         })
         // WORK PIPELINE 30 AUG : Add theme, correct traits, copy examples, etc.
-        .getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info, clientTraits, elementCopyExamples, numberOfExamples, theme);
+        .getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info, clientTraits, elementCopyExamples, numberOfExamples, theme, themeExamples);
         //get date and time of gpt request    
         var timeStamp = getDateAndTime();
         //make the api call
