@@ -954,7 +954,7 @@ function getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, c
 
 function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info, clientTraits, elementCopyExamples, numberOfExamples, theme, themeExamples) {
   var apiKey = getApiKey();
-  var statusLog = "start of getGPTResponseSuper \n";
+  var statusLog = "start of getGPTResponseSuper_fb \n";
 
   var primaryTextExamples_upvotes;
   var headlineExamples_upvotes;
@@ -1093,7 +1093,7 @@ function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info
         },
         {
             "name": "get_facebook_ad_element_responses",
-            "description": "Create a compelling Facebook ad copy using the provided information about the client, the theme and the preferences.",
+            "description": "Be in character and create a compelling Facebook ad copy using the provided information about the client, the theme and the preferences. Each tone should be unique and extreme",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -1108,9 +1108,33 @@ function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info
                             },
                             "required": ["element type", "content"]
                         }
-                    }
+                    },
+                      "overexcited_and_extravagant": {
+                        "type": "array",
+                        "description": "An overexcited and extravagant version of the facebook ad copy.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "element type": {"type": "string"},
+                                "content": {"type": "string"}
+                            },
+                            "required": ["element type", "content"]
+                        }
+                    },
+                        "playful_and_chill": {
+                        "type": "array",
+                        "description": "A playful and chill version of the facebook ad copy.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "element type": {"type": "string"},
+                                "content": {"type": "string"}
+                            },
+                            "required": ["element type", "content"]
+                        }
+                    },
                 },
-                "required": ["happy_and_helpful"]
+                "required": ["happy_and_helpful", "overexcited_and_extravagant", "playful_and_chill"]
                 //"required": ["overexcited_and_extravagant", "happy_and_helpful", "playful_and_chill"]
             }
         },
@@ -1184,10 +1208,10 @@ function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info
   if(responseData['choices'][0]['message']['function_call']){
     // Function call handling
     var replyContent = responseData['choices'][0]['message'];
-    //statusLog += "replyContent: " + JSON.stringify(replyContent) + "\n";
+    statusLog += "replyContent: " + JSON.stringify(replyContent) + "\n";
 
     var rawArguments = replyContent['function_call']['arguments'];
-    //statusLog += "Raw 'function_call' arguments: " + rawArguments + "\n";
+    statusLog += "Raw 'function_call' arguments: " + rawArguments + "\n";
     //statusLog += "Type of 'function_call' arguments: " + typeof rawArguments + "\n";
 
     try {
@@ -1200,7 +1224,7 @@ function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info
     }
 
   
-    //statusLog += "responseOptions: " + JSON.stringify(responseOptions) + "\n";
+    statusLog += "responseOptions: " + JSON.stringify(responseOptions) + "\n";
     //statusLog += "clientTraits: " + JSON.stringify(clientTraits) + "\n";
   
 
