@@ -952,7 +952,7 @@ function getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, c
   }
 }
 
-function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info, clientTraits, elementCopyExamples, numberOfExamples, theme, themeExamples){
+function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info, clientTraits, elementCopyExamples, numberOfExamples, theme, themeExamples) {
   var apiKey = getApiKey();
   var statusLog = "start of getGPTResponseSuper \n";
 
@@ -985,9 +985,9 @@ function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info
   var formattedHeadline = formatExamples(themeExamples.headline);
   var formattedDescription = formatExamples(themeExamples.description);
 
-  statusLog += "formattedPrimary:\n" + formattedPrimary + "\n";
-  statusLog += "formattedHeadline:\n" + formattedHeadline + "\n";
-  statusLog += "formattedDescription:\n" + formattedDescription + "\n";
+  //statusLog += "formattedPrimary:\n" + formattedPrimary + "\n";
+  //statusLog += "formattedHeadline:\n" + formattedHeadline + "\n";
+  //statusLog += "formattedDescription:\n" + formattedDescription + "\n";
 
   if (elementCopyExamples["Primary Text_upvotes"]){
     primaryTextExamples_upvotes = formatExamples(elementCopyExamples["Primary Text_upvotes"]);
@@ -1015,30 +1015,26 @@ function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info
     descriptionExamples_downvotes = formatExamples(elementCopyExamples["Description_downvotes"]);
   }
 
-  //statusLog += "primaryTextExamples_upvotes:\n" + primaryTextExamples_upvotes +  "\n";
-  //statusLog += "all examples: " + JSON.stringify(elementCopyExamples) + "\n";
-  //statusLog += typeof(heroBannerTitleExamples_upvotes) +  "\n";
-  
   var systemContent = 
     
-  "We will work together to write a highly engaging Facebook Ad for my client's ecommerce store.\n" +
+  "Take the role of a senior Facebook Ad Manager. You manage of a big portfolio of cliens. We will work together to write a highly engaging Facebook Ad for my client's ecommerce store.\n" +
 
      "Here's a list of details I will provide you with for this task:\n" +
-    "- The subject that dictates the main hooks of the Facebook Ad\n" +
+    "- The subject dictates the main hooks of the Facebook Ad\n" +
     "- The theme which is the occasion why the Facebook Ad is made for. It can be Valentine's Day, for Black Friday, for Christmas or simply for Spring Season. This will help you put context around the copy.\n" +
     "- Extra information (called extra info) give you more details about the context or the promotional offer such as discount details or promotion dates. Dates, rebate percentage or eligibility conditions must be included in the 'Primary Text'\n" +
     "- Given the list of client traits below, it is crucial to integrate them accurately into the ad copy. Each 'trait[i]' specifies a unique characteristic that the ad copy should reflect. It is of utmost importance to include each trait, as these are primary client requests. If a trait suggests a specific format, style, or content (e.g., 'All upper cases' or 'Include a smiley emoji'), the resultant copy should strictly follow it. Please meticulously incorporate every trait while crafting the copy. Let's make sure each trait is highlighted in the generated copy.\n" + 
     "- The Facebook Ad Elements : A JS Array with elements to write copy for. Include only copy for these elements. Do not add or remove any items.\n"+
 
     "Here's what each element will include based on their role (if requested):\n"+
-    "- The 'Primary Text': This is the first piece of content users see when they scroll past your ad. It should grab attention, be engaging, and reflect the core message or offer. Use action verbs and emphasize gains, desired result, or perceivable added-value. The 'Primary Text' should be concise, making the most out of 125 characters or fewer.\n" +
-        "Example: 'Unlock exclusive savings! 🔥 Hurry, limited time only.'\n"+
+    "- The 'Primary Text': This is the first piece of content users see when they scroll past your ad. It should grab attention, be engaging, and reflect the core message or offer. Use action verbs and emphasize gains, desired result, or perceivable added-value. Refer to the following examples for the format, length and style:\n" +
+        "Example:" + formattedPrimary + "\n"+
         
-    "- The 'Headline': This appears right below the visual content (image or video) and is bolded. The 'Headline' should be short, direct, and highlight the main offer or call to action. It has around 25 characters to make an impact. Use action verbs such as 'GET', 'WIN', 'SAVE', 'DISCOVER', 'CLAIM'.\n" +
-        "Example: 'SAVE 50% Today!'\n"+
+    "- The 'Headline': This appears right below the visual content (image or video) and is bolded. The 'Headline' should be short, direct, and highlight the main offer or call to action. It has around 25 characters to make an impact. Please refer to the following examples for the format, length and style:\n" +
+        "Example:" + formattedHeadline + "\n"+
         
-    "- The 'Description': This is a smaller text that appears below the 'Headline'. The 'Description' gives additional details about the offer or product. It should add urgency if possible or provide a touch of detail that will further entice the user. For promotions, indicate the discount percentage, dates, or time sensitivity. This should be concise with around 30 characters.\n" +
-        "Example: 'Ends midnight. Don't miss out!'\n"+
+    "- The 'Description': This is a smaller text (30 characters maximum) that appears below the 'Headline'. The 'Description' gives additional details about the offer or product. It should add urgency if possible or provide a touch of detail that will further entice the user. This should be concise with around 30 characters. Please refer to the following examples for the format, length and style:\n" +
+        "Example:" + formattedDescription + "\n"+
 
 
     "Here's a list of instructions to applies to all of the element copies:\n"+
@@ -1049,7 +1045,7 @@ function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info
     "- Maintain a consistent tone throughout the copy, whether it's friendly, conversational, or persuasive. Ensure that the tone remains consistent and cohesive. Review and rewrite the targeted tag elements as needed.\n"+
     "- Use the established and clear theme from Step 1. Identify the main theme or message of the ad and ensure that it is reflected in all tag elements. Consistency in theme helps reinforce the central idea and makes the email more impactful. Review and rewrite the targeted tag elements as needed.\n"+
     "- Use a storytelling approach. Frame the copy within a narrative or storytelling framework. Connect the different tag elements by weaving a coherent story or progression that flows smoothly from one element to another. This approach maintains engagement and coherence. Review and rewrite the targeted tag elements as needed.\n"+
-  
+
     "Here are concrete examples of my favorite copies that have proven very effective in our Facebook Ads. Please use these as a reference and inspiration to craft your copies. Below are the examples for each Ads element:\n\n"+
 
     "- Primary Text:\n" + primaryTextExamples_upvotes + "\n"+
@@ -1063,7 +1059,11 @@ function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info
     "- Description (Avoid these):\n" + descriptionExamples_downvotes;
    
 
-  var content = "Here's the subject: " + prompt + ". Here's the theme: " + theme + ". Here's the extra info: " + info + ". If the extra info includes promotion dates, promo code, discount percentage or other offer specificity, include those info in your copy. Here's the JavaScript Array with elements to write about: " + promptElements +". Before proceeding, it's vital to thoroughly understand the following CLIENT TRAITS. These traits serve as guidelines, and each one is integral to crafting the ad copy. Please ensure that you incorporate every single trait meticulously in the output:\n\n" + traitsList + "\nRemember, each trait plays a significant role, so it's crucial not to overlook any of them.";
+  var content =   "Based on the following example copies for a " + theme + " theme, generate a new promotional facebook ad copy. If you have the info, you may replace the placeholder [discount] or [client name] or [product] with the real info.\n" + 
+    "- Primary Text:\n" + formattedPrimary + "\n"+
+    "- Headline:\n" + formattedHeadline + "\n"+
+    "- Description:\n" + formattedDescription + "\n"+
+    "Here's the subject: " + prompt + ". Here's the theme: " + theme + ". Here's the extra info: " + info + ". If the extra info includes promotion dates, promo code, discount percentage or other offer specificity, include those info in your copy. Here's the JavaScript Array with elements to write about: " + promptElements +". Before proceeding, it's vital to thoroughly understand the following CLIENT TRAITS. These traits serve as guidelines, and each one is integral to crafting the ad copy. Please ensure that you incorporate every single trait meticulously in the output:\n\n" + traitsList + "\nRemember, each trait plays a significant role, so it's crucial not to overlook any of them.";
 
   // configure the API request to OpenAI
   var data = {
@@ -1092,14 +1092,14 @@ function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info
             }
         },
         {
-            "name": "get_email_element_responses",
-            "description": "ingest the various copywriting style and for each element requested provide a response for each style. Each style should be unique and will influence greatly the copy output. Be in caracter.",
+            "name": "get_facebook_ad_element_responses",
+            "description": "Create a compelling Facebook ad copy using the provided information about the client, the theme and the preferences.",
             "parameters": {
                 "type": "object",
                 "properties": {
                       "happy_and_helpful": {
                         "type": "array",
-                        "description": "Style 2: A happy and helpful version of the email copy.",
+                        "description": "A happy and helpful version of the facebook ad copy.",
                         "items": {
                             "type": "object",
                             "properties": {
@@ -1161,7 +1161,8 @@ function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info
             }
         }
     ],  
-    "function_call": {"name": "get_email_element_responses"},
+    "function_call": {"name": "get_facebook_ad_element_responses"},
+    //"function_call": "auto",
     };
 
   var options = {
@@ -1229,7 +1230,34 @@ function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info
 }
 
 
+var systemContent = 
+    
+  "We will work together to write a highly engaging Facebook Ad for my client's ecommerce store.\n" +
 
+     "Here's a list of details I will provide you with for this task:\n" +
+    "- The subject dictates the main hooks of the Facebook Ad\n" +
+    "- The theme which is the occasion why the Facebook Ad is made for. It can be Valentine's Day, for Black Friday, for Christmas or simply for Spring Season. This will help you put context around the copy.\n" +
+    "- Extra information (called extra info) give you more details about the context or the promotional offer such as discount details or promotion dates. Dates, rebate percentage or eligibility conditions must be included in the 'Primary Text'\n" +
+    "- Given the list of client traits below, it is crucial to integrate them accurately into the ad copy. Each 'trait[i]' specifies a unique characteristic that the ad copy should reflect. It is of utmost importance to include each trait, as these are primary client requests. If a trait suggests a specific format, style, or content (e.g., 'All upper cases' or 'Include a smiley emoji'), the resultant copy should strictly follow it. Please meticulously incorporate every trait while crafting the copy. Let's make sure each trait is highlighted in the generated copy.\n" + 
+    "- The Facebook Ad Elements : A JS Array with elements to write copy for. Include only copy for these elements. Do not add or remove any items.\n"+
+
+    "Here's what each element will include based on their role (if requested):\n"+
+//stuff
+
+
+    "Here's a list of instructions to applies to all of the element copies:\n"+
+    "- Follow the instructions from the Client Traits\n"+
+    "- Provide creative, engaging, and conversational copy\n"+
+    "- Avoid repeating the same information. For example, if the 'Primary Text' includes '30% off on product XYZ for 3 days only', the 'Headline' will not include '30% off on product XYZ'. It can include 'For a limited time' or 'While quantities last' or 'HURRY!'\n"+
+    "- Every element copy is short, engaging, and catchy. Remember that this is an ad, and the content should be easily readable on mobile devices.\n"+
+    "- Maintain a consistent tone throughout the copy, whether it's friendly, conversational, or persuasive. Ensure that the tone remains consistent and cohesive. Review and rewrite the targeted tag elements as needed.\n"+
+    "- Use the established and clear theme from Step 1. Identify the main theme or message of the ad and ensure that it is reflected in all tag elements. Consistency in theme helps reinforce the central idea and makes the email more impactful. Review and rewrite the targeted tag elements as needed.\n"+
+    "- Use a storytelling approach. Frame the copy within a narrative or storytelling framework. Connect the different tag elements by weaving a coherent story or progression that flows smoothly from one element to another. This approach maintains engagement and coherence. Review and rewrite the targeted tag elements as needed.\n"
+
+    //real examples
+    //upvotes
+    //Downvotes
+    ;
 
 function requestTranslation(dataToTranslate, lang){
   // Configure the API request 

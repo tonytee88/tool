@@ -1826,7 +1826,7 @@ gptRequest.addEventListener("submit", (e) => {
         google.script.run
         .withSuccessHandler((response) => {
           //console.log("Success:", response.result);  // Only logs the 'result' part of the response
-          console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
+          //console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
           globalApiResponse = response.result;  // Only use the 'result' part of the response
           updateStoredFinalObjectResult()
           resolve(response.result);  // Only resolve the 'result' part of the response
@@ -1835,7 +1835,7 @@ gptRequest.addEventListener("submit", (e) => {
           console.log("Error:", error);
           reject(error);
         })
-        // WORK PIPELINE 30 AUG : Add theme, correct traits, copy examples, etc.
+        // WORK PIPELINE 30 AUG DONE : Add theme, correct traits, copy examples, etc.
         .getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info, clientTraits, elementCopyExamples, numberOfExamples, theme, themeExamples);
         //get date and time of gpt request    
         var timeStamp = getDateAndTime();
@@ -1844,7 +1844,7 @@ gptRequest.addEventListener("submit", (e) => {
         .withSuccessHandler((response) => {
           //console.log("statusLog:", response);
         })
-        // WORK PIPELINE 30 AUG : Add the facebook stuff to log
+        // WORK PIPELINE 30 AUG DONE: Add the facebook stuff to log
         .logUsageOnServer(prompt, timeStamp, version, lang, info, requestedCorrections, clientName);
       });
       } else {
