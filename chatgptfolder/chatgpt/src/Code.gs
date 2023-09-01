@@ -89,7 +89,7 @@ function getGPTResponse(prompt, promptElements, optionsTotal, lang, info){
 
 
 
-function requestTranslation1(data1, lang) {
+function requestTranslation1(data1, lang, platformToServe) {
   // Configure the API request
   var stringToTranslate = JSON.stringify(data1);
   var langToTranslateTo = lang;
@@ -97,7 +97,7 @@ function requestTranslation1(data1, lang) {
 
   // Make the API call to the translation service
   var apiKey = getApiKey();
- var exampleObj ={
+ var exampleObj = {
     "email subject line": {
       "option1": "translated copy1",
       "option2": "translated copy2",
@@ -105,7 +105,22 @@ function requestTranslation1(data1, lang) {
     }
   };
 
-  var content = "Your response should only include the javascript object such as: " + exampleObj + "Act as an experienced linguist that specializes in translation design guidelines from English to French. I will provide you with a stringified javascript object in English and your task is to translate it in the requested language. The language is: " +langToTranslateTo + " and here's the object :" + stringToTranslate + ". Generate compelling marketing translation for an email campaign. The goal is to create catchy, short, engaging, and conversational copy that native speakers of the target language can easily understand. The translated copy should maintain the same level of impact, persuasion, and clarity as the original English version. Please ensure that the translated copy resonates with the target audience, captures their attention, and motivates them to take action. Pay attention to cultural nuances and adapt the language style to suit the preferences and communication style of the target audience. Provide multiple options for each section of the email, including subject lines, opening lines, body paragraphs, and closing statements. The final translated copy should be ready to use in real email marketing campaigns. Your expertise in translation and creativity in crafting compelling content are highly valued! You might get specific regional requests. For example, if you get Français (Québec) as the language, you must use words and expressions that are localized for Québec (as opposed to France). Translate only the values of the options in the provided objectif. Your response should have the same exact name keys as the provided stringied object. For example, if promptElements[0] = 'email subject line', please translate the 'option[i]' nested in the javascript object only. Each element should have its own object key-value pairs with the required number of translated options. Your response should only contain the Javascript Object. For example: " + exampleObj ;
+   var exampleObj = {
+    "Primary Text": {
+      "option1": "translated copy1",
+      "option2": "translated copy2",
+      "option3": "translated copy3",
+    }
+  };
+
+  if (platformToServe === "Email") {
+
+    var content = "Your response should only include the javascript object such as: " + exampleObj + "Act as an experienced linguist that specializes in translation design guidelines from English to French. I will provide you with a stringified javascript object in English and your task is to translate it in the requested language. The language is: " +langToTranslateTo + " and here's the object :" + stringToTranslate + ". Generate compelling marketing translation for an email campaign. The goal is to create catchy, short, engaging, and conversational copy that native speakers of the target language can easily understand. The translated copy should maintain the same level of impact, persuasion, and clarity as the original English version. Please ensure that the translated copy resonates with the target audience, captures their attention, and motivates them to take action. Pay attention to cultural nuances and adapt the language style to suit the preferences and communication style of the target audience. Provide multiple options for each section of the email, including subject lines, opening lines, body paragraphs, and closing statements. The final translated copy should be ready to use in real email marketing campaigns. Your expertise in translation and creativity in crafting compelling content are highly valued! You might get specific regional requests. For example, if you get Français (Québec) as the language, you must use words and expressions that are localized for Québec (as opposed to France). Translate only the values of the options in the provided objectif. Your response should have the same exact name keys as the provided stringied object. For example, if promptElements[0] = 'email subject line', please translate the 'option[i]' nested in the javascript object only. Each element should have its own object key-value pairs with the required number of translated options. Your response should only contain the Javascript Object. For example: " + exampleObj ;
+
+  } else if (platformToServe === "Facebook") {
+     
+    var content = "Your response should only include the javascript object such as: " + exampleObj + "Act as an experienced linguist that specializes in translation for Facebook Ads from English to French. I will provide you with a stringified javascript object in English and your task is to translate it in the requested language. The language is: " +langToTranslateTo + " and here's the object :" + stringToTranslate + ". Generate compelling marketing translation for a Facebook campaign. The goal is to create catchy, short, engaging, and conversational copy that native speakers of the target language can easily understand. The translated copy should maintain the same level of impact, persuasion, and clarity as the original English version. Please ensure that the translated copy resonates with the target audience, captures their attention, and motivates them to take action. Pay attention to cultural nuances and adapt the language style to suit the preferences and communication style of the target audience. Provide multiple options for each element of the ad. The final translated copy should be ready to use in real facebook marketing campaigns. Your expertise in translation and creativity in crafting compelling content are highly valued! You might get specific regional requests. For example, if you get Français (Québec) as the language, you must use words and expressions that are localized for Québec (as opposed to France). Translate only the values of the options in the provided objectif. Your response should have the same exact name keys as the provided stringied object. For example, if promptElements[0] = 'Primary Text', please translate the 'option[i]' nested in the javascript object only. Each element should have its own object key-value pairs with the required number of translated options. Your response should only contain the Javascript Object. For example: " + exampleObj ;
+  }
   
   
     // configure the API request to OpenAI
@@ -1284,7 +1299,8 @@ var systemContent =
     ;
 
 function requestTranslation(dataToTranslate, lang){
-  // Configure the API request 
+  // Configure the API request
+  
   var objectToTranslate = dataToTranslate
   var langToTranslateTo = lang;
   
@@ -1371,7 +1387,7 @@ function requestTranslation(dataToTranslate, lang){
             }
         }
     ],  
-    "function_call": "get_email_element_translated",
+    "function_call": ["get_email_element_translated"],
     };
 
   var options = {

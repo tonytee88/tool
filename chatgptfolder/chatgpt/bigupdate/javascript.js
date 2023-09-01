@@ -1773,7 +1773,7 @@ gptRequest.addEventListener("submit", (e) => {
               console.log("Error:", error);
               reject(error);
             })
-            .requestTranslation1(result, lang);
+            .requestTranslation1(result, lang, platformToServe);
         });
       }
     })
@@ -1881,8 +1881,8 @@ gptRequest.addEventListener("submit", (e) => {
                 console.log("Error:", error);
                 reject(error);
               })
-              // WORK PIPELINE 30 AUG : Make new function for FB... ??
-              .requestTranslation1(result, lang);
+              // WORK PIPELINE 30 AUG DONE : Make new function for FB... ??
+              .requestTranslation1(result, lang, platformToServe);
           });
         }
       })
