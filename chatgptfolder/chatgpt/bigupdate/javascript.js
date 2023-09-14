@@ -706,49 +706,57 @@ document.getElementById("loadTags").addEventListener("click", function() {
 });
   
 function createTablesInDoc() { 
-  return new Promise((resolve, reject) => {
-    var chosenDiv = document.getElementById("chosenContainer");
-    var elementButtons = chosenDiv.getElementsByClassName("element-button");
-    var elementsArray = [];
+  if (platformToServe === "Email") {
+    return new Promise((resolve, reject) => {
+      var chosenDiv = document.getElementById("chosenContainer");
+      var elementButtons = chosenDiv.getElementsByClassName("element-button");
+      var elementsArray = [];
 
-    for (var i = 0; i < elementButtons.length; i++) {
-      var category = "category " + (i + 1);
-      var value = elementButtons[i].textContent;
-      var elementName = elementButtons[i].textContent;
+      for (var i = 0; i < elementButtons.length; i++) {
+        var category = "category " + (i + 1);
+        var value = elementButtons[i].textContent;
+        var elementName = elementButtons[i].textContent;
 
-      // Special handling for "email subject line" and "email preview text"
-      if (value === "Email Subject Line" || value === "Email Preview Text") {
-        value = "Email Misc";
-      } else {
-        // Get the category name by extracting the characters before the first space
-        var firstSpaceIndex = value.indexOf(' ');
-        if (firstSpaceIndex !== -1) {
-          value = value.substring(0, firstSpaceIndex);
+        // Special handling for "email subject line" and "email preview text"
+        if (value === "Email Subject Line" || value === "Email Preview Text") {
+          value = "Email Misc";
         } else {
-          value = "Other";  // Default category if no space is found
+          // Get the category name by extracting the characters before the first space
+          var firstSpaceIndex = value.indexOf(' ');
+          if (firstSpaceIndex !== -1) {
+            value = value.substring(0, firstSpaceIndex);
+          } else {
+            value = "Other";  // Default category if no space is found
+          }
+        }
+        // Check if the category already exists in the elementsArray
+        var categoryExists = false;
+        for (var j = 0; j < elementsArray.length; j++) {
+          if (elementsArray[j][0] === value) {
+            // Add the element to the existing category
+            elementsArray[j].push([elementName, "{" + elementName + "}"]);
+            categoryExists = true;
+            break;
+          }
+        }
+        if (!categoryExists) {
+          // Add a new category with the element
+          elementsArray.push([value, [elementName, "{" + elementName + "}"]]);
         }
       }
-      // Check if the category already exists in the elementsArray
-      var categoryExists = false;
-      for (var j = 0; j < elementsArray.length; j++) {
-        if (elementsArray[j][0] === value) {
-          // Add the element to the existing category
-          elementsArray[j].push([elementName, "{" + elementName + "}"]);
-          categoryExists = true;
-          break;
-        }
-      }
-      if (!categoryExists) {
-        // Add a new category with the element
-        elementsArray.push([value, [elementName, "{" + elementName + "}"]]);
-      }
-    }
-    // Create the table via Code.gs
+      // Create the table via Code.gs
+      var lang = getLang();
+      google.script.run.withSuccessHandler(function(statusLog) {
+        resolve();
+      }).createTables(elementsArray, lang);
+    });
+  } else if (platformToServe === "Facebook") {
+    console.log("platformToServe: " + platformToServe);
+    var elementsArray = ["Primary Text", "Headline", "Description"];
     var lang = getLang();
-    google.script.run.withSuccessHandler(function(statusLog) {
-      resolve();
-    }).createTables(elementsArray, lang);
-  });
+    google.script.run.createTables(elementsArray, lang)
+
+  }
 }   
 
 function getCategory(tag) {
@@ -1118,6 +1126,7 @@ function processTags(tags) {
             finalObjectResult = {};
             //console.log("this ran once when adding listeners to the updatebutton")
             finalObjectResult = await updateStoredFinalObjectResult();
+            console.log("finalObjectResult: " + JSON.stringify(finalObjectResult));
             await updateDocumentPromise(finalObjectResult);
           } catch (error) {
             console.error('An error occurred:', error);
@@ -1890,7 +1899,7 @@ gptRequest.addEventListener("submit", (e) => {
         statusMessage.textContent = "Negociation with Open AI servers...";
         // Handle the API response
         return new Promise((resolve, reject) => {
-          // WORK PIPELINE 30 AUG : Fix function updatetext for FB
+          // WORK PIPELINE 30 AUG DONE : Fix function updatetext for FB
           updateTextContentCells(result, optionsCount);
           resolve(result);
         });
