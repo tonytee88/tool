@@ -18,7 +18,7 @@
 
 
 var optionsCount = 1;
-const optionsTotal = 3;
+const optionsTotal = 1;
 const designOptions = 3; // Number of design options
 var storedFinalObjectResult = {};
 var promptElements = [];
@@ -751,11 +751,22 @@ function createTablesInDoc() {
       }).createTables(elementsArray, lang);
     });
   } else if (platformToServe === "Facebook") {
-    console.log("platformToServe: " + platformToServe);
-    var elementsArray = ["Primary Text", "Headline", "Description"];
-    var lang = getLang();
-    google.script.run.createTables(elementsArray, lang)
-
+    return new Promise((resolve, reject) => {
+      var elementsArray = [
+        [
+          "Facebook Ad", 
+          ["Primary Text", "{Primary Text}"], 
+          ["Headline", "{Headline}"], 
+          ["Description", "{Description}"]
+        ]
+      ];
+      
+      // Create the table via Code.gs
+      var lang = getLang();
+      google.script.run.withSuccessHandler(function(statusLog) {
+        resolve();
+      }).createTables(elementsArray, lang);
+    });
   }
 }   
 
