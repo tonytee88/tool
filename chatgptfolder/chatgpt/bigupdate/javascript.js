@@ -191,23 +191,38 @@ function createPlatformSelection() {
 function startWorkflow(platform) {
   document.getElementById("navigation").style.display = 'block';
   if (platform === "Email") {
-    initNavSystemEmail()
-    initStep1()
     platformToServe = "Email";
-  }
-  if (platform === "Facebook") {
-    initStep1()
-    addThemeDropdown()
-    initNavSystemFacebook()
+    initNavSystemEmail();
+    initStep1();
+  } else if (platform === "Facebook") {
     platformToServe = "Facebook";
+    initStep1();
+    addThemeDropdown();
+    initNavSystemFacebook();
+  } else if (platform === "Google") {
+    platformToServe = "Google";
+    initStep1();
+    addThemeDropdown();
+    addKeywordInput();
+    addCampaignObjectiveInput();
+    addUSPInput();
+    removeSubjectField();
+    initNavSystemGoogle();
+
   }
   console.log("Selected Platform: " + platform);
 }
 
 function addThemeDropdown() {
+  console.log("platformToServe: " + platformToServe)
   // Declare themeList
-  const themeList = ["NONE", "BF - Early Access VIP", "Black Friday week", "Black Friday","Cyber Monday","BFCM - Last Chance","BFCM - Extended"];
-
+  let themeList;
+  if (platformToServe === "Facebook") {
+    themeList = ["NONE", "BF - Early Access VIP", "Black Friday week", "Black Friday","Cyber Monday","BFCM - Last Chance","BFCM - Extended"];
+  } else if (platformToServe === "Google") {
+    themeList = ["RSA"];
+  }
+  
   // Create the container div with id="adType"
   const adTypeDiv = document.createElement('div');
   adTypeDiv.id = "adType";
@@ -216,7 +231,11 @@ function addThemeDropdown() {
   const labelDiv = document.createElement('div');
   labelDiv.className = "label";
   labelDiv.id="labelText";
-  labelDiv.textContent = "Theme : ";
+  if (platformToServe === "Facebook") {
+    labelDiv.textContent = "Theme : ";
+  } else if (platformToServe === "Google") {
+    labelDiv.textContent = "Ad Type : ";;
+  }
   
   // Append label to adTypeDiv
   adTypeDiv.appendChild(labelDiv);
@@ -245,6 +264,108 @@ function addThemeDropdown() {
   // Insert adTypeDiv right before the div with id=subjectLabel
   const subjectLabelDiv = document.getElementById('subjectLabel');
   subjectLabelDiv.parentNode.insertBefore(adTypeDiv, subjectLabelDiv);
+}
+
+function addKeywordInput() {
+  // Create a new div element to hold the label and the input field
+  const newDiv = document.createElement('div');
+  newDiv.id = 'keywordDiv';
+
+  // Create a new label element and set its text content and class
+  const label = document.createElement('div');
+  label.textContent = 'Main Keywords';
+  label.className = 'label';
+  label.id = 'keywordLabel';
+
+  // Create a new input element and set its attributes and class
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.id = 'mainKeywords';
+  input.className = 'form-control';
+  input.placeholder = 'Enter main keywords';
+
+  // Append the label and input elements to the new div
+  newDiv.appendChild(label);
+  newDiv.appendChild(input);
+
+  // Get the reference to the div before which we want to insert the new div
+  const subjectLabelDiv = document.getElementById('subjectLabel');
+
+  // Insert the new div right before the subjectLabelDiv
+  subjectLabelDiv.parentNode.insertBefore(newDiv, subjectLabelDiv);
+}
+
+function addCampaignObjectiveInput() {
+  // Create a new div element to hold the label and the input field
+  const newDiv = document.createElement('div');
+  newDiv.id = 'campaignObjectiveDiv';
+
+  // Create a new label element and set its text content and class
+  const label = document.createElement('div');
+  label.textContent = 'Campaign Objective';
+  label.className = 'label';
+  label.id = 'campaignObjectiveLabel';
+
+  // Create a new input element and set its attributes and class
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.id = 'campaignObjective';
+  input.className = 'form-control';
+  input.placeholder = 'Enter campaign objective';
+  
+  // Prefill the input field with "sell more products"
+  input.value = 'sell more products';
+
+  // Append the label and input elements to the new div
+  newDiv.appendChild(label);
+  newDiv.appendChild(input);
+
+  // Get the reference to the div before which we want to insert the new div
+  const subjectLabelDiv = document.getElementById('subjectLabel');
+
+  // Insert the new div right before the subjectLabelDiv
+  subjectLabelDiv.parentNode.insertBefore(newDiv, subjectLabelDiv);
+}
+
+function addUSPInput() {
+  // Create a new div element to hold the label and the input field
+  const newDiv = document.createElement('div');
+  newDiv.id = 'uspDiv';
+
+  // Create a new label element and set its text content and class
+  const label = document.createElement('div');
+  label.textContent = 'USPs';
+  label.className = 'label';
+  label.id = 'uspLabel';
+
+  // Create a new textarea element and set its attributes and class
+  const textarea = document.createElement('textarea');
+  textarea.id = 'usp';
+  textarea.className = 'form-control large-input';  // Use 'large-input' class to make it bigger
+  textarea.placeholder = 'Enter USPs here...';
+
+  // Prefill the textarea with a default value
+  textarea.textContent = 'Quality, Affordability, Sustainability'; 
+
+  // Append the label and textarea elements to the new div
+  newDiv.appendChild(label);
+  newDiv.appendChild(textarea);
+
+  // Get the reference to the div before which we want to insert the new div
+  const subjectLabelDiv = document.getElementById('subjectLabel');
+
+  // Insert the new div right before the subjectLabelDiv
+  subjectLabelDiv.parentNode.insertBefore(newDiv, subjectLabelDiv);
+}
+
+function removeSubjectField() {
+  // Get the element for the subject label and subject input field
+  const subjectLabel = document.getElementById('subjectLabel');
+  const subjectInput = document.getElementById('subject');
+
+  // Remove the subject label and subject input field from the DOM
+  subjectLabel.remove();
+  subjectInput.remove();
 }
 
 // Call the function to create platform selection UI
@@ -701,8 +822,9 @@ document.getElementById("loadTags").addEventListener("click", function() {
   } else if (platformToServe === "Facebook") {
     var tags = ["Primary Text", "Headline", "Description"];
     processTags(tags);
+  } else if (platformToServe === "Facebook") {
+    var tags = ["Primary Text", "Headline", "Description"];
   }
-  // add else if for Google
 });
   
 function createTablesInDoc() { 
@@ -2137,6 +2259,93 @@ function setStatusMessage(message) {
 }
 
 function initNavSystemFacebook() {
+  document.getElementById("goNextButton").addEventListener('click', function() {
+    if (currentSection >= totalSections) {
+      return;
+    }
+
+    switch (currentSection) {
+      //subject to generate copy
+      case 1:
+        let clientName = document.getElementById("clients").value;
+        let adTheme = document.getElementById("themeDropdown").value;
+        if (clientName === "INVALID" || clientName === "")  {
+          setStatusMessage("Please select a client or create a new one first");
+          return; // Exit the function early
+        } else if (adTheme === "NONE" || adTheme === "") {
+          setStatusMessage("Please select a theme to start");
+          return; // Exit the function early
+        }
+        hideSectionAndTooltips(currentSection);
+        if (firstTimeStep3 === 0) {
+          simulateQaButtonkButtonClick();
+          firstTimeStep3 = 1;
+          document.getElementById("qaButton").classList.remove("hideButton");
+          currentSection = 3;
+          checkConditionBeforeDisplayStep3();
+          break;
+        } else {
+          currentSection = 3;
+          showSectionAndTooltips(currentSection);
+          break;
+        }
+        break;
+      //generated copy to correction  
+      case 3:
+        hideSectionAndTooltips(currentSection);
+        currentSection++;
+        showSectionAndTooltips(currentSection);
+        break;
+      case 4:
+        let traits = document.getElementById("traits").value;
+        if (traits !== "") {
+          hideSectionAndTooltips(currentSection);
+          simulateGptMagicButtonClick();
+          currentSection--;
+          checkCondition();
+          break;
+        } else {
+          setStatusMessage("Please input valid corrections");
+          break;
+        }
+        
+        default:
+        // For all other cases (this is a safe guard, might not be necessary depending on your totalSections)
+        console.error("Invalid section!");
+        break;
+    }
+
+    // The rest of your general logic, like disabling buttons, can stay outside of the switch
+    if (currentSection === totalSections) {
+      this.disabled = true;
+      this.style.backgroundColor = '#f1f1f1'; 
+    }
+    if (currentSection > 1) {
+      document.getElementById('goBackButton').disabled = false;
+      document.getElementById('goBackButton').style.backgroundColor = '#3498db'; 
+    }
+  });
+
+  document.getElementById('goBackButton').addEventListener('click', function() {
+    switch (currentSection) {
+      //generate copy to subject
+      case 3:
+        hideSectionAndTooltips(currentSection);
+        currentSection = 1;
+        showSectionAndTooltips(currentSection);
+        document.getElementById('goBackButton').disabled = true;
+        document.getElementById('goBackButton').style.backgroundColor = '#f1f1f1'; 
+        break;
+      case 4:
+        hideSectionAndTooltips(currentSection);
+        currentSection--;
+        showSectionAndTooltips(currentSection);
+        break;
+    }
+  }
+)};
+
+function initNavSystemGoogle() {
   document.getElementById("goNextButton").addEventListener('click', function() {
     if (currentSection >= totalSections) {
       return;
