@@ -1,0 +1,39 @@
+body {
+    font-family: Arial, sans-serif;
+    display:flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color : #f1f1f1;
+
+  }
+
+.large-input {
+    height: 500px; /* Adjust the height as needed */
+    width: 500px;
+    resize: vertical;
+    vertical-align: top;
+    overflow: auto;
+  }
+  
+  textarea.large-input {
+    font-family: Arial, sans-serif;
+  }
+
+  .form-control {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.3s ease;
+  }
+  
+  .form-control:focus {
+    outline: none;
+    border-color: #3498db;
+  }
+  
+  .label {
+    font-weight: bold;
+  }
