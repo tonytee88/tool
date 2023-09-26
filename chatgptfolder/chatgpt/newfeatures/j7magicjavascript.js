@@ -34,7 +34,6 @@ async function callApi(transcript, prompt) {
     }
 }
 
-
 function submitFormDescription() {
     const transcript = document.getElementById('transcript').value;
     const prompt = document.getElementById('descriptionPrompt').value; 
@@ -112,4 +111,12 @@ function createStarContainer(containerId) {
     } catch (error) {
         console.error('Error calling the API', error);
     }
+}
+
+
+function submitFormMongo() {
+    const category = "description";
+    callMongoApi(category).then(response => {
+        document.getElementById('descriptionOutput').value = JSON.stringify(response);
+    });
 }
