@@ -7,11 +7,12 @@
     <title>J7 Media Magic tool</title>
 </head>
 <body>
-    <div>
+    <div id="mainContainer">
         <div class="label">Copy-paste du transcript du podcast ici :</div>
-        <textarea id="transcript" class="form-control large-input" placeholder="Transcript podcast"></textarea>
-        <button onclick="submitForm()">Submit</button> <!-- Added Submit Button -->
-        <textarea id="output" class="form-control large-input" placeholder="OpenAI Response" readonly></textarea> <!-- Added Output Textarea -->
+        <div><textarea id="transcript" class="form-control large-input" placeholder="Transcript podcast"></textarea></div>
+        <div><textarea id="promptTranscript" class="form-control large-input" placeholder="Prompt pour transcript"></textarea></div>
+        <div><button onclick="submitForm()">Submit</button></div>
+        <div><textarea id="output" class="form-control large-input" placeholder="OpenAI Response" readonly></textarea></div>
     </div>
     <script src="j7magicjavascript.js"></script>
 </body>
