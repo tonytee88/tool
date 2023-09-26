@@ -1,10 +1,13 @@
 body {
     font-family: Arial, sans-serif;
+  }
+
+  #mainContainer {
     display:flex;
+    background-color: black;
     flex-direction: column;
     justify-content: space-between;
-    background-color : #f1f1f1;
-
+    height:fit-content;
   }
 
 .large-input {
@@ -15,11 +18,11 @@ body {
     overflow: auto;
   }
   
-  textarea.large-input {
+textarea.large-input {
     font-family: Arial, sans-serif;
   }
 
-  .form-control {
+.form-control {
     display: block;
     width: 100%;
     padding: 10px;
@@ -29,11 +32,12 @@ body {
     transition: border-color 0.3s ease;
   }
   
-  .form-control:focus {
+.form-control:focus {
     outline: none;
     border-color: #3498db;
   }
   
-  .label {
+.label {
     font-weight: bold;
   }
+
