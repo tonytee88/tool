@@ -2,31 +2,36 @@ body {
     font-family: Arial, sans-serif;
   }
 
-  #mainContainer {
-    display:flex;
-    background-color: black;
+#mainContainer {
+    display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height:fit-content;
+    gap : 10px;
   }
 
 .large-input {
-    height: 500px; /* Adjust the height as needed */
-    width: 500px;
+    font-family: Arial, sans-serif;  
+    height: 100px; /* Adjust the height as needed */
+    width: 50px;
     resize: vertical;
     vertical-align: top;
     overflow: auto;
   }
-  
-textarea.large-input {
-    font-family: Arial, sans-serif;
-  }
+
+.prompt-input form-control {
+  font-family: Arial, sans-serif;  
+  height: 72px;
+  width: 500px;
+  resize: vertical;
+  vertical-align: top;
+  overflow: auto;
+}
 
 .form-control {
     display: block;
-    width: 100%;
+    width: 250px;
     padding: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 0px;
     border: 1px solid #ccc;
     border-radius: 4px;
     transition: border-color 0.3s ease;
@@ -41,3 +46,73 @@ textarea.large-input {
     font-weight: bold;
   }
 
+  .button {
+    background-color: #4CAF50; /* Green background */
+    border: none; /* Remove borders */
+    color: white; /* White text */
+    padding: 10px 20px; /* Padding around the text */
+    text-align: center; /* Center the text */
+    text-decoration: none; /* Remove underlines */
+    display: inline-block; /* Make it inline-block */
+    font-size: 18px; /* Increase font size */
+    margin: 4px 2px; /* Some margin */
+    cursor: pointer; /* Add a pointer cursor on mouse-over */
+    border-radius: 12px; /* Rounded corners */
+
+}
+
+.button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+#descriptionContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content:center;
+  gap: 20px;
+}
+
+#linkedInContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content:center;
+  gap: 20px;
+}
+
+#newsletterContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content:center;
+  gap: 20px;
+}
+
+#transcriptContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content:center;
+  align-items: center;
+  gap: 20px;
+}
+
+h1 {
+  text-align: center;
+}
+
+.button-container {
+  display:flex;
+  justify-content: center;
+}
+
+#descriptionStarContainer,
+#linkedInStarContainer,
+#newsletterStarContainer {
+  font-size: 10px;
+}
+
+table {
+  border-spacing: 0px; /* Adjust as needed */
+}
+
+td {
+  padding: 0px; /* Adjust as needed */
+}

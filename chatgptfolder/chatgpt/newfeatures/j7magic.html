@@ -1,18 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" type="text/css" href="stylesheet4magic.css" media=”screen” />
+    <link rel="stylesheet" type="text/css" href="stylesheet4magic.css"/>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>J7 Media Magic tool</title>
 </head>
 <body>
+    <div class="label"><h1>J7 MAGIC TOOL</h1></div>
     <div id="mainContainer">
-        <div class="label">Copy-paste du transcript du podcast ici :</div>
-        <div><textarea id="transcript" class="form-control large-input" placeholder="Transcript podcast"></textarea></div>
-        <div><textarea id="promptTranscript" class="form-control large-input" placeholder="Prompt pour transcript"></textarea></div>
-        <div><button onclick="submitForm()">Submit</button></div>
-        <div><textarea id="output" class="form-control large-input" placeholder="OpenAI Response" readonly></textarea></div>
+        <div id="transcriptContainer">
+            <div class="label">Copy-paste du transcript du podcast ici :</div>
+            <div><textarea id="transcript" class="prompt-input form-control" placeholder="Transcript podcast">Antoine: Hello everyone, today we will see how rain can affect the cost of Facebook ads. The longer the storm, the better the pricedrop!</textarea></div>
+        </div>
+        <div id="descriptionContainer">
+            <div><textarea id="descriptionPrompt" class="form-control large-input" placeholder="Prompt pour description"></textarea></div>
+            <div><textarea id="descriptionOutput" class="form-control large-input" placeholder="Description output"></textarea></div>
+        </div>
+        <div class="button-container">
+            <div><button class="button" onclick="submitFormDescription()">Submit</button></div>
+        </div>
+        <div id="linkedInContainer">
+            <div><textarea id="linkedInPrompt" class="form-control large-input" placeholder="Prompt pour LinkedIn">You are an influencer on LinkedIn. I need to you craft a one sentence hook based on the transcript to be able to engage with the readers as quickly as possible.</textarea></div>
+            <div><textarea id="linkedInOutput" class="form-control large-input" placeholder="LinkedIn output"></textarea></div>
+        </div>
+        <div class="button-container">
+            <div><button class="button" onclick="submitFormLinkedIn()">Submit</button></div>
+        </div>
+        <div id="newsletterContainer">
+            <div><textarea id="newsletterPrompt" class="form-control large-input" placeholder="Prompt pour newsletter"></textarea></div>
+            <div><textarea id="newsletterOutput" class="form-control large-input" placeholder="Newsletter output"></textarea></div>
+        </div>
+        <div class="button-container">
+            <div><button class="button" onclick="submitFormNewsletter()">Submit</button></div>
+        </div>
+        
     </div>
     <script src="j7magicjavascript.js"></script>
 </body>
