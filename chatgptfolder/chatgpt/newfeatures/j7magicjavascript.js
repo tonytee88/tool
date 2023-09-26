@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 //page unit
   // Call the function for each subcontainer
   createStarContainer('descriptionContainer');
@@ -87,23 +89,20 @@ function createStarContainer(containerId) {
   }
   
   function getStarCountFromMongoDB(category) {
-    const apiKey = getMongoApiKey();
-    var statusLog = "Start of mongo api call...\n";
+    const apiKey = process.env.Mongo_API_KEY;
     const url = 'https://us-east-1.aws.data.mongodb-api.com/app/data-gkvfy/endpoint/data/v1/action/findOne';
     
     const data = JSON.stringify({
-      "collection": "clientsCollection",
-      "database": "clientsDB",
+      "collection": "StarCountCollection",
+      "database": "J7MagicTool",
       "dataSource": "Cluster0",
       "filter": {
-        "name": clientName
+        "name": category
       },
       "projection": {
         "_id": 1,
         "name": 1,
-        "traits": 1,
-        "upvotes":1,
-        "downvotes":1
+        "starcount": 1
       }
     });
     statusLog += "Data:" + data +"\n";
@@ -120,9 +119,9 @@ function createStarContainer(containerId) {
     const response = UrlFetchApp.fetch(url, config);
     const responseData = JSON.parse(response.getContentText());
   
-    statusLog += "responseData:" + responseData +"\n";
     // Process the response data as needed
   
     //return {result: responseData, statusLog: statusLog};
+    console.log("responseData:" + responseData)
     return responseData
   }

@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/google-apps-script": "^1.0.63"
+    "@types/google-apps-script": "^1.0.63",
+    "dotenv": "^16.3.1"
   }
 }
