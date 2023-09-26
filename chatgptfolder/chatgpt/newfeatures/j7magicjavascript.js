@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 //page unit
   // Call the function for each subcontainer
   createStarContainer('descriptionContainer');
@@ -88,40 +86,30 @@ function createStarContainer(containerId) {
     container.appendChild(starContainer);
   }
   
-  function getStarCountFromMongoDB(category) {
-    const apiKey = process.env.Mongo_API_KEY;
-    const url = 'https://us-east-1.aws.data.mongodb-api.com/app/data-gkvfy/endpoint/data/v1/action/findOne';
-    
-    const data = JSON.stringify({
-      "collection": "StarCountCollection",
-      "database": "J7MagicTool",
-      "dataSource": "Cluster0",
-      "filter": {
-        "name": category
-      },
-      "projection": {
-        "_id": 1,
-        "name": 1,
-        "starcount": 1
-      }
-    });
-    statusLog += "Data:" + data +"\n";
-    const config = {
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Request-Headers': '*',
-        'api-key': apiKey
-      },
-      payload: data
-    };
-  
-    const response = UrlFetchApp.fetch(url, config);
-    const responseData = JSON.parse(response.getContentText());
-  
-    // Process the response data as needed
-  
-    //return {result: responseData, statusLog: statusLog};
-    console.log("responseData:" + responseData)
-    return responseData
-  }
+  async function callMongoApi(category) {
+    try {
+        const response = await fetch('https://j7-magic-tool.vercel.app/api/mongoCall', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ category }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        //console.log(data); // Process the response data as needed
+        const content = data;
+        // Check if content is undefined and return an error message if it is
+        if (content === undefined) {
+            return "Error: Content is undefined";
+        }
+
+        return content;
+    } catch (error) {
+        console.error('Error calling the API', error);
+    }
+}
