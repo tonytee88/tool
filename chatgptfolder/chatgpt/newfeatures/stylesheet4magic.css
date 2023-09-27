@@ -116,3 +116,28 @@ table {
 td {
   padding: 0px; /* Adjust as needed */
 }
+
+.loading {
+  position: relative;
+  pointer-events: none; /* Disable button clicks while loading */
+}
+
+.loading:after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -8px 0 0 -8px; /* Center the loader */
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #000;
+  border-top-color: transparent;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

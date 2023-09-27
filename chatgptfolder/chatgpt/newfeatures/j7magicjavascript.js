@@ -1,18 +1,31 @@
 //page unit
-  // Call the function for each subcontainer
-
-  let descriptionStarCount = "";
-  let linkedInStarCount = "";
-  let newsletterStarCount = "";
-
+  // Call the star function for each subcontainer
   createStarContainer('descriptionContainer');
   createStarContainer('linkedInContainer');
   createStarContainer('newsletterContainer');
 
-  
+window.onload = async function() {
 
+    const categories = ['description', 'linkedIn', 'newsletter'];
 
-async function callApi(transcript, prompt) {
+    for (const category of categories) {
+        let textFromMongo = (await getTextFromMongo(category)).document.text;
+        ;
+        console.log(textFromMongo);
+
+    // Set the fetched value as the default value of the textarea
+    document.getElementById(`${category}Prompt`).value = textFromMongo;
+    }
+}
+
+async function callApi(transcript, prompt, category) {
+    const submitButton = document.getElementById(`submitButton${category}`);
+    const originalColor = submitButton.style.color;
+    submitButton.style.color = '#4CAF50';
+
+    // Add the loading class to show the spinner
+    submitButton.classList.add('loading');  
+
     try {
         const response = await fetch('https://j7-magic-tool.vercel.app/api/openaiCall', {
             method: 'POST',
@@ -37,31 +50,39 @@ async function callApi(transcript, prompt) {
         return content;
     } catch (error) {
         console.error('Error calling the API', error);
+    } finally {
+        // Remove the loading class to hide the spinner once the call is done
+        submitButton.classList.remove('loading');
+        submitButton.style.color = originalColor;
     }
 }
 
 function submitFormDescription() {
     const transcript = document.getElementById('transcript').value;
     const prompt = document.getElementById('descriptionPrompt').value; 
-    callApi(transcript, prompt).then(response => {
+    callApi(transcript, prompt, "Description").then(response => {
         document.getElementById('descriptionOutput').value = response;
     });
+    // put the value of prompt field to the one saved on server
+    updateTextMongoCall("description", prompt);
 }
 
 function submitFormLinkedIn() {
     const transcript = document.getElementById('transcript').value;
     const prompt = document.getElementById('linkedInPrompt').value; 
-    callApi(transcript, prompt).then(response => {
+    callApi(transcript, prompt, "LinkedIn").then(response => {
         document.getElementById('linkedInOutput').value = response;
     });
+    updateTextMongoCall("linkedIn", prompt);
 }
 
 function submitFormNewsletter() {
     const transcript = document.getElementById('transcript').value;
     const prompt = document.getElementById('newsletterPrompt').value; 
-    callApi(transcript, prompt).then(response => {
+    callApi(transcript, prompt, "Newsletter").then(response => {
         document.getElementById('newsletterOutput').value = response;
     });
+    updateTextMongoCall("newsletter", prompt)
 }
 
 async function createStarContainer(containerId) {
@@ -72,9 +93,20 @@ async function createStarContainer(containerId) {
     // Wait for the star count to be fetched
     const starCount = await fetchStarCount(category);
   
+    // Define the id of the starContainer
+    const starContainerId = containerId + 'StarContainer';
+  
+    // Check if the starContainer already exists
+    const existingStarContainer = document.getElementById(starContainerId);
+    
+    // If it exists, clear its content
+    if (existingStarContainer) {
+        existingStarContainer.innerHTML = '';
+    }
+
     // Create the star container div and assign an ID
-    const starContainer = document.createElement('div');
-    starContainer.id = containerId + 'StarContainer';
+    const starContainer = existingStarContainer || document.createElement('div');
+    starContainer.id = starContainerId;
     
     // Create a table to organize stars in 2 columns
     const table = document.createElement('table');
@@ -98,7 +130,9 @@ async function createStarContainer(containerId) {
     starContainer.appendChild(table);
     
     // Append the star container to the main container
-    container.appendChild(starContainer);
+    if (!existingStarContainer) {
+        container.appendChild(starContainer);
+    }
     
     // Create and append the star button to the star container
     const starButton = document.createElement('button');
@@ -112,17 +146,26 @@ async function createStarContainer(containerId) {
     container.appendChild(starContainer);
 }
 
-    function onStarButtonClick(category) {
-    // find the right category
+async function onStarButtonClick(category) {
+    // // find the right category's id
+    // findOneMongoCall(category).then(response => {
+    //     const categoryId = response.document._id;
+    // })
+    let incrementToAdd = 1;
     // write +1 in the starcount
+    await updateStarMongoCall(category, incrementToAdd)
     //run the starcreation again to update visual
+    createStarContainer('descriptionContainer');
+    createStarContainer('linkedInContainer');
+    createStarContainer('newsletterContainer');
+
     //get user input (prompt + response) and store in a new mongodb collection
     //change color of button until textarea is modified
     console.log(`Star button clicked for category: ${category}`);
 }
 
   
-  async function callMongoApi(category) {
+  async function findOneMongoCall(category) {
     try {
         const response = await fetch('https://j7-magic-tool.vercel.app/api/mongoCall', {
             method: 'POST',
@@ -150,31 +193,106 @@ async function createStarContainer(containerId) {
     }
 }
 
+async function getTextFromMongo(category) {
+    try {
+        const response = await fetch('https://j7-magic-tool.vercel.app/api/mongoCallGetText', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ category }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        //console.log(data); // Process the response data as needed
+        const content = data;
+        // Check if content is undefined and return an error message if it is
+        if (content === undefined) {
+            return "Error: Content is undefined";
+        }
+
+        return content;
+    } catch (error) {
+        console.error('Error calling the API', error);
+    }
+}
+
+async function updateStarMongoCall(category, add) {
+    try {
+        const response = await fetch('https://j7-magic-tool.vercel.app/api/mongoCallAdd', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ category, add }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        //console.log(data); // Process the response data as needed
+        const content = data;
+        // Check if content is undefined and return an error message if it is
+        if (content === undefined) {
+            return "Error: Content is undefined";
+        }
+
+        return content;
+    } catch (error) {
+        console.error('Error calling the API', error);
+    }
+}
+
+async function updateTextMongoCall(category, text) {
+    try {
+        const response = await fetch('https://j7-magic-tool.vercel.app/api/mongoCallLoadText', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ category, text }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        //console.log(data); // Process the response data as needed
+        const content = data;
+        // Check if content is undefined and return an error message if it is
+        if (content === undefined) {
+            return "Error: Content is undefined";
+        }
+
+        return content;
+    } catch (error) {
+        console.error('Error calling the API', error);
+    }
+}
+
 function submitFormMongo() {
     const category = "description";
-    callMongoApi(category).then(response => {
+    findOneMongoCall(category).then(response => {
         const starcount = response.document.starcount;
         document.getElementById('descriptionOutput').value = starcount;
     });
 }
 
 async function getStarsForCategory(category) {
-    const response = await callMongoApi(category);
+    const response = await findOneMongoCall(category);
     const starcount = response.document.starcount;
     return starcount;
 }
 
 async function fetchStarCount(category) {
     let starCount = await getStarsForCategory(category);
-    
-    // if (category === "description") {
-    //     descriptionStarCount = starCount;
-    // } else if (category === "linkedIn") {
-    //     linkedInStarCount = starCount;
-    // } else if (category === "newsletter") {
-    //     newsletterStarCount = starCount;
-    // }
-
     return starCount;
 }
   
