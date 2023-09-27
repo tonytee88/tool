@@ -147,19 +147,17 @@ async function createStarContainer(containerId) {
 }
 
 async function onStarButtonClick(category) {
-    // // find the right category's id
-    // findOneMongoCall(category).then(response => {
-    //     const categoryId = response.document._id;
-    // })
+    let prompt = document.getElementById(`${category}Prompt`).value
+    let apiresponse = document.getElementById(`${category}Output`).value
     let incrementToAdd = 1;
     // write +1 in the starcount
     await updateStarMongoCall(category, incrementToAdd)
     //run the starcreation again to update visual
-    createStarContainer('descriptionContainer');
-    createStarContainer('linkedInContainer');
-    createStarContainer('newsletterContainer');
+    createStarContainer(`${category}Container`);
 
     //get user input (prompt + response) and store in a new mongodb collection
+    pushStarMongoCall(category, prompt, apiresponse)
+
     //change color of button until textarea is modified
     console.log(`Star button clicked for category: ${category}`);
 }
@@ -257,6 +255,34 @@ async function updateTextMongoCall(category, text) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ category, text }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        //console.log(data); // Process the response data as needed
+        const content = data;
+        // Check if content is undefined and return an error message if it is
+        if (content === undefined) {
+            return "Error: Content is undefined";
+        }
+
+        return content;
+    } catch (error) {
+        console.error('Error calling the API', error);
+    }
+}
+
+async function pushStarMongoCall(category, prompt, apiresponse) {
+    try {
+        const response = await fetch('https://j7-magic-tool.vercel.app/api/mongoCallPushStars', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ category, prompt, apiresponse }),
         });
 
         if (!response.ok) {
