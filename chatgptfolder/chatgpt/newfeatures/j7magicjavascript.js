@@ -10,8 +10,6 @@ window.onload = async function() {
 
     for (const category of categories) {
         let textFromMongo = (await getTextFromMongo(category)).document.text;
-        ;
-        console.log(textFromMongo);
 
     // Set the fetched value as the default value of the textarea
     document.getElementById(`${category}Prompt`).value = textFromMongo;
@@ -27,6 +25,7 @@ async function callApi(transcript, prompt, category) {
     submitButton.classList.add('loading');  
 
     try {
+        console.log("trying to fetch");
         const response = await fetch('https://j7-magic-tool.vercel.app/api/openaiCall', {
             method: 'POST',
             headers: {
@@ -36,17 +35,19 @@ async function callApi(transcript, prompt, category) {
         });
 
         if (!response.ok) {
+            const data = await response.json();
+            console.error('Server error:', data.error);
+            console.log('Server error:', data.error);
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
         const data = await response.json();
-        //console.log(data); // Process the response data as needed
+
         const content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
-        // Check if content is undefined and return an error message if it is
+
         if (content === undefined) {
             return "Error: Content is undefined";
         }
-
         return content;
     } catch (error) {
         console.error('Error calling the API', error);
