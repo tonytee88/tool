@@ -19,13 +19,30 @@ window.onload = async function() {
 async function callApi(transcript, prompt, category) {
     const submitButton = document.getElementById(`submitButton${category}`);
     const originalColor = submitButton.style.color;
-    submitButton.style.color = '#4CAF50';
+    const originalText = submitButton.innerText;
+    //submitButton.style.color = '#4CAF50';
 
     // Add the loading class to show the spinner
-    submitButton.classList.add('loading');  
-
+    //submitButton.classList.add('loading');  
+    
+    // Initialize countdown value
+    let countdown = 10;
+    
+    // Update the button text with the countdown value
+    submitButton.innerText = `(${countdown})`;
+    
+    // Start the countdown timer
+    const timerInterval = setInterval(() => {
+        countdown -= 1;
+        submitButton.innerText = `(${countdown})`;
+        
+        if (countdown <= 0) {
+            clearInterval(timerInterval);
+            submitButton.innerText = originalText;
+        }
+    }, 1000);
+    
     try {
-        console.log("trying to fetch");
         const response = await fetch('https://j7-magic-tool.vercel.app/api/openaiCall', {
             method: 'POST',
             headers: {
@@ -35,24 +52,22 @@ async function callApi(transcript, prompt, category) {
         });
 
         if (!response.ok) {
-            const data = await response.json();
-            console.error('Server error:', data.error);
-            console.log('Server error:', data.error);
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
         const data = await response.json();
-
         const content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
-
         if (content === undefined) {
             return "Error: Content is undefined";
         }
+
         return content;
     } catch (error) {
         console.error('Error calling the API', error);
     } finally {
-        // Remove the loading class to hide the spinner once the call is done
+        // Clear the interval and reset the button text and color
+        clearInterval(timerInterval);
+        submitButton.innerText = originalText;
         submitButton.classList.remove('loading');
         submitButton.style.color = originalColor;
     }
