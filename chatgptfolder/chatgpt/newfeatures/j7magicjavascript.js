@@ -41,7 +41,14 @@ async function callApi(transcript, prompt, category) {
             submitButton.innerText = originalText;
         }
     }, 1000);
-    
+    // step1 : check total character counts, if above 10k, divide the transcript in 10k chunks.
+    // Try to cut between paragraphs so we don't lose good info
+    // Calculate the total number summary bullet point required, each 1000 tokens equal 1 summary point
+    // For each 10k tokens, run the summarizer api call to request the summary based on the number of tokens
+    // Store the summary in an array
+    // After the last chunk, add up the summary element of the array
+    // make a final openai call to request the user's request (description, linkedin post, newsletter)
+
     try {
         const response = await fetch('https://j7-magic-tool.vercel.app/api/openaiCall', {
             method: 'POST',
