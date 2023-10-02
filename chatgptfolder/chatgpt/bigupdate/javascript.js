@@ -342,10 +342,10 @@ function addUSPInput() {
   const textarea = document.createElement('textarea');
   textarea.id = 'usp';
   textarea.className = 'form-control large-input';  // Use 'large-input' class to make it bigger
-  textarea.placeholder = 'Enter USPs here...';
+  textarea.placeholder = 'Enter USPs here... Include at least 1 social proof, 1 generic USP about the business and a product-specific one';
 
   // Prefill the textarea with a default value
-  textarea.textContent = 'Quality, Affordability, Sustainability'; 
+  textarea.textContent = 'Expert knowledge, Customer focused, 4.7 ratings, best price on wooden chairs on the market'; 
 
   // Append the label and textarea elements to the new div
   newDiv.appendChild(label);
@@ -822,8 +822,8 @@ document.getElementById("loadTags").addEventListener("click", function() {
   } else if (platformToServe === "Facebook") {
     var tags = ["Primary Text", "Headline", "Description"];
     processTags(tags);
-  } else if (platformToServe === "Facebook") {
-    var tags = ["Primary Text", "Headline", "Description"];
+  } else if (platformToServe === "Google") {
+    var tags = ["Headline Type", "Headline Text", "Headline Char Count", "USP", "Description", "Description Char Count"];
   }
 });
   
@@ -889,6 +889,23 @@ function createTablesInDoc() {
         resolve();
       }).createTables(elementsArray, lang);
     });
+  } else if (platformToServe === "Google") {
+    return new Promise((resolve, reject) => {
+      //WORK PIPELINE 2 OCT : Fix the tags and elements for Google
+      var elementsArray = [
+        [
+          "Google Ad", 
+          ["Primary Text", "{Primary Text}"], 
+          ["Headline", "{Headline}"], 
+          ["Description", "{Description}"]
+        ]
+      ];
+          // Create the table via Code.gs
+          var lang = getLang();
+          google.script.run.withSuccessHandler(function(statusLog) {
+            resolve();
+          }).createTables(elementsArray, lang);
+        });
   }
 }   
 
@@ -1615,6 +1632,7 @@ function extractTraits(response) {
     
       return clientTraits;
     } else {
+    //WORK PIPELINE 2 OCT : Fix how to extract trait for Google call
       return {};
     }
   }
@@ -1832,6 +1850,7 @@ gptRequest.addEventListener("submit", (e) => {
   }
   var client = getClient();
   var themeExamples = getThemeExamples(theme);
+   //WORK PIPELINE 2 OCT : Setup google : get Ad Type, main keywords, USP, campaign objective
 
   setStatusMessage("Talking to ChatGPT...")
   
@@ -2049,6 +2068,7 @@ gptRequest.addEventListener("submit", (e) => {
         statusMessage.textContent = "Script encountered an error.";
       });
   }
+   //WORK PIPELINE 2 OCT : add else if for google
 });
 
 function getTopContainerStatus() {
@@ -2265,7 +2285,7 @@ function initNavSystemFacebook() {
     }
 
     switch (currentSection) {
-      //subject to generate copy
+      //WORK PIPELINE 2 OCT : Long step, fix QA button to get good values and get good output for google
       case 1:
         let clientName = document.getElementById("clients").value;
         let adTheme = document.getElementById("themeDropdown").value;
@@ -2344,7 +2364,7 @@ function initNavSystemFacebook() {
     }
   }
 )};
-
+ //WORK PIPELINE 2 OCT : Revise the google nav system
 function initNavSystemGoogle() {
   document.getElementById("goNextButton").addEventListener('click', function() {
     if (currentSection >= totalSections) {
