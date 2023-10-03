@@ -823,7 +823,7 @@ document.getElementById("loadTags").addEventListener("click", function() {
     var tags = ["Primary Text", "Headline", "Description"];
     processTags(tags);
   } else if (platformToServe === "Google") {
-    var tags = ["Headline Type", "Headline Text", "Headline Char Count", "USP", "Description", "Description Char Count"];
+    var tags = ["Headlines with main keywords", "Headline Text", "Headline Char Count", "USP", "Description", "Description Char Count"];
   }
 });
   
@@ -894,7 +894,12 @@ function createTablesInDoc() {
       //WORK PIPELINE 2 OCT : Fix the tags and elements for Google
       var elementsArray = [
         [
-          "Google Ad", 
+          "Headlines with main keywords", 
+          ["Headline", "{Headline}"], 
+          ["Character Count", "{Character Count}"]
+        ],
+        [
+          "Google 1", 
           ["Primary Text", "{Primary Text}"], 
           ["Headline", "{Headline}"], 
           ["Description", "{Description}"]
