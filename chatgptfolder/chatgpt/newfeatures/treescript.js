@@ -1,5 +1,7 @@
-incrementCategory();
-initTrees();
+document.addEventListener('DOMContentLoaded', (event) => {
+    incrementCategory();
+    initTrees();
+});
 
 function showGarden() {
     const plusContent = document.getElementById("plusContent");
@@ -18,22 +20,27 @@ function showPlus() {
 }
 
 function incrementCategory() {
-    const dropdown = document.getElementById("categoryDropdown");
-    const selectedCategory = dropdown.value;
     const addOne = document.getElementById("addOne");
-    const noteInput = document.getElementById("noteInput");
-    const noteValue = noteInput.value
-    const add = 1;
 
     addOne.addEventListener('click', function() {
+        const dropdown = document.getElementById("categoryDropdown");
+        const selectedCategory = dropdown.value;
+        const noteInput = document.getElementById("noteInput");
+        const noteValue = noteInput.value;
+        const add = 1;
+
         console.log("clicked on +1");
         updateMongoAndTrees(selectedCategory, add, noteValue);
     });
 }
 
 async function updateMongoAndTrees(selectedCategory, add, noteValue) {
-    await treeMongoAdd(selectedCategory, add, noteValue)
-    initTrees();
+    try {
+        await treeMongoAdd(selectedCategory, add, noteValue);
+        initTrees();
+    } catch (error) {
+        console.error('Error updating MongoDB and Trees', error);
+    }
 }
 
 async function initTrees() {
@@ -46,11 +53,14 @@ async function initTrees() {
 }
 
 function createPreElements(count, category) {
-    const trunk = document.getElementById(category.toLowerCase()); // get the specific trunkContainer by category
+    const trunk = document.getElementById(category.toLowerCase());
+    
+    // Clear the current trunk elements
+    trunk.innerHTML = '';
 
     for (let i = 0; i < count; i++) {
         const preElement = document.createElement("pre");
-        preElement.innerText = "|   |"; // ASCII representation for a tree trunk segment. Adjust as needed.
+        preElement.innerText = "|   |";
         trunk.appendChild(preElement);
     }
 }
@@ -72,6 +82,7 @@ async function treeMongoAdd(category, add, note) {
         const data = await response.json();
         //console.log(data); // Process the response data as needed
         const content = data;
+
         // Check if content is undefined and return an error message if it is
         if (content === undefined) {
             return "Error: Content is undefined";
@@ -84,6 +95,7 @@ async function treeMongoAdd(category, add, note) {
 }
 
 async function treeMongoGetCount(category) {
+
     try {
         const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoGetCount', {
             method: 'POST',
@@ -98,15 +110,14 @@ async function treeMongoGetCount(category) {
         }
 
         const data = await response.json();
-        
-        // Check if the count property is available in the data
-        if (data.count !== undefined) {
-            return data.count;
+        console.log(data)
+        // Check if the count property is available in the nested document object
+        if (data.document && data.document.count !== undefined) {
+            return data.document.count;
         } else {
             console.error('Count not found in the response data');
             return 0;  // Return 0 or any default value if count is not found
         }
-        
     } catch (error) {
         console.error('Error calling the API', error);
         return 0;  // You may choose to return 0 or any other default value in case of error
