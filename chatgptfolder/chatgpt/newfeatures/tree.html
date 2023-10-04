@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tree Growth</title>
+    <link rel="stylesheet" href="treestylesheet.css">
+</head>
+<body>
+<div class="treeContainer">
+    <div class="tree1">
+        <pre class="treeHead">
+   / \    
+  /   \   
+ /     \  
+/_______\ </pre>
+        <div class="trunkContainer" id="husband"></div>
+    </div>
+    <div class="tree1">
+        <pre class="treeHead">
+   / \    
+  /   \   
+ /     \  
+/_______\ </pre>
+        <div class="trunkContainer" id="fatherhood"></div>
+    </div>
+    <div class="tree1">
+        <pre class="treeHead">
+   / \    
+  /   \   
+ /     \  
+/_______\ </pre>
+        <div class="trunkContainer" id="home"></div>
+    </div>
+    <div class="tree1">
+        <pre class="treeHead">
+   / \    
+  /   \   
+ /     \  
+/_______\ </pre>
+        <div class="trunkContainer" id="money"></div>
+    </div>
+    <div class="tree1">
+        <pre class="treeHead">
+   / \    
+  /   \   
+ /     \  
+/_______\ </pre>
+        <div class="trunkContainer" id="brain"></div>
+    </div>
+    <div class="tree1">
+        <pre class="treeHead">
+   / \    
+  /   \   
+ /     \  
+/_______\ </pre>
+        <div class="trunkContainer" id="body"></div>
+    </div>
+</div>
+
+
+<!-- Plus Tab Content -->
+<div id="plusContent" class="tabContent">
+    <select id="categoryDropdown">
+        <option value="Husband">Husband</option>
+        <option value="Fatherhood">Fatherhood</option>
+        <option value="Home">Home</option>
+        <option value="Money">Money</option>
+        <option value="Brain">Brain</option>
+        <option value="Body">Body</option>
+    </select>
+    <button id="addOne">+1</button>
+    <input id="noteInput" type="text">
+</div>
+<!-- Tabs Section -->
+<div class="tabContainer">
+    <button id="gardenTab" onclick="showGarden()">Garden</button>
+    <button id="plusTab" onclick="showPlus()">+</button>
+</div>
+    <script src="treescript.js"></script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+body {
+    font-family: "Courier New", Courier, monospace; /* ASCII looks best in monospace */
+    text-align: center;
+    margin-top: 50px;
+}
+
+button {
+    padding: 10px 20px; /* Add some space around text inside buttons */
+    font-size: 18px; /* Bigger font size for better touch target */
+    border: none; /* Remove default borders */
+    background-color: transparent; /* No default background */
+    outline: none; /* Remove focus outline */
+}
+
+button:active {
+    background-color: rgba(0,0,0,0.1); /* Slight feedback on tap/click */
+}
+
+.tree1 {
+    display: block;
+}
+
+.trunkContainer {
+    display: flex;
+    flex-direction: column-reverse;
+    padding: 0;
+    margin: 0;
+}
+
+.trunkSegment {
+    font-family: "Courier New", Courier, monospace;
+}
+
+pre {
+    margin: 0;
+    text-align: center;
+}
+
+.treeContainer {
+    display:flex;
+    flex-direction: row;
+    justify-content:center;
+}
+
+.tabContainer {
+    display: flex;
+    justify-content: space-around; /* equally spaces the two buttons */
+    position: fixed; /* fixes the navbar to the bottom */
+    bottom: 0;
+    left: 0;
+    width: 100%; /* makes sure it spans the entire width of the viewport */
+    background-color: #ffffff; /* give it a background so content doesn't overlap and show through */
+    border-top: 1px solid #e0e0e0; /* subtle top border */
+    padding: 10px 0;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* subtle shadow for elevation effect */
+}
+
+.tabContent {
+    display: none;
+    text-align: center;
+    margin-top: 20px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+}
+
+#plusContent {
+    display: none; /* It's hidden by default */
+}
+
+body, html {
+    height: 100%;
+    padding: 0;
+}
+
+html {
+    overflow-y: scroll; /* Always show vertical scrollbar */
+}
