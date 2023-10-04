@@ -226,7 +226,7 @@ textarea.large-input {
   font-weight: bold;
 }
 
-.element-button {
+.element-button, .element-button-google {
   display: inline-block;
   margin-right: 5px;
   margin-bottom: 5px;

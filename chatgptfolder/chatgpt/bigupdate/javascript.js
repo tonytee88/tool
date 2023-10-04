@@ -46,39 +46,12 @@ console.log("v"+version);
 
 window.addEventListener('load', function() {
   sidebarInit();
-  initUIAndTooltips();
   createPlatformSelection();
-  function moveElementButton(button, fromSection, toSection) {
-    fromSection.removeChild(button);
-    toSection.appendChild(button);
-  }
+  initUISteps();
 
-async function initUIAndTooltips() {
-  try {
-    var step1 = await initTooltips();
-    var step2 = initUISteps();
 
-  } catch (error) {
-  console.error('An error occurred:', error);
-      }
-  }
 
-  // Add event listeners to element buttons
-  var chosenSection = document.getElementById('chosenContainer');
-  var recommendedSection = document.getElementById('recommendedSection');
-  var elementButtons = document.getElementsByClassName('element-button');
 
-  for (let i = 0; i < elementButtons.length; i++) {
-    elementButtons[i].addEventListener('click', function() {
-      if (chosenSection.contains(this)) {
-        // Move from chosen to recommended
-        moveElementButton(this, chosenSection, recommendedSection);
-      } else if (recommendedSection.contains(this)) {
-        // Move from recommended to chosen
-        moveElementButton(this, recommendedSection, chosenSection);
-      }
-    });
-  }
 
   // Add event listener to "Add" button
   var addElementButton = document.getElementById('addElementButton');
@@ -152,6 +125,85 @@ async function initUIAndTooltips() {
   });
 });
 
+function moveElementButton(button, fromSection, toSection) {
+  fromSection.removeChild(button);
+  toSection.appendChild(button);
+}
+
+function addClickToMoveFeature() {
+  // Add event listeners to element buttons
+  var chosenSection = document.getElementById('chosenContainer');
+  var recommendedSection = document.getElementById('recommendedSection');
+  var elementButtons = document.getElementsByClassName('element-button');
+
+  for (let i = 0; i < elementButtons.length; i++) {
+    elementButtons[i].addEventListener('click', function() {
+      if (chosenSection.contains(this)) {
+        // Move from chosen to recommended
+        moveElementButton(this, chosenSection, recommendedSection);
+      } else if (recommendedSection.contains(this)) {
+        // Move from recommended to chosen
+        moveElementButton(this, recommendedSection, chosenSection);
+      }
+    });
+  }
+}
+
+async function initUIAndTooltips() {
+  try {
+    var step1 = await initTooltips();
+    var step2 = initUISteps();
+    initStep1();
+
+  } catch (error) {
+  console.error('An error occurred:', error);
+      }
+  }
+
+function initStep2(platformToServe) {
+  let chosenContainer = document.getElementById('chosenContainer');
+  let recommendedSection = document.getElementById('recommendedSection');
+  if (platformToServe === "Google") {
+      chosenContainer.innerHTML = `
+          <div class="label" id="chosen">Chosen Elements:</div>
+          <button class="element-button">Headlines [main keywords]</button>
+          <button class="element-button">Headlines [social proof]</button>
+          <button class="element-button">Headlines [generic USP]</button>
+          <button class="element-button">Headlines [CTA]</button>
+          <button class="element-button">Description [main keywords][product-specific USP][CTA]</button>
+          <button class="element-button">Description [main keywords][generic USP]</button>
+          <div class="element-buttons" id="chosenSection"></div>
+      `;
+      recommendedSection.innerHTML = `
+          <button class="element-button">test 123</button>
+      `;
+    addClickToMoveFeature()
+  } else {
+    chosenContainer.innerHTML = `
+        <div class="label" id="chosen">Chosen Elements:</div>
+        <button class="element-button">Email Subject Line</button>
+        <button class="element-button">Email Preview Text</button>
+        <button class="element-button">HeroBanner Title</button>
+        <button class="element-button">HeroBanner Text</button>
+        <button class="element-button">HeroBanner CTA</button>
+        <button class="element-button">DescriptiveBlock Title</button>
+        <button class="element-button">DescriptiveBlock Text</button>
+        <button class="element-button">DescriptiveBlock CTA</button>
+        <button class="element-button">ProductBlock Title</button>
+        <button class="element-button">ProductBlock Text</button>
+        <button class="element-button">ProductBlock CTA</button>
+        <div class="element-buttons" id="chosenSection"></div>
+    `;
+    recommendedSection.innerHTML = `
+        <button class="element-button">Benefits1 Title</button>
+        <button class="element-button">Benefits1 Text</button>
+        <button class="element-button">Tip1 Title</button>
+        <button class="element-button">Tip1 Text</button>
+    `;
+    addClickToMoveFeature()
+  }
+}
+
 // create the platform selection screen
 function createPlatformSelection() {
   // Create main container
@@ -175,8 +227,11 @@ function createPlatformSelection() {
       platformDiv.textContent = platform;
 
       // Event listener to start workflow
-      platformDiv.addEventListener('click', function() {
-          startWorkflow(platform);
+      platformDiv.addEventListener('click', async function() {
+        startWorkflow(platform);
+        initStep2(platform);
+        initUIAndTooltips();
+
       });
 
       containerCard.appendChild(platformDiv);
@@ -192,16 +247,13 @@ function startWorkflow(platform) {
   document.getElementById("navigation").style.display = 'block';
   if (platform === "Email") {
     platformToServe = "Email";
-    initNavSystemEmail();
-    initStep1();
+    initNavSystemEmail(); 
   } else if (platform === "Facebook") {
     platformToServe = "Facebook";
-    initStep1();
     addThemeDropdown();
     initNavSystemFacebook();
   } else if (platform === "Google") {
     platformToServe = "Google";
-    initStep1();
     addThemeDropdown();
     addKeywordInput();
     addCampaignObjectiveInput();
@@ -531,7 +583,7 @@ function initTooltips() {
 function initUISteps() {
   
   let numberOfStepsToHide = 7;
-  for (var i = 1; i < 8; i++) {
+  for (var i = 1; i < (numberOfStepsToHide+1); i++) {
   document.getElementById("step"+[i]).style.display = 'none';
   }
 }
