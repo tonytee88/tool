@@ -1,3 +1,5 @@
+let addPointsContainerState = 0; 
+
 document.addEventListener('DOMContentLoaded', (event) => {
     incrementCategory();
     initTrees();
@@ -23,16 +25,40 @@ function showPlus() {
 function incrementCategory() {
     const addOne = document.getElementById("addOne");
 
-    addOne.addEventListener('click', function() {
+    addOne.addEventListener('click', async function() {
         const dropdown = document.getElementById("categoryDropdown");
         const selectedCategory = dropdown.value;
         const noteInput = document.getElementById("noteInput");
         const noteValue = noteInput.value;
         const add = 1;
 
-        console.log("clicked on +1");
+        // Check for ideaTag in addPointsContainer
+        const addPointsContainer = document.getElementById('addPointsContainer');
+        const ideaTag = addPointsContainer.querySelector('.ideaTag');
+
+        if (ideaTag) {
+            const ideaValue = ideaTag.innerText; // Assuming the idea text is the innerText of the ideaTag
+            ideaTag.remove(); // Delete the ideaTag currently in the addPointsContainer
+
+            // Delete data in mongo
+            await treeMongoDeleteIdea(selectedCategory, ideaValue);
+            addPointsContainerState = 0;
+            // Reload the tags
+            await getAndLoadIdeas();
+        }
+
         updateMongoAndTrees(selectedCategory, add, noteValue);
+        noteInput.value ="";
+
+        // Add animation to the +1 button
+        addOne.classList.add('clicked-animation'); // Assuming you have defined this class in your CSS
+
+        // Remove the animation class after 500ms (or adjust the time based on your desired animation length)
+        setTimeout(() => {
+            addOne.classList.remove('clicked-animation');
+        }, 500);
     });
+
 }
 
 async function updateMongoAndTrees(selectedCategory, add, noteValue) {
@@ -173,15 +199,13 @@ async function treeMongoAddNotebookIdeas(category, idea) {
 
 async function getAndLoadIdeas() {
     const ideasList = document.getElementById('ideasList');
+    const addPointsContainer = document.getElementById('addPointsContainer');
 
     // Clear previous ideas
     ideasList.innerHTML = '';
 
     for (const category of Object.keys(categoryColors)) {
-        console.log("fetching category from category colors"+category)
         const ideas = await treeMongoFetchIdeas(category);
-
-        // Filter out empty ideas
         const filteredIdeas = ideas.filter(idea => idea.trim() !== "");
         
         filteredIdeas.forEach(idea => {
@@ -189,6 +213,41 @@ async function getAndLoadIdeas() {
             ideaTag.className = 'ideaTag';
             ideaTag.style.backgroundColor = categoryColors[category];
             ideaTag.innerText = idea;
+
+            ideaTag.addEventListener('click', () => {
+                console.log("you clicked me once!");
+                const noteInput = document.getElementById('noteInput');
+                const categoryDropdown = document.getElementById('categoryDropdown');
+
+                // If there's no ideaTag in addPointsContainer, move the clicked ideaTag there
+                if (addPointsContainerState === 0) {
+                    const noteInputContainer = document.getElementById('noteInputContainer');
+                    noteInputContainer.insertAdjacentElement('afterend', ideaTag);
+                    noteInput.value = idea;
+                    categoryDropdown.value = category;
+                    ideaTag.style.marginTop = '2px';
+                    addPointsContainerState = 1;
+                } 
+                // If there's an ideaTag inside addPointsContainer and it's the clicked one, move it back to ideasList
+                else if (addPointsContainerState === 1 && ideaTag.parentElement === addPointsContainer) {
+                    ideaTag.style.marginTop = '0px';
+                    ideasList.appendChild(ideaTag);
+                    addPointsContainerState = 0;
+                } 
+                // If another ideaTag was inside addPointsContainer, replace it
+                else if (addPointsContainerState === 1) {
+                    const existingIdeaTag = addPointsContainer.querySelector('.ideaTag');
+                    existingIdeaTag.style.marginTop = '0px';
+                    ideasList.appendChild(existingIdeaTag);
+                    
+                    const noteInputContainer = document.getElementById('noteInputContainer');
+                    noteInputContainer.insertAdjacentElement('afterend', ideaTag);
+                    noteInput.value = idea;
+                    categoryDropdown.value = category;
+                    ideaTag.style.marginTop = '2px';
+                }
+            });
+            
             ideasList.appendChild(ideaTag);
         });
     }
@@ -205,7 +264,6 @@ const categoryColors = {
 };
 
 async function treeMongoFetchIdeas(category) {
-    console.log("treeMongoFetchIdeas" + category);
     try {
         const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoFetchIdeas', {
             method: 'POST',
@@ -220,10 +278,8 @@ async function treeMongoFetchIdeas(category) {
         }
 
         const data = await response.json();
-        console.log(data);
         // Check if the ideas property is available in the nested document object
         if (data.document && Array.isArray(data.document.ideas)) {
-            console.log(data.document.ideas);
             return data.document.ideas;
         } else {
             console.error('Ideas array not found in the response data');
@@ -234,3 +290,32 @@ async function treeMongoFetchIdeas(category) {
         return [];  // Return an empty array in case of error
     }
 }
+
+async function treeMongoDeleteIdea(category, idea) {
+    try {
+        const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoDeleteIdea', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ category, idea }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log(data)
+        // Assuming your API sends a confirmation message under 'message' property.
+        if (data && data.message) {
+            return data.message;
+        } else {
+            throw new Error('Unexpected response structure from the API');
+        }
+    } catch (error) {
+        console.error('Error calling the API', error);
+        return 'Failed to delete the idea';  // Return an error message in case of error
+    }
+}
+
