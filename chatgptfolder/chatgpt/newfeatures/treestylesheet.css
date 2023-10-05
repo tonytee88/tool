@@ -57,10 +57,11 @@ pre {
     bottom: 0;
     left: 0;
     width: 100%; /* makes sure it spans the entire width of the viewport */
-    background-color: #ffffff; /* give it a background so content doesn't overlap and show through */
-    border-top: 1px solid #e0e0e0; /* subtle top border */
+    border-top: 1px solid #383838; /* subtle top border */
     padding: 10px 0;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* subtle shadow for elevation effect */
+    background-color: #383838; /* Dark background */
+    border-radius: 5px;
 }
 
 .tabContent {
@@ -95,7 +96,6 @@ html {
 #idea {
     width: 90%;
     height: 100px;
-
     border: none;
     outline: none;
     border-radius: 10px;  /* Rounded corners */
@@ -115,7 +115,7 @@ html {
 
 #addPointsContainer {
     display:flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 10px;
@@ -151,17 +151,31 @@ button {
     box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Button shadow for depth */
 }
 
+#gardenTab, #plusTab {
+    background-color: #383838;
+    box-shadow: none;
+    padding: 15px 30px;  /* Increased padding for larger hitbox */
+    font-size: 24px;    /* Bigger font size */
+    border-radius: 10px; /* Rounded corners for aesthetics */
+    margin: 5px;        /* Some spacing between buttons if they are side by side */
+    transition: background-color 0.2s;  /* Smooth color transition on hover */
+}
+
+
 button:hover {
     background-color: #606060;  /* Slightly lighter shade on hover */
 }
 
 #noteInputContainer {
     width: 100%; /* Takes full width */
+    display:flex;
+    flex-direction: column;
+
 }
 
 #idea {
     /* ...existing properties... */
-    height: 120px;  /* Taller text input */
+    height: 30px;  /* Taller text input */
 }
 
 .tabContainer, .tabContent {
@@ -172,7 +186,7 @@ button:hover {
 
 #ideasList {
     margin-top: 48px;
-    margin-bottom: 72px;
+    margin-bottom: 48px;
 }
 
 #notebookButtonContainer {
@@ -180,4 +194,8 @@ button:hover {
     gap: 10px;
     justify-content: center;
     align-items: center;
+}
+
+#addPointsBottomContainer {
+    margin-top: 10px;
 }
