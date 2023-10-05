@@ -53,17 +53,20 @@ async function initTrees() {
 }
 
 function createPreElements(count, category) {
-    const trunk = document.getElementById(category.toLowerCase());
-    
-    // Clear the current trunk elements
-    trunk.innerHTML = '';
+    const trunk = document.getElementById(category.toLowerCase()); // get the specific trunkContainer by category
+
+    // Clear any existing trunks first, this will prevent duplicating trunks every time you initialize
+    trunk.innerHTML = ''; 
 
     for (let i = 0; i < count; i++) {
         const preElement = document.createElement("pre");
-        preElement.innerText = "|   |";
+        preElement.innerText = "|   |"; // ASCII representation for a tree trunk segment. Adjust as needed.
+        
+        // This will prepend (or insert at the beginning) the new trunk segment
         trunk.appendChild(preElement);
     }
 }
+
 
 async function treeMongoAdd(category, add, note) {
     try {

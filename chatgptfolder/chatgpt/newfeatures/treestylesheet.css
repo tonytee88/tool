@@ -17,7 +17,11 @@ button:active {
 }
 
 .tree1 {
-    display: block;
+    display: flex;
+    flex-direction: column; /* This will make new trunks appear at the bottom */
+    align-items: center; /* To center align tree trunk and head */
+    justify-content: flex-end; /* Push content to the bottom */
+    height: 100%; /* Take the full height available to the tree */
 }
 
 .trunkContainer {
@@ -25,6 +29,13 @@ button:active {
     flex-direction: column-reverse;
     padding: 0;
     margin: 0;
+}
+
+.treeContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    height: calc(100% - 100px); /* subtracting approx height of tabContainer, adjust as needed */
 }
 
 .trunkSegment {
