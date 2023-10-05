@@ -22,6 +22,7 @@ button:active {
     align-items: center; /* To center align tree trunk and head */
     justify-content: flex-end; /* Push content to the bottom */
     height: 100%; /* Take the full height available to the tree */
+    font-size: 10px;;
 }
 
 .trunkContainer {
@@ -45,12 +46,6 @@ button:active {
 pre {
     margin: 0;
     text-align: center;
-}
-
-.treeContainer {
-    display:flex;
-    flex-direction: row;
-    justify-content:center;
 }
 
 .tabContainer {
@@ -84,4 +79,11 @@ body, html {
 
 html {
     overflow-y: scroll; /* Always show vertical scrollbar */
+}
+
+#notebookContainer {
+    display:flex;
+    justify-content: center;
+    gap:10px;
+    margin-top: 10px;
 }
