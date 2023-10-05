@@ -87,3 +87,24 @@ html {
     gap:10px;
     margin-top: 10px;
 }
+
+#idea {
+    width: 90%;
+    height: 100px;
+    background-color: #f5f5f5;  /* Light grey */
+    border: none;
+    outline: none;
+    border-radius: 10px;  /* Rounded corners */
+    padding: 10px;
+    font-size: 18px;
+    resize: none;  /* Prevent users from resizing the field */
+}
+
+.ideaTag {
+    border-radius: 15px;
+    padding: 5px 10px;
+    font-size: 20px;
+    display: inline-block;
+    margin: 5px;
+    color: white;
+}
