@@ -305,6 +305,36 @@ async function treeMongoFetchIdeas(category) {
     }
 }
 
+async function treeMongoFetchSavedIdeas(saveName) {
+    console.log(saveName);
+    try {
+        const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoFetchSavedIdeas', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ saveName }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log(data);
+        // Check if the ideas property is available in the nested document object
+        if (data.document.save && Array.isArray(data.document.save)) {
+            return data.document.save;
+        } else {
+            console.error('Ideas array not found in the response data');
+            return [];  // Return an empty array if ideas are not found
+        }
+    } catch (error) {
+        console.error('Error calling the API', error);
+        return [];  // Return an empty array in case of error
+    }
+}
+
 async function treeMongoDeleteIdea(category, idea) {
     try {
         const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoDeleteIdea', {
@@ -333,9 +363,35 @@ async function treeMongoDeleteIdea(category, idea) {
     }
 }
 
+async function treeMongoSaveIdeas(saveName, ideas) {
+    try {
+        const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoSaveIdeas', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ saveName, ideas }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("the data sent to be saved: " + JSON.stringify(data));
+        // Assuming your API sends a confirmation message under 'message' property.
+
+    } catch (error) {
+        console.error('Error calling the API', error);
+        return 'Failed to delete the idea';  // Return an error message in case of error
+    }
+}
+
 document.getElementById('refreshButton').addEventListener('click', async () => {
     const cardsContainer = document.getElementById('cardsContainer');
-    const ideas = await generateIdeasGPT(); // This should return an array of ideas with categories
+    const saveName = "ideas1";
+    const savedIdeas = await treeMongoFetchSavedIdeas(saveName);
+    const ideas = await extractIdeas(savedIdeas); // This should return an array of ideas with categories
 
     cardsContainer.innerHTML = ''; // Clear out any old cards
 
@@ -348,21 +404,123 @@ document.getElementById('refreshButton').addEventListener('click', async () => {
     }
 });
 
+document.getElementById('preload').addEventListener('click', async () => {
+    const preloadButton = document.getElementById('preload');
+    const saveName = "ideas1";
+
+    // Hide the button text
+    preloadButton.innerHTML = "";
+
+    // Create the loader element
+    const loader = document.createElement('div');
+    loader.className = 'loader';
+
+    // Append the loader to the button
+    preloadButton.appendChild(loader);
+    
+    const currentDate = "Oct 6th, 2023";
+    const keywords = "love and laughter";
+
+    let ideas = await callApi(currentDate, keywords);
+    await treeMongoSaveIdeas(saveName, ideas)
+    
+    // Show the text and remove the loading animation
+    preloadButton.removeChild(loader);
+    preloadButton.innerHTML = "Preload";
+    
+    return ideas;
+});
+
+async function extractIdeas(savedIdeas) {
+    let extractedIdeas = [];
+
+    try {
+        // Attempt to parse the data string
+        let data = JSON.parse(savedIdeas);
+
+        // Handle the first format
+        if (Array.isArray(data) && data[0].hasOwnProperty('sphere') && Array.isArray(data[0].ideas)) {
+            for (let item of data) {
+                for (let idea of item.ideas) {
+                    extractedIdeas.push({
+                        sphere: item.sphere,
+                        text: idea
+                    });
+                }
+            }
+        }
+    } catch (e) {
+        // Handle the second format if the above parse fails
+        const sections = savedIdeas.split('\n\n');  // Split by double newline to get sections
+        for (let section of sections) {
+            const lines = section.split('\n');
+            const sphere = lines[0].slice(0, -1);  // Removing the colon at the end
+            for (let i = 1; i < lines.length; i++) {
+                extractedIdeas.push({
+                    sphere: sphere,
+                    text: lines[i].slice(3)  // Removing the "1. " at the beginning
+                });
+            }
+        }
+    }
+
+    return extractedIdeas;
+}
+
 async function generateIdeasGPT() {
     ideas = [
         {
-            "category": "Husband",
+            "sphere": "Husband",
             "text": "Spend quality time together at least once a week."
         },
         {
-            "category": "Fatherhood",
+            "sphere": "Fatherhood",
             "text": "Read a bedtime story every night."
         },
         {
-            "category": "Home",
+            "sphere": "Home",
             "text": "Create a monthly cleaning schedule."
         },
-        // ... more ideas for other categories
-    ]
+        {
+            "sphere": "Money",
+            "text": "Create a monthly cleaning schedule."
+        },
+        {
+            "sphere": "Brain",
+            "text": "Create a monthly cleaning schedule."
+        },
+        {
+            "sphere": "Body",
+            "text": "Create a monthly cleaning schedule."
+        },
+    ];
     return ideas
+}
+
+async function callApi(currentDate, keywords) {
+    const submitButton = document.getElementById("preload");
+    try {
+        const response = await fetch('https://j7-magic-tool.vercel.app/api/treeOpenAiCall', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ currentDate, keywords }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+
+        if (content === undefined) {
+            return "Error: Content is undefined";
+        }
+
+        return content;
+    } catch (error) {
+        console.error('Error calling the API', error);
+    } 
 }

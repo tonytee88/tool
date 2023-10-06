@@ -289,3 +289,28 @@ button:hover {
     align-items: center;
     gap: 10px;
 }
+
+#preload {
+    color: #fff;  /* This is the original color. */
+}
+#preload.hide-text {
+    color: #505050;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loader {
+    border: 4px solid rgba(255, 255, 255, 0.3); /* Transparent circle */
+    border-radius: 50%;
+    border-top: 4px solid #000; /* Black circle */
+    width: 12px;
+    height: 12px;
+    animation: spin 1s linear infinite;
+}
+
+.hide-text {
+    color: transparent; /* hides the text */
+}
