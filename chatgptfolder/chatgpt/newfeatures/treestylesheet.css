@@ -199,3 +199,68 @@ button:hover {
 #addPointsBottomContainer {
     margin-top: 10px;
 }
+
+.card {
+    background-color: white; /* default color, can be replaced based on category */
+    border-radius: 8px;
+    padding: 10px;
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* To set the color based on category */
+[data-category="Husband"] {
+    background-color: #f28d35;
+}
+
+[data-category="Fatherhood"] {
+    background-color: #35a2f2;
+}
+
+[data-category="Home"] {
+    background-color: #9ef235;
+}
+
+[data-category="Money"] {
+    background-color: #e835f2;
+}
+
+[data-category="Brain"] {
+    background-color: #35f2a2;
+}
+
+[data-category="Body"] {
+    background-color: #f23572;
+}
+
+/* Setting color for Husband tree */
+#husbandHead, #husband {
+    color: #f28d35;
+}
+
+/* Setting color for Fatherhood tree */
+#fatherhoodHead, #fatherhood {
+    color: #35a2f2;
+}
+
+/* Setting color for Home tree */
+#homeHead, #home {
+    color: #9ef235;
+}
+
+/* Setting color for Money tree */
+#moneyHead, #money{
+    color: #e835f2;
+}
+
+/* Setting color for Brain tree */
+#brainHead, #brain {
+    color: #35f2a2;
+}
+
+/* Setting color for Body tree */
+#bodyHead, #body {
+    color: #f23572;
+}
