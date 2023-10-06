@@ -9,7 +9,7 @@
 <body>
 <div class="treeContainer">
     <div class="tree1">
-        <pre class="treeHead">
+        <pre class="treeHead" id="husbandHead">Husband
    / \    
   /   \   
  /     \  
@@ -17,7 +17,7 @@
         <div class="trunkContainer" id="husband"></div>
     </div>
     <div class="tree1">
-        <pre class="treeHead">
+        <pre class="treeHead" id="fatherhoodHead">Fatherhood
    / \    
   /   \   
  /     \  
@@ -25,7 +25,7 @@
         <div class="trunkContainer" id="fatherhood"></div>
     </div>
     <div class="tree1">
-        <pre class="treeHead">
+        <pre class="treeHead"id="homeHead">Home
    / \    
   /   \   
  /     \  
@@ -33,7 +33,7 @@
         <div class="trunkContainer" id="home"></div>
     </div>
     <div class="tree1">
-        <pre class="treeHead">
+        <pre class="treeHead"id="moneyHead">Money
    / \    
   /   \   
  /     \  
@@ -41,7 +41,7 @@
         <div class="trunkContainer" id="money"></div>
     </div>
     <div class="tree1">
-        <pre class="treeHead">
+        <pre class="treeHead"id="brainHead">Brain
    / \    
   /   \   
  /     \  
@@ -49,7 +49,7 @@
         <div class="trunkContainer" id="brain"></div>
     </div>
     <div class="tree1">
-        <pre class="treeHead">
+        <pre class="treeHead"id="bodyHead">Body
    / \    
   /   \   
  /     \  
@@ -102,10 +102,22 @@
         </div>
     </div>
 </div>
+<!-- Explore Tab Content -->
+<div id="exploreContent" class="tabContent">
+    <button id="refreshButton">Refresh</button>
+    <!-- Place for generated cards -->
+    <div id="cardsContainer"></div>
+</div>
+
 <!-- Tabs Section -->
 <div class="tabContainer">
     <button id="gardenTab" onclick="showGarden()">Garden</button>
     <button id="plusTab" onclick="showPlus()">+</button>
+    <div class="tabContainer">
+        <button id="gardenTab" onclick="showGarden()">Garden</button>
+        <button id="plusTab" onclick="showPlus()">+</button>
+        <button id="exploreTab" onclick="showExplore()">Explore</button>
+    </div>
 </div>
     <script src="treescript.js"></script>
 </body>

@@ -319,3 +319,17 @@ async function treeMongoDeleteIdea(category, idea) {
     }
 }
 
+document.getElementById('refreshButton').addEventListener('click', async () => {
+    const cardsContainer = document.getElementById('cardsContainer');
+    const ideas = await generateIdeasGPT(); // This should return an array of ideas with categories
+
+    cardsContainer.innerHTML = ''; // Clear out any old cards
+
+    for (const idea of ideas) {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.setAttribute('data-category', idea.category);
+        card.innerText = idea.text; // Assuming there's a text property with the idea's content
+        cardsContainer.appendChild(card);
+    }
+});
