@@ -9,17 +9,31 @@ document.addEventListener('DOMContentLoaded', (event) => {
 function showGarden() {
     const plusContent = document.getElementById("plusContent");
     const treeContainer = document.querySelector(".treeContainer");
+    const exploreContent = document.getElementById("exploreContent");
     
     plusContent.style.display = "none";
+    exploreContent.style.display = "none";
     treeContainer.style.display = "flex";
 }
 
 function showPlus() {
     const plusContent = document.getElementById("plusContent");
     const treeContainer = document.querySelector(".treeContainer");
+    const exploreContent = document.getElementById("exploreContent");
 
     treeContainer.style.display = "none";
+    exploreContent.style.display = "none";
     plusContent.style.display = "block";
+}
+
+function showExplore () {
+    const plusContent = document.getElementById("plusContent");
+    const treeContainer = document.querySelector(".treeContainer");
+    const exploreContent = document.getElementById("exploreContent");
+
+    treeContainer.style.display = "none";
+    exploreContent.style.display = "block";
+    plusContent.style.display = "none";
 }
 
 function incrementCategory() {
@@ -333,3 +347,22 @@ document.getElementById('refreshButton').addEventListener('click', async () => {
         cardsContainer.appendChild(card);
     }
 });
+
+async function generateIdeasGPT() {
+    ideas = [
+        {
+            "category": "Husband",
+            "text": "Spend quality time together at least once a week."
+        },
+        {
+            "category": "Fatherhood",
+            "text": "Read a bedtime story every night."
+        },
+        {
+            "category": "Home",
+            "text": "Create a monthly cleaning schedule."
+        },
+        // ... more ideas for other categories
+    ]
+    return ideas
+}
