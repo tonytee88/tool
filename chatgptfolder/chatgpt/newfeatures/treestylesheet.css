@@ -67,12 +67,15 @@ pre {
 .tabContent {
     display: none;
     text-align: center;
-    margin-top: 20px;
+    margin-top: 10px;
     padding-bottom: calc(10px + env(safe-area-inset-bottom));
 }
 
 #plusContent {
     display: none; /* It's hidden by default */
+    height: calc(100vh - 120px); /* This will make the div take up the full viewport height minus 50px */
+    overflow-y: auto; /* This will make the content inside the div scrollable if it overflows the div's height */
+    position: relative; /* This ensures it's positioned relative to the usual document flow, at the top */
 }
 
 body, html {
@@ -88,7 +91,6 @@ html {
     display:flex;
     flex-direction: column;
     justify-content: center;
-
     gap:10px;
     margin-top: 10px;
 }
@@ -154,8 +156,7 @@ button {
 #gardenTab, #plusTab {
     background-color: #383838;
     box-shadow: none;
-    padding: 15px 30px;  /* Increased padding for larger hitbox */
-    font-size: 24px;    /* Bigger font size */
+    font-size: 18px;    /* Bigger font size */
     border-radius: 10px; /* Rounded corners for aesthetics */
     margin: 5px;        /* Some spacing between buttons if they are side by side */
     transition: background-color 0.2s;  /* Smooth color transition on hover */
@@ -179,8 +180,8 @@ button:hover {
 
 .tabContainer, .tabContent {
     border-radius: 5px; /* Rounded corners */
-    margin: 10px; /* Some space around */
-    padding: 10px; /* Inner spacing */
+    margin: 0px; /* Some space around */
+    padding: 0px; /* Inner spacing */
 }
 
 #ideasList {
