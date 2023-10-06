@@ -153,7 +153,7 @@ button {
     box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Button shadow for depth */
 }
 
-#gardenTab, #plusTab {
+#gardenTab, #plusTab, #exploreTab {
     background-color: #383838;
     box-shadow: none;
     font-size: 18px;    /* Bigger font size */
@@ -161,7 +161,6 @@ button {
     margin: 5px;        /* Some spacing between buttons if they are side by side */
     transition: background-color 0.2s;  /* Smooth color transition on hover */
 }
-
 
 button:hover {
     background-color: #606060;  /* Slightly lighter shade on hover */
@@ -201,7 +200,7 @@ button:hover {
 }
 
 .card {
-    background-color: white; /* default color, can be replaced based on category */
+    border : 1px solid;
     border-radius: 8px;
     padding: 10px;
     margin: 10px;
@@ -210,57 +209,83 @@ button:hover {
     align-items: center;
 }
 
-/* To set the color based on category */
+#cardsContainer {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;  /* space between the cards */
+    padding: 10px;  /* space around the entire grid */
+    padding-top: 50px;
+    overflow-y: auto;  /* allow vertical scrolling */
+    scroll-behavior: smooth;  /* smooth scrolling effect */
+    max-height: calc(100vh - 100px);  /* adjust as needed based on height of fixed elements */
+    padding-bottom: 80px;  /* space at the bottom for better scroll experience; adjust as needed */
+    margin-top: 60px;  /* space at the top to avoid overlap with fixed refresh button */
+}
+/*
+@media (max-width: 600px) {
+    #cardsContainer {
+        grid-template-columns: 1fr; /////for 1 column on smaller screens
+    }
+}
+*/
+
 [data-category="Husband"] {
-    background-color: #f28d35;
+    border-color: #f28d35;
 }
 
 [data-category="Fatherhood"] {
-    background-color: #35a2f2;
+    border-color: #35a2f2;
 }
 
 [data-category="Home"] {
-    background-color: #9ef235;
+    border-color: #9ef235;
 }
 
 [data-category="Money"] {
-    background-color: #e835f2;
+    border-color: #e835f2;
 }
 
 [data-category="Brain"] {
-    background-color: #35f2a2;
+    border-color: #35f2a2;
 }
 
 [data-category="Body"] {
-    background-color: #f23572;
+    border-color: #f23572;
 }
 
-/* Setting color for Husband tree */
 #husbandHead, #husband {
     color: #f28d35;
 }
 
-/* Setting color for Fatherhood tree */
 #fatherhoodHead, #fatherhood {
     color: #35a2f2;
 }
 
-/* Setting color for Home tree */
 #homeHead, #home {
     color: #9ef235;
 }
 
-/* Setting color for Money tree */
 #moneyHead, #money{
     color: #e835f2;
 }
 
-/* Setting color for Brain tree */
 #brainHead, #brain {
     color: #35f2a2;
 }
 
-/* Setting color for Body tree */
 #bodyHead, #body {
     color: #f23572;
+}
+
+#refreshContainer {
+    position: fixed;  /* or you can use sticky if you want it to stick at a certain position */
+    top: 10px;  /* adjust as needed */
+    width: 100%;  /* span the entire width of the viewport */
+    z-index: 1000;  /* ensure it stays on top of other elements */
+    display: flex;
+    justify-content: center;  /* center the button horizontally */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
 }
