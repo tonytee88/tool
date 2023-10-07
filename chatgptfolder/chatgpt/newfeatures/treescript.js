@@ -323,8 +323,9 @@ async function treeMongoFetchSavedIdeas(saveName) {
         const data = await response.json();
         console.log(data);
         // Check if the ideas property is available in the nested document object
-        if (data.document.save && Array.isArray(data.document.save)) {
-            return data.document.save;
+        if (data.document.savedIdeas) {
+            console.log(data.document.savedIdeas);
+            return data.document.savedIdeas;
         } else {
             console.error('Ideas array not found in the response data');
             return [];  // Return an empty array if ideas are not found
@@ -436,10 +437,11 @@ async function extractIdeas(savedIdeas) {
 
     try {
         // Attempt to parse the data string
-        let data = JSON.parse(savedIdeas);
-
+        let data = savedIdeas
+        //let data = JSON.parse(savedIdeas);
         // Handle the first format
-        if (Array.isArray(data) && data[0].hasOwnProperty('sphere') && Array.isArray(data[0].ideas)) {
+        if (savedIdeas) {
+            console.log("im an array so it works");
             for (let item of data) {
                 for (let idea of item.ideas) {
                     extractedIdeas.push({
@@ -514,7 +516,7 @@ async function callApi(currentDate, keywords) {
 
         const data = await response.json();
         const content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
-
+        console.log(content);
         if (content === undefined) {
             return "Error: Content is undefined";
         }
