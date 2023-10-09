@@ -447,17 +447,17 @@ function extractIdeas(savedIdeas) {
 
     try {
         for (let item of parsedSavedIdeas) {
-            extractedIdeas.push({
-                sphere: item.sphere,
-                text: item.idea
-                
-            });
+            for (let idea of item.ideas) {
+                extractedIdeas.push({
+                    sphere: item.sphere,
+                    text: idea.description
+                });
+            }
         }
     } catch (e) {
         // If there's a problem iterating over savedIdeas
         console.error("Error while extracting ideas:", e);
     }
-console.log(extractedIdeas);
     return extractedIdeas;
 }
 
