@@ -306,7 +306,6 @@ async function treeMongoFetchIdeas(category) {
 }
 
 async function treeMongoFetchSavedIdeas(saveName) {
-    console.log(saveName);
     try {
         const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoFetchSavedIdeas', {
             method: 'POST',
@@ -321,7 +320,6 @@ async function treeMongoFetchSavedIdeas(saveName) {
         }
 
         const data = await response.json();
-        console.log(data);
         // Check if the ideas property is available in the nested document object
         if (data.document.savedIdeas) {
             console.log(data.document.savedIdeas);
@@ -392,15 +390,14 @@ document.getElementById('refreshButton').addEventListener('click', async () => {
     const cardsContainer = document.getElementById('cardsContainer');
     const saveName = "ideas1";
     const savedIdeas = await treeMongoFetchSavedIdeas(saveName);
-    const ideas = await extractIdeas(savedIdeas); // This should return an array of ideas with categories
-
+    const ideas = extractIdeas(savedIdeas); // This should return an array of ideas with categories
     cardsContainer.innerHTML = ''; // Clear out any old cards
 
     for (const idea of ideas) {
         const card = document.createElement('div');
         card.className = 'card';
-        card.setAttribute('data-category', idea.category);
-        card.innerText = idea.text; // Assuming there's a text property with the idea's content
+        card.setAttribute('data-sphere', idea.sphere);
+        card.innerText = `${idea.sphere}: ${idea.text}`; 
         cardsContainer.appendChild(card);
     }
 });
@@ -432,40 +429,23 @@ document.getElementById('preload').addEventListener('click', async () => {
     return ideas;
 });
 
-async function extractIdeas(savedIdeas) {
+function extractIdeas(savedIdeas) {
     let extractedIdeas = [];
+    parsedSavedIdeas = JSON.parse(savedIdeas)
 
     try {
-        // Attempt to parse the data string
-        let data = savedIdeas
-        //let data = JSON.parse(savedIdeas);
-        // Handle the first format
-        if (savedIdeas) {
-            console.log("im an array so it works");
-            for (let item of data) {
-                for (let idea of item.ideas) {
-                    extractedIdeas.push({
-                        sphere: item.sphere,
-                        text: idea
-                    });
-                }
-            }
+        for (let item of parsedSavedIdeas) {
+            extractedIdeas.push({
+                sphere: item.sphere,
+                text: item.idea
+                
+            });
         }
     } catch (e) {
-        // Handle the second format if the above parse fails
-        const sections = savedIdeas.split('\n\n');  // Split by double newline to get sections
-        for (let section of sections) {
-            const lines = section.split('\n');
-            const sphere = lines[0].slice(0, -1);  // Removing the colon at the end
-            for (let i = 1; i < lines.length; i++) {
-                extractedIdeas.push({
-                    sphere: sphere,
-                    text: lines[i].slice(3)  // Removing the "1. " at the beginning
-                });
-            }
-        }
+        // If there's a problem iterating over savedIdeas
+        console.error("Error while extracting ideas:", e);
     }
-
+console.log(extractedIdeas);
     return extractedIdeas;
 }
 

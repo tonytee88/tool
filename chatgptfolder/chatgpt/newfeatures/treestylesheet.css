@@ -229,27 +229,27 @@ button:hover {
 }
 */
 
-[data-category="Husband"] {
+[data-sphere="Husband"] {
     border-color: #f28d35;
 }
 
-[data-category="Fatherhood"] {
+[data-sphere="Fatherhood"] {
     border-color: #35a2f2;
 }
 
-[data-category="Home"] {
+[data-sphere="Home"] {
     border-color: #9ef235;
 }
 
-[data-category="Money"] {
+[data-sphere="Money"] {
     border-color: #e835f2;
 }
 
-[data-category="Brain"] {
+[data-sphere="Brain"] {
     border-color: #35f2a2;
 }
 
-[data-category="Body"] {
+[data-sphere="Body"] {
     border-color: #f23572;
 }
 
