@@ -402,8 +402,20 @@ document.getElementById('refreshButton').addEventListener('click', async () => {
     }
 });
 
+function getLocalDateForMontreal() {
+    // Create a date object in the local timezone
+    const date = new Date();
+
+    // Convert the local date to the Montreal timezone
+    const options = { timeZone: 'America/Toronto', year: 'numeric', month: 'long', day: 'numeric' };
+    const montrealDate = new Intl.DateTimeFormat('en-CA', options).format(date);
+
+    return montrealDate;
+}
+
 document.getElementById('preload').addEventListener('click', async () => {
     const preloadButton = document.getElementById('preload');
+    const preloadInput = document.getElementById('preloadInput');
     const saveName = "ideas1";
 
     // Hide the button text
@@ -416,8 +428,8 @@ document.getElementById('preload').addEventListener('click', async () => {
     // Append the loader to the button
     preloadButton.appendChild(loader);
     
-    const currentDate = "Oct 6th, 2023";
-    const keywords = "love and laughter";
+    const currentDate = getLocalDateForMontreal();
+    const keywords = preloadInput;
 
     let ideas = await callApi(currentDate, keywords);
     await treeMongoSaveIdeas(saveName, ideas)
