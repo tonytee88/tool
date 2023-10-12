@@ -226,6 +226,10 @@ async function getAndLoadIdeas() {
             const ideaTag = document.createElement('div');
             ideaTag.className = 'ideaTag';
             ideaTag.style.backgroundColor = categoryColors[category];
+            ideaTag.style.color = "#000000"
+            if (category === "Home") {
+                ideaTag.style.color = "#000000"
+            }
             ideaTag.innerText = idea;
 
             ideaTag.addEventListener('click', () => {
@@ -270,7 +274,7 @@ async function getAndLoadIdeas() {
 const categoryColors = {
     "Husband": "#f28d35",  // Example color
     "Fatherhood": "#35a2f2",
-    "Home": "#9ef235",
+    "Home": "#87c040",
     "Money": "#e835f2",
     "Brain": "#35f2a2",
     "Body": "#f23572",

@@ -238,7 +238,7 @@ button:hover {
 }
 
 [data-sphere="Home"] {
-    border-color: #9ef235;
+    border-color: #87c040;
 }
 
 [data-sphere="Money"] {
@@ -262,7 +262,7 @@ button:hover {
 }
 
 #homeHead, #home {
-    color: #9ef235;
+    color: #87c040;
 }
 
 #moneyHead, #money{
