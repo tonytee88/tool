@@ -166,18 +166,19 @@ function initStep2(platformToServe) {
   if (platformToServe === "Google") {
       chosenContainer.innerHTML = `
           <div class="label" id="chosen">Chosen Elements:</div>
-          <button class="element-button">Headlines [main keywords]</button>
-          <button class="element-button">Headlines [social proof]</button>
-          <button class="element-button">Headlines [generic USP]</button>
-          <button class="element-button">Headlines [CTA]</button>
-          <button class="element-button">Description [main keywords][product-specific USP][CTA]</button>
-          <button class="element-button">Description [main keywords][generic USP]</button>
+          <div><button class="element-button">Headlines [kw]</button></div>
+          <div><button class="element-button">Headlines [social proof]</button></div>
+          <div><button class="element-button">Headlines [gen USP]</button></div>
+          <div><button class="element-button">Headlines [CTA]</button></div>
+          <div><button class="element-button">Descrip [kw][prod USP][CTA]</button></div>
+          <div><button class="element-button">Descrip [kw][gen USP]</button></div>
           <div class="element-buttons" id="chosenSection"></div>
       `;
       recommendedSection.innerHTML = `
-          <button class="element-button">test 123</button>
+          <div><button class="element-button">test 123</button></div>
       `;
-    addClickToMoveFeature()
+    addClickToMoveFeature();
+    addTextFieldsForGoogle();
   } else {
     chosenContainer.innerHTML = `
         <div class="label" id="chosen">Chosen Elements:</div>
@@ -200,7 +201,8 @@ function initStep2(platformToServe) {
         <button class="element-button">Tip1 Title</button>
         <button class="element-button">Tip1 Text</button>
     `;
-    addClickToMoveFeature()
+    addClickToMoveFeature();
+    removeTinyTextFields();
   }
 }
 
@@ -944,19 +946,10 @@ function createTablesInDoc() {
   } else if (platformToServe === "Google") {
     return new Promise((resolve, reject) => {
       //WORK PIPELINE 2 OCT : Fix the tags and elements for Google
-      var elementsArray = [
-        [
-          "Headlines with main keywords", 
-          ["Headline", "{Headline}"], 
-          ["Character Count", "{Character Count}"]
-        ],
-        [
-          "Google 1", 
-          ["Primary Text", "{Primary Text}"], 
-          ["Headline", "{Headline}"], 
-          ["Description", "{Description}"]
-        ]
-      ];
+      var chosenDiv = document.getElementById("chosenContainer");
+      var elementButtons = chosenDiv.getElementsByClassName("element-button");
+      var elementsArray = [];
+      
           // Create the table via Code.gs
           var lang = getLang();
           google.script.run.withSuccessHandler(function(statusLog) {
@@ -2441,6 +2434,11 @@ function initNavSystemGoogle() {
           return; // Exit the function early
         }
         hideSectionAndTooltips(currentSection);
+        currentSection++;
+        showSectionAndTooltips(currentSection);
+        break;
+        case 2:
+          //add logique for step 2->step3
         if (firstTimeStep3 === 0) {
           simulateQaButtonkButtonClick();
           firstTimeStep3 = 1;
@@ -2456,6 +2454,7 @@ function initNavSystemGoogle() {
         break;
       //generated copy to correction  
       case 3:
+        
         hideSectionAndTooltips(currentSection);
         currentSection++;
         showSectionAndTooltips(currentSection);
@@ -2578,3 +2577,35 @@ function simulateGptMagicButtonClick() {
   gptMagicButton.click(); // Simulate a click event on the addElementButton
 }
 
+function addTextFieldsForGoogle() {
+  // Select all elements with the class 'element-button'
+  const buttons = document.querySelectorAll('.element-button');
+
+  // Iterate through each button and append a tiny text field within its parent div
+  buttons.forEach(button => {
+    // Create an input field with a maximum length of 2 characters
+    const inputField = document.createElement('input');
+    inputField.setAttribute('type', 'text');
+    inputField.setAttribute('maxlength', '2');
+    inputField.style.width = '2ch'; // Width to fit 2 characters
+    inputField.style.marginRight = '2px';
+
+    // Append the input field to the button's parent div
+    button.parentNode.insertBefore(inputField, button);
+  });
+}
+
+function removeTinyTextFields() {
+  // Select all elements with the class 'element-button'
+  const buttons = document.querySelectorAll('.element-button');
+
+  // Iterate through each button and remove the following input field
+  buttons.forEach(button => {
+    const nextElement = button.nextElementSibling;
+    
+    // If the next element is an input field, remove it
+    if (nextElement && nextElement.tagName === 'INPUT') {
+      nextElement.remove();
+    }
+  });
+}
