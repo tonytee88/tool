@@ -928,14 +928,33 @@ function createTablesInDoc() {
     });
   } else if (platformToServe === "Facebook") {
     return new Promise((resolve, reject) => {
-      var elementsArray = [
-        [
-          "Facebook Ad", 
-          ["Primary Text", "{Primary Text}"], 
-          ["Headline", "{Headline}"], 
-          ["Description", "{Description}"]
-        ]
-      ];
+      function getElementsArray() {
+        const elementsArray = [];
+      
+        // Select all elements with the class 'element-button'
+        const buttons = document.querySelectorAll('.element-button');
+      
+        // Iterate through each button
+        buttons.forEach(button => {
+          const elementText = button.textContent;
+          const inputField = button.previousSibling;  // Since we inserted the input field before the button
+          const repetitionCount = parseInt(inputField.value) || 0;
+      
+          for (let i = 0; i < repetitionCount; i++) {
+            elementsArray.push([
+              elementText,
+              ["Text", "{Text}"],
+              ["Character count", "{Character count}"]
+            ]);
+          }
+        });
+      
+        return elementsArray;
+      }
+
+      var testelements = getElementsArray();
+      console.log(JSON.stringify(testelements));
+
       
       // Create the table via Code.gs
       var lang = getLang();
