@@ -929,8 +929,30 @@ function createTablesInDoc() {
   } else if (platformToServe === "Facebook") {
     return new Promise((resolve, reject) => {
       function getElementsArray() {
-        const elementsArray = [];
-      
+        var elementsArray = [
+          [
+            "Facebook Ad", 
+            ["Primary Text", "{Primary Text}"], 
+            ["Headline", "{Headline}"], 
+            ["Description", "{Description}"]
+          ]
+        ]
+      }
+      // Create the table via Code.gs
+      var lang = getLang();
+      google.script.run.withSuccessHandler(function(statusLog) {
+        resolve();
+      }).createTables(elementsArray, lang);
+    });
+  } else if (platformToServe === "Google") {
+    console.log("hello im google");
+    return new Promise((resolve, reject) => {
+      //WORK PIPELINE 2 OCT : Fix the tags and elements for Google
+      var chosenDiv = document.getElementById("chosenContainer");
+      var elementButtons = chosenDiv.getElementsByClassName("element-button");
+      const elementsArray = [];
+      function getElementsArray() {
+              
         // Select all elements with the class 'element-button'
         const buttons = document.querySelectorAll('.element-button');
       
@@ -951,24 +973,11 @@ function createTablesInDoc() {
       
         return elementsArray;
       }
-
+      
       var testelements = getElementsArray();
       console.log(JSON.stringify(testelements));
 
-      
-      // Create the table via Code.gs
-      var lang = getLang();
-      google.script.run.withSuccessHandler(function(statusLog) {
-        resolve();
-      }).createTables(elementsArray, lang);
-    });
-  } else if (platformToServe === "Google") {
-    return new Promise((resolve, reject) => {
-      //WORK PIPELINE 2 OCT : Fix the tags and elements for Google
-      var chosenDiv = document.getElementById("chosenContainer");
-      var elementButtons = chosenDiv.getElementsByClassName("element-button");
-      var elementsArray = [];
-      
+
           // Create the table via Code.gs
           var lang = getLang();
           google.script.run.withSuccessHandler(function(statusLog) {
@@ -1909,11 +1918,13 @@ const gptRequest = document.getElementById("gptRequest");
 gptRequest.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  var prompt = getSubject();
+  if (platformToServe !== "Google") {
+    var prompt = getSubject();
+    var subject = getSubject();
+  }
   var lang = getLang();
   var info = getInfo();
   promptElements = getPromptElements();
-  var subject = getSubject();
   if (platformToServe === "Facebook") {
     var theme = getTheme();
   }
@@ -2462,8 +2473,9 @@ function initNavSystemGoogle() {
           simulateQaButtonkButtonClick();
           firstTimeStep3 = 1;
           document.getElementById("qaButton").classList.remove("hideButton");
+          hideSectionAndTooltips(currentSection);
           currentSection = 3;
-          checkConditionBeforeDisplayStep3();
+          checkConditionBeforeDisplayStep3Google();
           break;
         } else {
           currentSection = 3;
@@ -2551,6 +2563,15 @@ const checkConditionBeforeDisplayStep3 = () => {
   var primaryText = document.getElementById("Primary-Text");
   if (primaryText.textContent !== "Primary Text") {
     storedEmailSubject = primaryText.textContent;
+    showSectionAndTooltips(currentSection);
+  } else {
+  setTimeout(checkConditionBeforeDisplayStep3, 500);  // Check again after a delay
+  }
+};
+
+const checkConditionBeforeDisplayStep3Google = () => {
+  var primaryText = document.getElementById("Primary-Text");
+  if (1) {
     showSectionAndTooltips(currentSection);
   } else {
   setTimeout(checkConditionBeforeDisplayStep3, 500);  // Check again after a delay
