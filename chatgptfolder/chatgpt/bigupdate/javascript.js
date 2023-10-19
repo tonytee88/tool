@@ -877,7 +877,21 @@ document.getElementById("loadTags").addEventListener("click", function() {
     var tags = ["Primary Text", "Headline", "Description"];
     processTags(tags);
   } else if (platformToServe === "Google") {
-    var tags = ["Headlines with main keywords", "Headline Text", "Headline Char Count", "USP", "Description", "Description Char Count"];
+    const buttons = document.querySelectorAll('.element-button');
+    const tags = [];
+
+    buttons.forEach(button => {
+      const tagText = button.textContent;
+      const inputField = button.previousSibling;  // Since we inserted the input field before the button
+      const repetitionCount = parseInt(inputField.value) || 0;
+
+      tags.push({
+        name: tagText,
+        count: repetitionCount
+      });
+    });
+
+    //processTags(tags);  // Note: Make sure processTags can handle this new format!
   }
 });
   
@@ -1341,7 +1355,9 @@ function processTags(tags) {
                 })
               }
           }
-      });
+      })
+      tagList.appendChild(table);
+    })
     if (processTagsAddedListeners === 0) {
       processTagsAddedListeners = 1;
       const handleUpdateButtonClick = document.getElementById("update");
@@ -1414,157 +1430,12 @@ function processTags(tags) {
           })
         }
     }
-  });
+  };
 
   // Append the table to the tag list element
-  tagList.appendChild(table);
+  
 
   //end of table generating code
-   
-
-    //end of updatedocument
-    // function "bidon" to isolate design phase -- remove "function bidon() {} to enable design phase"
-  //   function bidon() {
-  //   //create elements for design phase
-    
-  //   //Change gpt-request-status
-  //   var topContainer = document.getElementById("topContainer");
-  //   topContainer.setAttribute("gpt-request-status", "generate-design-tips");
-
-  //   // Get the text content of the required divs
-  //   try {
-  //     heroBannerTitle = document.getElementById("HeroBanner-Title").textContent.trim();
-  //     heroBannerSubtitle = document.getElementById("HeroBanner-Text").textContent.trim();
-  //     heroBannerCTA = document.getElementById("HeroBanner-CTA").textContent.trim();
-
-  //     // If an error occurs within the try block, the catch block will handle it
-  //   } catch (error) {
-  //     // Code to handle the error
-  //     console.error('An error occurred:', error.message);
-  //     var statusMessage = document.getElementById("statusMessage");
-  //     // Set the message to indicate the running state
-  //     statusMessage.textContent = "Make sure your tags include : 'hero banner title', 'hero banner text' and 'hero banner cta'";
-  //   }
-
-  //   // Clear the content of div with id="tableContainer"
-  //   var tableContainer = document.getElementById("tableContainer");
-  //   tableContainer.innerHTML = "";
-
-  //   // Generate a new table with 4 rows
-  //   for (var i = 1; i <= designOptions; i++) {
-  //   // Create a new table for each design option
-  //   var newTable = document.createElement("table");
-  //   newTable.id = 'designTable' + i;
-
-  //   // Create the first row with two divs
-  //   var row1 = document.createElement("tr");
-
-  //   var cell1 = document.createElement("td");
-  //   var div1 = document.createElement("div");
-  //   div1.textContent = "Option " + i;
-  //   // Apply CSS styles to div1
-
-  //   var cell2 = document.createElement("td");
-  //   var div2 = document.createElement("div");
-
-  //   // Create a button element
-  //   var deleteButton = document.createElement("button");
-  //   deleteButton.id = 'deleteDesignIdea' + i;
-  //   deleteButton.innerHTML = "&#128465"; // Unicode character for trash can
-  //   deleteButton.style.fontSize = "12px"; // Set the font size to make the button small
-
-  //   // Apply CSS styles to the button
-  //   //deleteButton.style.boxShadow = "0 0 5px rgba(0, 0, 0, 0.3)";
-  //   deleteButton.style.transition = "box-shadow 0.3s ease-in-out";
-
-  //   // Add event listeners for hover and click animations
-  //   deleteButton.addEventListener("mouseover", function() {
-  //     this.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.5)";
-  //   });
-
-  //   deleteButton.addEventListener("mouseout", function() {
-  //     this.style.boxShadow = "0 0 5px rgba(0, 0, 0, 0.3)";
-  //   });
-
-  //   deleteButton.addEventListener("click", createDeleteTableHandler(i)); // Call a separate function to handle the deletion
-
-  //   // Append the button to the second div
-  //   div2.appendChild(deleteButton);
-
-  //   cell1.appendChild(div1);
-  //   cell2.appendChild(div2);
-  //   row1.appendChild(cell1);
-  //   row1.appendChild(cell2);
-
-  //   newTable.appendChild(row1);
-  //   // Create the second row with the response from the API call
-  //   var row2 = document.createElement("tr");
-  //   var cell3 = document.createElement("td");
-  //   cell3.colSpan = 2;
-  //   cell3.id = "cell3_option" + i;
-  //   cell3.className = "cell3_option";
-  //   //var response = getGPTDesignResponse(lang, heroBannerTitle, heroBannerText, heroBannerCTA, subject, info);
-  //   //cell3.textContent = "Response: " + JSON.stringify(response.result);
-    
-  //   row2.appendChild(cell3);
-  //   newTable.appendChild(row2);
-
-  //   // Append the new table to the table container
-  //   var tableContainer = document.getElementById("tableContainer");
-  //   tableContainer.appendChild(newTable);
-
-  // }
-  //   var addButton = document.createElement("button");
-  //   addButton.id = "addDesignTips";
-  //   addButton.className = "option-button";
-  //   addButton.textContent = "Add Design Tip";
-
-  //   tableContainer.appendChild(addButton);
- 
-
-
-  //  // Find the textarea with class "large-input"
-  //  var textarea = document.querySelector(".large-input");
-  //   textarea.value = "Focus on the sale"; // Change the text
-
-  //   //Scroll back to the top for best UX
-  //   document.documentElement.scrollTop = 0; // For modern browsers
-  //   document.body.scrollTop = 0; // For older browsers
-
-  //   // Add an animation to the textarea
-  //   textarea.classList.add("textarea-animation");
-  //   setTimeout(function() {
-  //     textarea.classList.remove("textarea-animation");
-  //   }, 1000);
-
-  //   const handleAddDesignTipsButtonClick = document.getElementById("addDesignTips");
-
-  //   handleAddDesignTipsButtonClick.addEventListener("click", function() {
-  //   var designTips = document.getElementsByClassName("cell3_option");
-  //   var designTipsText = [];
-
-  //   for (var i = 0; i < designTips.length; i++) {
-  //     var designTip = designTips[i];
-  //     var textContent = designTip.textContent.trim(); // Trim the text content
-  //     designTipsText.push(textContent);
-  //   }
-
-  //   console.log(designTipsText);
-  //   google.script.run.addDesignTips(designTipsText);
-  // });
-  
-  // }
-  // //end of function bidon()
-
-
-
-    
-    //create elements for design phase
-    
-        //Change gpt-request-status
-    //add the code to change and prepare design stuff, see same script a bit above
-  }
-
 
 //END OF PROCESS TAG FUNCTION
 //----------------------------------------------------------------------------------------------------------------
