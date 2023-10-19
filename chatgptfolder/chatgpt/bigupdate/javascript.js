@@ -891,7 +891,7 @@ document.getElementById("loadTags").addEventListener("click", function() {
       });
     });
 
-    //processTags(tags);  // Note: Make sure processTags can handle this new format!
+    processTags(tags);  // Note: Make sure processTags can handle this new format!
   }
 });
   
@@ -1090,7 +1090,7 @@ function processTags(tags) {
   table.id = 'mainTable';
 
   // Iterate over each tag and create table rows
-  tags.forEach(function (tag) {
+  function handleTag(tag) {
     // Create unique IDs for buttons and tagsWithDelimitersCell
     var buttonId = 'button_' + tag.replace(/\s+/g, '-').replace('{', '').replace('}', '');
     var voteButtonId = 'voteButton_' + tag.replace(/\s+/g, '-').replace('{', '').replace('}', '');
@@ -1357,7 +1357,20 @@ function processTags(tags) {
           }
       })
       tagList.appendChild(table);
-    })
+    }
+
+    tags.forEach(function (tagEntry) {
+      // Check if it's from Google (object format) or other platforms (string format)
+      if (typeof tagEntry === 'string') {
+        handleTag(tagEntry);
+      } else if (typeof tagEntry === 'object' && tagEntry.name && tagEntry.count) {
+        console.log("ok tagEntry is object")
+        for (let i = 0; i < tagEntry.count; i++) {
+          handleTag(tagEntry.name);
+          console.log(tagEntry.name);
+        }
+      }
+    });
     if (processTagsAddedListeners === 0) {
       processTagsAddedListeners = 1;
       const handleUpdateButtonClick = document.getElementById("update");
