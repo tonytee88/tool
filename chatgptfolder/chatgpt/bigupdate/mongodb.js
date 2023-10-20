@@ -390,7 +390,7 @@ handleGptMagicButtonClick.addEventListener("click", function() {
         return new Promise((resolve, reject) => {
         //upate array with traits from input and from mongoDB
         //console.log(result);
-        traitsString = combineTraits(result, clientTraits2);
+        traitsString = combineTraits(result, clientTraits2, platformToServe);
         const checkCondition = () => {
         const divElement = document.querySelector("#Email-Subject-Line");
         if (traitsString) {

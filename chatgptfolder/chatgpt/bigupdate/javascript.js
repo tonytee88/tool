@@ -1591,11 +1591,21 @@ function extractTraits(response) {
       }
     
       return clientTraits;
-    } else {
-    //WORK PIPELINE 2 OCT : Fix how to extract trait for Google call
-      return {};
-    }
+    } else if (platformToServe === "Google") {
+      if (response && response.document && response.document.traits_google) {
+        const traits = response.document.traits_google;
+        const traitArray = traits.split(',').map(trait => trait.trim());
+        
+        const clientTraits = {};
+        for (var i = 0; i < traitArray.length; i++) {
+          const key = 'trait' + (i + 1);
+          clientTraits[key] = i < traitArray.length ? traitArray[i] : '';
+        }
+      
+        return clientTraits;
+      } 
   }
+}
 }
 
 function getUpvotesAndDownvotes() {
@@ -1641,19 +1651,20 @@ function getUpvotesAndDownvotes() {
   }
 }
 
-function combineTraits(preferenceObject, clientTraits2) {
+function combineTraits(preferenceObject, clientTraits2, platformToServe) {
   // Get the first key name from the apiResponse object
   let preferenceObjectParsed = JSON.parse(preferenceObject);
-
+  
+  //console.log("preferenceObjectParsed: " + JSON.stringify(preferenceObjectParsed));
+  
   let firstKey = Object.keys(preferenceObjectParsed)[0];
   let firstKeyValue = preferenceObjectParsed[firstKey];
-  //console.log(firstKey);
-  //console.log(firstKeyValue);
+
   traitsArray = [];
   for(let i = 0; i < firstKeyValue.length; i++) {
     traitsArray.push(firstKeyValue[i].preference);
   }
-
+  console.log("clienttraits2: " + JSON.stringify(clientTraits2));
   for (let key in clientTraits2) {
     if (clientTraits2.hasOwnProperty(key)) {
       // Push each value into the traitsArray
