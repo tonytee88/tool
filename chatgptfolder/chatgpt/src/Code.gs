@@ -1922,10 +1922,32 @@ function createDataFromMongoDB(clientName) {
   return {result: responseData, statusLog: statusLog};
 }
 
-function updateDataFromMongoDB(clientName, traitsString) {
+function updateDataFromMongoDB(clientName, traitsString, platformToServe) {
   const apiKey = getMongoApiKey();
   var statusLog = "Start of mongo api call...\n"
   const url = 'https://us-east-1.aws.data.mongodb-api.com/app/data-gkvfy/endpoint/data/v1/action/updateOne';
+  let traitUpdate = {
+        "$set": {
+          "name": clientName
+        }
+      };
+
+      switch (platformToServe) {
+        case "Email":
+          traitUpdate["$set"]["traits"] = traitsString;
+          break;
+        case "Facebook":
+          traitUpdate["$set"]["traits_fb"] = traitsString;
+          break;
+        case "Google":
+          traitUpdate["$set"]["traits_google"] = traitsString;
+          break;
+        default:
+          // handle other cases or throw an error
+          break;
+      }
+
+  
   const data = JSON.stringify({
     "collection": "clientsCollection",
     "database": "clientsDB",
@@ -1934,12 +1956,7 @@ function updateDataFromMongoDB(clientName, traitsString) {
       // Add the filter criteria to identify the document(s) to update
       "name": clientName
     },
-    "update": {
-    "$set": {
-      "name": clientName,
-      "traits": traitsString
-    }
-    }
+    "update": traitUpdate
   });
   statusLog += "Data:" + data + "\n";
   const config = {

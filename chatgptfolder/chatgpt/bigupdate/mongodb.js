@@ -277,7 +277,10 @@ handleGptMagicButtonClick.addEventListener("click", function() {
     var statusMessage = document.getElementById("statusMessage");
     var traits = document.getElementById("traits").value;
     //traitsArray.push(traits); // push it later after having formatted the input
-    var subject = getSubject();
+    if (platformToServe !== "Google") {
+      var subject = getSubject();
+    }
+
     var lang = getLang();
     var info = getInfo();
 
@@ -404,7 +407,7 @@ handleGptMagicButtonClick.addEventListener("click", function() {
         //console.log(traitsString);
         return new Promise((resolve, reject) => {
         //upate array with traits from input and from mongoDB
-        google.script.run.updateDataFromMongoDB(clientName, traitsString);
+        google.script.run.updateDataFromMongoDB(clientName, traitsString, platformToServe);
         resolve(traitsString);  
         })
     })

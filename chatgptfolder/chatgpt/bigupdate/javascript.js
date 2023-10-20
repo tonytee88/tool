@@ -870,7 +870,7 @@ document.getElementById("loadTags").addEventListener("click", function() {
     });
     setTimeout(() => {}, 1000)
     
-    //console.log(tags);
+    console.log(tags);
     // Step 2
     processTags(tags);
   } else if (platformToServe === "Facebook") {
@@ -890,7 +890,7 @@ document.getElementById("loadTags").addEventListener("click", function() {
         count: repetitionCount
       });
     });
-
+    console.log(JSON.stringify(tags));
     processTags(tags);  // Note: Make sure processTags can handle this new format!
   }
 });
@@ -961,7 +961,7 @@ function createTablesInDoc() {
   } else if (platformToServe === "Google") {
     console.log("hello im google");
     return new Promise((resolve, reject) => {
-      //WORK PIPELINE 2 OCT : Fix the tags and elements for Google
+      //WORK PIPELINE 2 OCT : Fix the tags and elements for Google - DONE
       var chosenDiv = document.getElementById("chosenContainer");
       var elementButtons = chosenDiv.getElementsByClassName("element-button");
       const elementsArray = [];
@@ -1364,10 +1364,8 @@ function processTags(tags) {
       if (typeof tagEntry === 'string') {
         handleTag(tagEntry);
       } else if (typeof tagEntry === 'object' && tagEntry.name && tagEntry.count) {
-        console.log("ok tagEntry is object")
         for (let i = 0; i < tagEntry.count; i++) {
           handleTag(tagEntry.name);
-          console.log(tagEntry.name);
         }
       }
     });
@@ -1717,9 +1715,11 @@ function combineTraits(preferenceObject, clientTraits2) {
 
 
 function getSubject() {
-  var subjectInput = document.getElementById("subject");
-  var prompt = subjectInput.value;
-  return prompt;
+  if (platformToServe !== "Google"){
+    var subjectInput = document.getElementById("subject");
+    var prompt = subjectInput.value;
+    return prompt;
+  }
 }
 
 function getLang() {
@@ -2380,7 +2380,7 @@ function initNavSystemGoogle() {
           hideSectionAndTooltips(currentSection);
           simulateGptMagicButtonClick();
           currentSection--;
-          checkCondition();
+          //checkCondition();
           break;
         } else {
           setStatusMessage("Please input valid corrections");
@@ -2424,6 +2424,7 @@ function initNavSystemGoogle() {
 )};
 
 const checkCondition = (retryCount = 0, maxRetries = 30) => {
+  if (platformToServe === "Facebook") {
   var primaryText = document.getElementById("Primary-Text");
 
   if (primaryText.textContent !== storedEmailSubject) {
@@ -2441,7 +2442,10 @@ const checkCondition = (retryCount = 0, maxRetries = 30) => {
       showSectionAndTooltips(currentSection);
     }
   }
+  } 
+  //to add conditions for Google
 }
+
 
 const checkConditionBeforeDisplayStep3 = () => {
   var primaryText = document.getElementById("Primary-Text");
