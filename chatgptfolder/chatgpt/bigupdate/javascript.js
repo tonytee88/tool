@@ -1564,6 +1564,7 @@ function updateTextContentCells(response, optionsCount) {
 
 // extract the traits from a specific client from MongoDB
 function extractTraits(response) {
+  console.log(JSON.stringify(response))
   if (platformToServe === "Email") {
     if (response && response.document && response.document.traits) {
       const traits = response.document.traits;
@@ -1591,21 +1592,24 @@ function extractTraits(response) {
       }
     
       return clientTraits;
-    } else if (platformToServe === "Google") {
-      if (response && response.document && response.document.traits_google) {
-        const traits = response.document.traits_google;
-        const traitArray = traits.split(',').map(trait => trait.trim());
-        
-        const clientTraits = {};
-        for (var i = 0; i < traitArray.length; i++) {
-          const key = 'trait' + (i + 1);
-          clientTraits[key] = i < traitArray.length ? traitArray[i] : '';
-        }
-      
-        return clientTraits;
-      } 
+    }
+  } else if (platformToServe === "Google") {
+    if (response.document.traits_google) {
+
+      const traits = response.document.traits_google;
+      const traitArray = traits.split(',').map(trait => trait.trim());
+      console.log("i see google and the traits are: " + traits)
+      const clientTraits = {};
+      for (var i = 0; i < traitArray.length; i++) {
+        const key = 'trait' + (i + 1);
+        clientTraits[key] = i < traitArray.length ? traitArray[i] : '';
+      }
+    
+      return clientTraits;
+    }
   }
-}
+  
+  return {};
 }
 
 function getUpvotesAndDownvotes() {

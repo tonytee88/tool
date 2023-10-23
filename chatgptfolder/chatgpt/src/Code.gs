@@ -1863,7 +1863,8 @@ function findOneDataFromMongoDB(clientName) {
       "traits": 1,
       "upvotes":1,
       "downvotes":1,
-      "traits_fb": 1
+      "traits_fb": 1,
+      "traits_google": 1
     }
   });
   statusLog += "Data:" + data +"\n";
