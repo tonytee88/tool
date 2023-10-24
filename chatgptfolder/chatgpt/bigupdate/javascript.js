@@ -885,12 +885,19 @@ document.getElementById("loadTags").addEventListener("click", function() {
       const inputField = button.previousSibling;  // Since we inserted the input field before the button
       const repetitionCount = parseInt(inputField.value) || 0;
 
-      tags.push({
-        name: tagText,
-        count: repetitionCount
-      });
+      if (repetitionCount === 1) {
+        tags.push({
+          name: tagText + "_1"
+        });
+      } else {
+        for (let i = 1; i <= repetitionCount; i++) {
+          tags.push({
+            name: tagText + "_" + i
+          });
+        }
+      }
     });
-    console.log(JSON.stringify(tags));
+
     processTags(tags);  // Note: Make sure processTags can handle this new format!
   }
 });
@@ -1564,7 +1571,6 @@ function updateTextContentCells(response, optionsCount) {
 
 // extract the traits from a specific client from MongoDB
 function extractTraits(response) {
-  console.log(JSON.stringify(response))
   if (platformToServe === "Email") {
     if (response && response.document && response.document.traits) {
       const traits = response.document.traits;
@@ -1633,7 +1639,7 @@ function getUpvotesAndDownvotes() {
 
       }
     }
-  } else if (platformToServe === "Facebook") {
+  } else if ((platformToServe === "Facebook") || (platformToServe === "Google")) {
     elementCopyExamples = {};
     let clientMongoDocumentUpvotes = clientMongoDocument.document.upvotes;
     let clientMongoDocumentDownvotes = clientMongoDocument.document.downvotes;
@@ -1668,7 +1674,6 @@ function combineTraits(preferenceObject, clientTraits2, platformToServe) {
   for(let i = 0; i < firstKeyValue.length; i++) {
     traitsArray.push(firstKeyValue[i].preference);
   }
-  console.log("clienttraits2: " + JSON.stringify(clientTraits2));
   for (let key in clientTraits2) {
     if (clientTraits2.hasOwnProperty(key)) {
       // Push each value into the traitsArray
@@ -2046,8 +2051,119 @@ gptRequest.addEventListener("submit", (e) => {
         console.error("Error:", error);
         statusMessage.textContent = "Script encountered an error.";
       });
+      //WORK PIPELINE 2 OCT : add else if for google
+  } else if (platformToServe === "Google") {
+
+    new Promise((resolve, reject) => {
+      // Add your condition based on gpt-request-status here
+      var topContainer = document.getElementById("topContainer");
+      var gptRequestStatus = topContainer.getAttribute("gpt-request-status");
+  
+      if (gptRequestStatus === "generate-copy") {
+        clientTraits = "";
+        // Find the right client traits
+        var foundOneData = GoogleScriptRun("findOneDataFromMongoDB", client, true)
+        .then(response => {
+          //console.log("Success949:", response);
+          return response; // Return the response to use it further if needed
+        })
+        .then(foundOneData => {
+          clientTraits = extractTraits(foundOneData);
+          clientMongoDocument = foundOneData;
+          return clientTraits;
+        }).then(clientTraits => {
+          console.log("prompt elmements : " + promptElements)
+          getUpvotesAndDownvotes()
+        }).then(result => {
+        // Run getGPTResponse
+        google.script.run
+        .withSuccessHandler((response) => {
+          //console.log("Success:", response.result);  // Only logs the 'result' part of the response
+          console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
+          globalApiResponse = response.result;  // Only use the 'result' part of the response
+          updateStoredFinalObjectResult()
+          resolve(response.result);  // Only resolve the 'result' part of the response
+        })
+        .withFailureHandler((error) => {
+          console.log("Error:", error);
+          reject(error);
+        })
+        // WORK PIPELINE 30 AUG DONE : Add theme, correct traits, copy examples, etc.
+        // rendu ici 23 oct 9.26 PM
+        .getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info, clientTraits, elementCopyExamples, numberOfExamples, theme, themeExamples);
+        //get date and time of gpt request    
+        var timeStamp = getDateAndTime();
+        //make the api call
+        google.script.run
+        .withSuccessHandler((response) => {
+          //console.log("statusLog:", response);
+        })
+        // WORK PIPELINE 30 AUG DONE: Add the facebook stuff to log
+        .logUsageOnServer(prompt, timeStamp, version, lang, info, requestedCorrections, clientName);
+      });
+      } else {
+        // Run getGPTDesignResponse
+        google.script.run
+          .withSuccessHandler((response) => {
+            //console.log("Success:", response.result);
+            resolve(response.result);
+          })
+          .withFailureHandler((error) => {
+            console.log("Error:", error);
+            reject(error);
+          })
+          .getGPTDesignResponse(lang, heroBannerTitle, heroBannerText, heroBannerCTA, subject, info);
+      }
+    })
+      .then((result) => {
+        statusMessage.textContent = "Translating with ChatGPT...";
+        if (lang === "English") {
+          // Skip requestTranslation and continue to the next step
+          return Promise.resolve(result);
+        } else {
+          // Proceed with requestTranslation
+          return new Promise((resolve, reject) => {
+            //console.log("Success:", result);
+            google.script.run
+              .withSuccessHandler((response) => {
+                //console.log("Success:", response.result);
+                //console.log("Success:", response.statusLog);
+                globalApiResponse = response.result;
+                resolve(response.result);
+              })
+              .withFailureHandler((error) => {
+                console.log("Error:", error);
+                reject(error);
+              })
+              // WORK PIPELINE 30 AUG DONE : Make new function for FB... ??
+              .requestTranslation1(result, lang, platformToServe);
+          });
+        }
+      })
+      .then((result) => {
+        statusMessage.textContent = "Negociation with Open AI servers...";
+        // Handle the API response
+        return new Promise((resolve, reject) => {
+          // WORK PIPELINE 30 AUG DONE : Fix function updatetext for FB
+          updateTextContentCells(result, optionsCount);
+          resolve(result);
+        });
+      })
+      .then((result) => {
+        statusMessage.textContent = "Script completed.";
+        // Process each tag and call showOptionsOnHover
+        promptElements.forEach((tag) => {
+          showOptionsOnHover(tag, optionsCount);
+        });
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        statusMessage.textContent = "Script encountered an error.";
+      });
   }
-   //WORK PIPELINE 2 OCT : add else if for google
+
+
+
 });
 
 function getTopContainerStatus() {
