@@ -117,17 +117,18 @@ function getDateAndTime() {
 
 // findAllData
 function findAllData() {
+  console.log("start of findalldata function")
     return new Promise((resolve, reject) => {
         google.script.run
             .withSuccessHandler(response => {
-                //console.log("Success:", response.result); 
+                console.log("Success:", response.result); 
                 //console.log("statusLog:", response.statusLog);
                 documentNamesObj = response.result;
                 //console.log("documentNamesObj: " + JSON.stringify(documentNamesObj));
                 resolve(documentNamesObj);
             })
             .withFailureHandler(error => {
-                console.log("Error:", error);
+                console.log("Error @ findalldata:", error);
                 reject(error);
             })
             .findAllDataFromMongoDB();

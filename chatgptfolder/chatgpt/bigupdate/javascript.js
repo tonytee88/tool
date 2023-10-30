@@ -56,7 +56,7 @@ window.addEventListener('load', function() {
   // Add event listener to "Add" button
   var addElementButton = document.getElementById('addElementButton');
   var otherElementInput = document.getElementById('otherElementInput');
-  var chosenElementButtons = chosenSection.querySelector('.element-buttons');
+  //var chosenElementButtons = chosenSection.querySelector('.element-buttons');
 
   addElementButton.addEventListener('click', function() {
   var elementText = otherElementInput.value.trim();
@@ -591,6 +591,7 @@ function initUISteps() {
 }
 
 async function sidebarInit() {
+  console.log("start of sidebarinit")
     try {
       var clientListDiv = document.getElementById('clientDiv');
       var clientLabel = document.getElementById('clientLabel');
@@ -607,7 +608,9 @@ async function sidebarInit() {
       if (currentSection !== 1) {
         statusMessage.textContent = "Updating client list...";
       }
-      var result1 = await findAllData();
+      console.log("just before findalldata")
+      var result1 = await findAllData()
+      console.log("just after findalldata")
       var result2 = await getNamesArray(result1);
       var result3 = await getDropListNames();
       
