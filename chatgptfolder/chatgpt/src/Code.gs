@@ -1033,7 +1033,7 @@ function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info
 
   var systemContent = 
     
-  "Take the role of a senior Facebook Ad Manager. You manage of a big portfolio of cliens. We will work together to write a highly engaging Facebook Ad for my client's ecommerce store.\n" +
+  "Take the role of a senior Facebook Ad Manager. You manage of a big portfolio of clients. We will work together to write a highly engaging Facebook Ad for my client's ecommerce store.\n" +
 
      "Here's a list of details I will provide you with for this task:\n" +
     "- The subject dictates the main hooks of the Facebook Ad\n" +
@@ -1043,13 +1043,13 @@ function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info
     "- The Facebook Ad Elements : A JS Array with elements to write copy for. Include only copy for these elements. Do not add or remove any items.\n"+
 
     "Here's what each element will include based on their role (if requested):\n"+
-    "- The 'Primary Text': This is the first piece of content users see when they scroll past your ad. It should grab attention, be engaging, and reflect the core message or offer. Use action verbs and emphasize gains, desired result, or perceivable added-value. Refer to the following examples for the format, length and style:\n" +
+    "- The 'Primary Text': It should be at least 125 characters long. You may vary the length up to 200 characters on certain options so we can choose  the one we like best. This is the first piece of content users see when they scroll past your ad. It should grab attention, be engaging, and reflect the core message or offer. Use action verbs and emphasize gains, desired result, or perceivable added-value. Refer to the following examples for the format, length and style:\n" +
         "Example:" + formattedPrimary + "\n"+
         
-    "- The 'Headline': This appears right below the visual content (image or video) and is bolded. The 'Headline' should be short, direct, and highlight the main offer or call to action. It has around 25 characters to make an impact. Please refer to the following examples for the format, length and style:\n" +
+    "- The 'Headline': It should be at least 40 characters long. This appears right below the visual content (image or video) and is bolded. The 'Headline' should be short, direct, and highlight the main offer or call to action. It has around 25 characters to make an impact. Please refer to the following examples for the format, length and style:\n" +
         "Example:" + formattedHeadline + "\n"+
         
-    "- The 'Description': This is a smaller text (30 characters maximum) that appears below the 'Headline'. The 'Description' gives additional details about the offer or product. It should add urgency if possible or provide a touch of detail that will further entice the user. This should be concise with around 30 characters. Please refer to the following examples for the format, length and style:\n" +
+    "- The 'Description': This is a smaller text (20 characters maximum) that appears below the 'Headline'. The 'Description' gives additional details about the offer or product. It should add urgency if possible or provide a touch of detail that will further entice the user. This should be concise with around 30 characters. Please refer to the following examples for the format, length and style:\n" +
         "Example:" + formattedDescription + "\n"+
 
 
@@ -1109,13 +1109,13 @@ function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info
         },
         {
             "name": "get_facebook_ad_element_responses",
-            "description": "Be in character and create a compelling Facebook ad copy using the provided information about the client, the theme and the preferences. Each tone should be unique and extreme",
+            "description": "Understand each versions prioritiesa nd create a compelling Facebook ad copy using the provided information about the client, the theme and the preferences. Each options should be unique and extreme",
             "parameters": {
                 "type": "object",
                 "properties": {
-                      "happy_and_helpful": {
+                      "features_and_benefits": {
                         "type": "array",
-                        "description": "A happy and helpful version of the facebook ad copy.",
+                        "description": "A facebook ad copy response version that is focused on the features and the benefits of the products. How are they impactful on everyone's day to day. What's in it for the consumer? All about facts and excitement around it. Longer length : 200 characters",
                         "items": {
                             "type": "object",
                             "properties": {
@@ -1125,9 +1125,9 @@ function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info
                             "required": ["element type", "content"]
                         }
                     },
-                      "overexcited_and_extravagant": {
+                      "deals_and_savings": {
                         "type": "array",
-                        "description": "An overexcited and extravagant version of the facebook ad copy.",
+                        "description": "AA facebook ad copy response version that is focused on the deals, the savings and the urgency. How much can one save, how long do the deals last and why they should hurry. This is the god of deals. Medium length : 150 characters",
                         "items": {
                             "type": "object",
                             "properties": {
@@ -1137,9 +1137,9 @@ function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info
                             "required": ["element type", "content"]
                         }
                     },
-                        "playful_and_chill": {
+                        "brand_and_confident": {
                         "type": "array",
-                        "description": "A playful and chill version of the facebook ad copy.",
+                        "description": "A facebook ad copy response version that is focused on the brand image. Stay put and calm but show off the good deals. Our product are good and the deals are awesome. We know it, but we don't go crazy. You should tho! Shorter length : 125 characters",
                         "items": {
                             "type": "object",
                             "properties": {
@@ -1150,7 +1150,7 @@ function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info
                         }
                     },
                 },
-                "required": ["happy_and_helpful", "overexcited_and_extravagant", "playful_and_chill"]
+                "required": ["features_and_benefits", "deals_and_savings", "brand_and_confident"]
                 //"required": ["overexcited_and_extravagant", "happy_and_helpful", "playful_and_chill"]
             }
         },
@@ -1743,13 +1743,21 @@ function cleanUpTraits(traitsArray){
 
 
 
-function createTables(elementsArray, lang) {
+function createTables(elementsArray, lang, platformToServe) {
   var document = DocumentApp.getActiveDocument();
   var body = document.getBody();
 
   // Append the H1 styled paragraph with "EMAILS FOR {lang}" text
+  if (platformToServe === "Email") {
   var headerParagraph = body.appendParagraph("Email for " + lang);
   headerParagraph.setHeading(DocumentApp.ParagraphHeading.HEADING1);
+  } else if (platformToServe === "Facebook") {
+  var headerParagraph = body.appendParagraph("Facebook Ads Copy for " + lang);
+  headerParagraph.setHeading(DocumentApp.ParagraphHeading.HEADING1);
+  } else if (platformToServe === "Google") {
+  var headerParagraph = body.appendParagraph("Google Ads Copy for " + lang);
+  headerParagraph.setHeading(DocumentApp.ParagraphHeading.HEADING1);
+  }
 
   // Loop through elementsArray to create the tables
   for (var i = 0; i < elementsArray.length; i++) {

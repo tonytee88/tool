@@ -18,7 +18,7 @@
 
 
 var optionsCount = 1;
-const optionsTotal = 1;
+const optionsTotal = 3;
 const designOptions = 3; // Number of design options
 var storedFinalObjectResult = {};
 var promptElements = [];
@@ -591,7 +591,6 @@ function initUISteps() {
 }
 
 async function sidebarInit() {
-  console.log("start of sidebarinit")
     try {
       var clientListDiv = document.getElementById('clientDiv');
       var clientLabel = document.getElementById('clientLabel');
@@ -608,9 +607,7 @@ async function sidebarInit() {
       if (currentSection !== 1) {
         statusMessage.textContent = "Updating client list...";
       }
-      console.log("just before findalldata")
       var result1 = await findAllData()
-      console.log("just after findalldata")
       var result2 = await getNamesArray(result1);
       var result3 = await getDropListNames();
       
@@ -948,11 +945,11 @@ function createTablesInDoc() {
       var lang = getLang();
       google.script.run.withSuccessHandler(function(statusLog) {
         resolve();
-      }).createTables(elementsArray, lang);
+      }).createTables(elementsArray, lang, platformToServe);
     });
   } else if (platformToServe === "Facebook") {
     return new Promise((resolve, reject) => {
-      function getElementsArray() {
+
         var elementsArray = [
           [
             "Facebook Ad", 
@@ -961,15 +958,15 @@ function createTablesInDoc() {
             ["Description", "{Description}"]
           ]
         ]
-      }
+      
       // Create the table via Code.gs
       var lang = getLang();
       google.script.run.withSuccessHandler(function(statusLog) {
         resolve();
-      }).createTables(elementsArray, lang);
+      }).createTables(elementsArray, lang, platformToServe);
     });
   } else if (platformToServe === "Google") {
-    console.log("hello im google");
+
     return new Promise((resolve, reject) => {
       //WORK PIPELINE 2 OCT : Fix the tags and elements for Google - DONE
       var chosenDiv = document.getElementById("chosenContainer");
@@ -1006,7 +1003,7 @@ function createTablesInDoc() {
           var lang = getLang();
           google.script.run.withSuccessHandler(function(statusLog) {
             resolve();
-          }).createTables(elementsArray, lang);
+          }).createTables(elementsArray, lang, platformToServe);
         });
   }
 }   
