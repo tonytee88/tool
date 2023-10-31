@@ -272,7 +272,7 @@ function addThemeDropdown() {
   // Declare themeList
   let themeList;
   if (platformToServe === "Facebook") {
-    themeList = ["NONE", "BF - Early Access VIP", "Black Friday week", "Black Friday","Cyber Monday","BFCM - Last Chance","BFCM - Extended"];
+    themeList = ["NONE", "BF - Early Access VIP", "Black Friday week", "Black Friday","Cyber Monday","BFCM - Last Chance","BFCM - Extended", "Custom"];
   } else if (platformToServe === "Google") {
     themeList = ["RSA"];
   }

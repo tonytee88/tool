@@ -995,7 +995,7 @@ function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info
 
       return formatted;
   }
-  
+  if (Object.keys(themeExamples).length !== 0)  {
   var formattedPrimary = formatExamples(themeExamples.primary);
   var formattedHeadline = formatExamples(themeExamples.headline);
   var formattedDescription = formatExamples(themeExamples.description);
@@ -1014,6 +1014,7 @@ function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info
 
   if (elementCopyExamples["Description_upvotes"]){
     descriptionExamples_upvotes = formatExamples(elementCopyExamples["Description_upvotes"]);
+  }
   }
 
 //DOWNVOTES
