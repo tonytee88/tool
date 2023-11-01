@@ -1079,7 +1079,7 @@ function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info
     "- Primary Text:\n" + formattedPrimary + "\n"+
     "- Headline:\n" + formattedHeadline + "\n"+
     "- Description:\n" + formattedDescription + "\n"+
-    "Here's the subject: " + prompt + ". Here's the theme: " + theme + ". Here's the extra info: " + info + ". If the extra info includes promotion dates, promo code, discount percentage or other offer specificity, include those info in your copy. Here's the JavaScript Array with elements to write about: " + promptElements +". Before proceeding, it's vital to thoroughly understand the following CLIENT TRAITS. These traits serve as guidelines, and each one is integral to crafting the ad copy. Please ensure that you incorporate every single trait meticulously in the output:\n\n" + traitsList + "\nRemember, each trait plays a significant role, so it's crucial not to overlook any of them.";
+    "Here's the subject: " + prompt + ". Here's the theme: " + theme + ". Here's the extra info: " + info + ". If the extra info includes promotion dates, promo code, discount percentage or other offer specificity, include those info in your copy. Here's the JavaScript Array with elements to write about: " + promptElements +". Before proceeding, it's vital to thoroughly understand the following CLIENT TRAITS. These traits serve as guidelines, and each one is integral to crafting the ad copy. Please ensure that you incorporate every single trait meticulously in the output:\n\n" + traitsList + "\nRemember, each trait plays a significant role, so it's crucial not to overlook any of them. Generate "+optionsTotal + " different versions of the copy following the priorities of each.";
 
   // configure the API request to OpenAI
   var data = {
@@ -1109,7 +1109,7 @@ function getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info
         },
         {
             "name": "get_facebook_ad_element_responses",
-            "description": "Understand each versions prioritiesa nd create a compelling Facebook ad copy using the provided information about the client, the theme and the preferences. Each options should be unique and extreme",
+            "description": "Understand each versions priorities and create a compelling Facebook ad copy using the provided information about the client, the theme and the preferences. Each options should be unique and extreme",
             "parameters": {
                 "type": "object",
                 "properties": {

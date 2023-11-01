@@ -361,7 +361,7 @@ handleGptMagicButtonClick.addEventListener("click", function() {
                 console.log("Error:", error);
                 reject(error);
             })
-            .requestTranslation1(result, lang);
+            .requestTranslation1(result, lang, platformToServe);
         });
         }
     })
