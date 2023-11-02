@@ -36,11 +36,12 @@ var processTagsAddedListeners = 0;
 let currentSection = 1;
 const totalSections = 5;
 let platformToServe = "";
-const version = "1.7.2";
-var notifText = "Release v1.7.2 - Aug 25th \n"+
-"- New notification system implemented! \n" +
-"- New tooltip system added to help you use the tool (hover the ⊕) \n" +
-"- From your feedback: please make sure to use the 'Extra Info' as much as you can. See its tooltip for more info! \n";
+const version = "2.0.0";
+var notifText = "Release v2.0.0 - November 2nd \n"+
+"- Facebook Ads added! \n" +
+"- Google Ads in beta (still buggy) \n" +
+"- Added 3 options for Facebook \n"; +
+"- Fixed a lot of bugs along the way \n";
 
 console.log("v"+version);
 
