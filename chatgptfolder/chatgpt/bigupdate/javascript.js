@@ -18,7 +18,7 @@
 
 
 var optionsCount = 1;
-const optionsTotal = 3;
+let optionsTotal = 1;
 const designOptions = 3; // Number of design options
 var storedFinalObjectResult = {};
 var promptElements = [];
@@ -250,10 +250,12 @@ function startWorkflow(platform) {
   if (platform === "Email") {
     platformToServe = "Email";
     initNavSystemEmail(); 
+    optionsTotal = 1;
   } else if (platform === "Facebook") {
     platformToServe = "Facebook";
     addThemeDropdown();
     initNavSystemFacebook();
+    optionsTotal = 3;
   } else if (platform === "Google") {
     platformToServe = "Google";
     addThemeDropdown();
@@ -262,6 +264,7 @@ function startWorkflow(platform) {
     addUSPInput();
     removeSubjectField();
     initNavSystemGoogle();
+    optionsTotal = 1;
 
   }
   console.log("Selected Platform: " + platform);
