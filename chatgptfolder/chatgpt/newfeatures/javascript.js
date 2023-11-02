@@ -16,10 +16,9 @@
 //   }
 // }
 
-// sequentialSteps();
-console.log("BIGUPDATE/JAVASCRIPT.JS v1.7.2");
+
 var optionsCount = 1;
-const optionsTotal = 3;
+let optionsTotal = 1;
 const designOptions = 3; // Number of design options
 var storedFinalObjectResult = {};
 var promptElements = [];
@@ -36,51 +35,29 @@ var namesArray = [];
 var processTagsAddedListeners = 0;
 let currentSection = 1;
 const totalSections = 5;
-const version = "1.7.2";
-var notifText = "Release v1.7.2 - Aug 25th \n"+
-"- New notification system implemented! \n" +
-"- New tooltip system added to help you use the tool (hover the ⊕) \n" +
-"- From your feedback: please make sure to use the 'Extra Info' as much as you can. See its tooltip for more info! \n";
+let platformToServe = "";
+const version = "2.0.0";
+var notifText = "Release v2.0.0 - November 2nd \n"+
+"- Facebook Ads added! \n" +
+"- Google Ads in beta (still buggy) \n" +
+"- Added 3 options for Facebook \n"; +
+"- Fixed a lot of bugs along the way \n";
+
+console.log("v"+version);
 
 window.addEventListener('load', function() {
   sidebarInit();
-  initUIAndTooltips();
-  function moveElementButton(button, fromSection, toSection) {
-    fromSection.removeChild(button);
-    toSection.appendChild(button);
-  }
+  createPlatformSelection();
+  initUISteps();
 
-async function initUIAndTooltips() {
-  try {
-    var step1 = await initTooltips();
-    var step2 = initUISteps();
 
-  } catch (error) {
-  console.error('An error occurred:', error);
-      }
-  }
 
-  // Add event listeners to element buttons
-  var chosenSection = document.getElementById('chosenContainer');
-  var recommendedSection = document.getElementById('recommendedSection');
-  var elementButtons = document.getElementsByClassName('element-button');
 
-  for (let i = 0; i < elementButtons.length; i++) {
-    elementButtons[i].addEventListener('click', function() {
-      if (chosenSection.contains(this)) {
-        // Move from chosen to recommended
-        moveElementButton(this, chosenSection, recommendedSection);
-      } else if (recommendedSection.contains(this)) {
-        // Move from recommended to chosen
-        moveElementButton(this, recommendedSection, chosenSection);
-      }
-    });
-  }
 
   // Add event listener to "Add" button
   var addElementButton = document.getElementById('addElementButton');
   var otherElementInput = document.getElementById('otherElementInput');
-  var chosenElementButtons = chosenSection.querySelector('.element-buttons');
+  //var chosenElementButtons = chosenSection.querySelector('.element-buttons');
 
   addElementButton.addEventListener('click', function() {
   var elementText = otherElementInput.value.trim();
@@ -148,6 +125,313 @@ async function initUIAndTooltips() {
   }
   });
 });
+
+function moveElementButton(button, fromSection, toSection) {
+  fromSection.removeChild(button);
+  toSection.appendChild(button);
+}
+
+function addClickToMoveFeature() {
+  // Add event listeners to element buttons
+  var chosenSection = document.getElementById('chosenContainer');
+  var recommendedSection = document.getElementById('recommendedSection');
+  var elementButtons = document.getElementsByClassName('element-button');
+
+  for (let i = 0; i < elementButtons.length; i++) {
+    elementButtons[i].addEventListener('click', function() {
+      if (chosenSection.contains(this)) {
+        // Move from chosen to recommended
+        moveElementButton(this, chosenSection, recommendedSection);
+      } else if (recommendedSection.contains(this)) {
+        // Move from recommended to chosen
+        moveElementButton(this, recommendedSection, chosenSection);
+      }
+    });
+  }
+}
+
+async function initUIAndTooltips() {
+  try {
+    var step1 = await initTooltips();
+    var step2 = initUISteps();
+    initStep1();
+
+  } catch (error) {
+  console.error('An error occurred:', error);
+      }
+  }
+
+function initStep2(platformToServe) {
+  let chosenContainer = document.getElementById('chosenContainer');
+  let recommendedSection = document.getElementById('recommendedSection');
+  if (platformToServe === "Google") {
+      chosenContainer.innerHTML = `
+          <div class="label" id="chosen">Chosen Elements:</div>
+          <div><button class="element-button">Headlines [kw]</button></div>
+          <div><button class="element-button">Headlines [social proof]</button></div>
+          <div><button class="element-button">Headlines [gen USP]</button></div>
+          <div><button class="element-button">Headlines [CTA]</button></div>
+          <div><button class="element-button">Descrip [kw][prod USP][CTA]</button></div>
+          <div><button class="element-button">Descrip [kw][gen USP]</button></div>
+          <div class="element-buttons" id="chosenSection"></div>
+      `;
+      recommendedSection.innerHTML = `
+          <div><button class="element-button">test 123</button></div>
+      `;
+    addClickToMoveFeature();
+    addTextFieldsForGoogle();
+  } else {
+    chosenContainer.innerHTML = `
+        <div class="label" id="chosen">Chosen Elements:</div>
+        <button class="element-button">Email Subject Line</button>
+        <button class="element-button">Email Preview Text</button>
+        <button class="element-button">HeroBanner Title</button>
+        <button class="element-button">HeroBanner Text</button>
+        <button class="element-button">HeroBanner CTA</button>
+        <button class="element-button">DescriptiveBlock Title</button>
+        <button class="element-button">DescriptiveBlock Text</button>
+        <button class="element-button">DescriptiveBlock CTA</button>
+        <button class="element-button">ProductBlock Title</button>
+        <button class="element-button">ProductBlock Text</button>
+        <button class="element-button">ProductBlock CTA</button>
+        <div class="element-buttons" id="chosenSection"></div>
+    `;
+    recommendedSection.innerHTML = `
+        <button class="element-button">Benefits1 Title</button>
+        <button class="element-button">Benefits1 Text</button>
+        <button class="element-button">Tip1 Title</button>
+        <button class="element-button">Tip1 Text</button>
+    `;
+    addClickToMoveFeature();
+    removeTinyTextFields();
+  }
+}
+
+// create the platform selection screen
+function createPlatformSelection() {
+  // Create main container
+  const containerCard = document.createElement('div');
+  containerCard.id = "platformCardContainer";
+
+  const containerTitle = document.createElement('div');
+  containerTitle.id = "titleContainer";
+
+  // Add a title above the platform cards
+  const title = document.createElement('h1');
+  title.textContent = "What platform do you require copy for?";
+  containerTitle.appendChild(title); // Appending title to the container
+
+  // Define platforms
+  const platforms = ['Email', 'Facebook', 'Google'];
+
+  platforms.forEach((platform) => {
+      const platformDiv = document.createElement('div');
+      platformDiv.className = "platformCard";
+      platformDiv.textContent = platform;
+
+      // Event listener to start workflow
+      platformDiv.addEventListener('click', async function() {
+        startWorkflow(platform);
+        initStep2(platform);
+        initUIAndTooltips();
+
+      });
+
+      containerCard.appendChild(platformDiv);
+  });
+
+  let midContainer = document.getElementById('midContainer');
+  midContainer.insertBefore(containerCard, midContainer.firstChild);
+  midContainer.insertBefore(containerTitle, midContainer.firstChild);
+  
+}
+
+function startWorkflow(platform) {
+  document.getElementById("navigation").style.display = 'block';
+  if (platform === "Email") {
+    platformToServe = "Email";
+    initNavSystemEmail(); 
+    optionsTotal = 1;
+  } else if (platform === "Facebook") {
+    platformToServe = "Facebook";
+    addThemeDropdown();
+    initNavSystemFacebook();
+    optionsTotal = 3;
+  } else if (platform === "Google") {
+    platformToServe = "Google";
+    addThemeDropdown();
+    addKeywordInput();
+    addCampaignObjectiveInput();
+    addUSPInput();
+    removeSubjectField();
+    initNavSystemGoogle();
+    optionsTotal = 1;
+
+  }
+  console.log("Selected Platform: " + platform);
+}
+
+function addThemeDropdown() {
+  console.log("platformToServe: " + platformToServe)
+  // Declare themeList
+  let themeList;
+  if (platformToServe === "Facebook") {
+    themeList = ["NONE", "BF - Early Access VIP", "Black Friday week", "Black Friday","Cyber Monday","BFCM - Last Chance","BFCM - Extended", "Custom"];
+  } else if (platformToServe === "Google") {
+    themeList = ["RSA"];
+  }
+  
+  // Create the container div with id="adType"
+  const adTypeDiv = document.createElement('div');
+  adTypeDiv.id = "adType";
+
+  // Create div with class="label"
+  const labelDiv = document.createElement('div');
+  labelDiv.className = "label";
+  labelDiv.id="labelText";
+  if (platformToServe === "Facebook") {
+    labelDiv.textContent = "Theme : ";
+  } else if (platformToServe === "Google") {
+    labelDiv.textContent = "Ad Type : ";;
+  }
+  
+  // Append label to adTypeDiv
+  adTypeDiv.appendChild(labelDiv);
+
+  // Create dropdown div with id="themeDropdown"
+  const dropdownDiv = document.createElement('div');
+  
+  // Create the dropdown list (select element)
+  const selectList = document.createElement('select');
+  selectList.id = "themeDropdown";
+
+  // Populate the selectList with themeList
+  themeList.forEach(theme => {
+    const option = document.createElement('option');
+    option.value = theme;
+    option.textContent = theme;
+    selectList.appendChild(option);
+  });
+
+  // Append selectList to dropdownDiv
+  dropdownDiv.appendChild(selectList);
+
+  // Append dropdownDiv to adTypeDiv
+  adTypeDiv.appendChild(dropdownDiv);
+
+  // Insert adTypeDiv right before the div with id=subjectLabel
+  const subjectLabelDiv = document.getElementById('subjectLabel');
+  subjectLabelDiv.parentNode.insertBefore(adTypeDiv, subjectLabelDiv);
+}
+
+function addKeywordInput() {
+  // Create a new div element to hold the label and the input field
+  const newDiv = document.createElement('div');
+  newDiv.id = 'keywordDiv';
+
+  // Create a new label element and set its text content and class
+  const label = document.createElement('div');
+  label.textContent = 'Main Keywords';
+  label.className = 'label';
+  label.id = 'keywordLabel';
+
+  // Create a new input element and set its attributes and class
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.id = 'mainKeywords';
+  input.className = 'form-control';
+  input.placeholder = 'Enter main keywords';
+
+  // Append the label and input elements to the new div
+  newDiv.appendChild(label);
+  newDiv.appendChild(input);
+
+  // Get the reference to the div before which we want to insert the new div
+  const subjectLabelDiv = document.getElementById('subjectLabel');
+
+  // Insert the new div right before the subjectLabelDiv
+  subjectLabelDiv.parentNode.insertBefore(newDiv, subjectLabelDiv);
+}
+
+function addCampaignObjectiveInput() {
+  // Create a new div element to hold the label and the input field
+  const newDiv = document.createElement('div');
+  newDiv.id = 'campaignObjectiveDiv';
+
+  // Create a new label element and set its text content and class
+  const label = document.createElement('div');
+  label.textContent = 'Campaign Objective';
+  label.className = 'label';
+  label.id = 'campaignObjectiveLabel';
+
+  // Create a new input element and set its attributes and class
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.id = 'campaignObjective';
+  input.className = 'form-control';
+  input.placeholder = 'Enter campaign objective';
+  
+  // Prefill the input field with "sell more products"
+  input.value = 'sell more products';
+
+  // Append the label and input elements to the new div
+  newDiv.appendChild(label);
+  newDiv.appendChild(input);
+
+  // Get the reference to the div before which we want to insert the new div
+  const subjectLabelDiv = document.getElementById('subjectLabel');
+
+  // Insert the new div right before the subjectLabelDiv
+  subjectLabelDiv.parentNode.insertBefore(newDiv, subjectLabelDiv);
+}
+
+function addUSPInput() {
+  // Create a new div element to hold the label and the input field
+  const newDiv = document.createElement('div');
+  newDiv.id = 'uspDiv';
+
+  // Create a new label element and set its text content and class
+  const label = document.createElement('div');
+  label.textContent = 'USPs';
+  label.className = 'label';
+  label.id = 'uspLabel';
+
+  // Create a new textarea element and set its attributes and class
+  const textarea = document.createElement('textarea');
+  textarea.id = 'usp';
+  textarea.className = 'form-control large-input';  // Use 'large-input' class to make it bigger
+  textarea.placeholder = 'Enter USPs here... Include at least 1 social proof, 1 generic USP about the business and a product-specific one';
+
+  // Prefill the textarea with a default value
+  textarea.textContent = 'Expert knowledge, Customer focused, 4.7 ratings, best price on wooden chairs on the market'; 
+
+  // Append the label and textarea elements to the new div
+  newDiv.appendChild(label);
+  newDiv.appendChild(textarea);
+
+  // Get the reference to the div before which we want to insert the new div
+  const subjectLabelDiv = document.getElementById('subjectLabel');
+
+  // Insert the new div right before the subjectLabelDiv
+  subjectLabelDiv.parentNode.insertBefore(newDiv, subjectLabelDiv);
+}
+
+function removeSubjectField() {
+  // Get the element for the subject label and subject input field
+  const subjectLabel = document.getElementById('subjectLabel');
+  const subjectInput = document.getElementById('subject');
+
+  // Remove the subject label and subject input field from the DOM
+  subjectLabel.remove();
+  subjectInput.remove();
+}
+
+// Call the function to create platform selection UI
+function initStep1() {
+  document.getElementById("step1").style.display = 'block';
+  document.getElementById("platformCardContainer").style.display = 'none';
+  document.getElementById("titleContainer").style.display = 'none';
+}
 
 function getNamesArray() {
   //console.log("documentNamesObj: " + documentNamesObj)
@@ -273,7 +557,7 @@ function initTooltips() {
   return new Promise((resolve, reject) => {
     try {
       var tooltipPickClient = "If your client is not here, create a new one! Go to 🧠 --> CREATE NEW CLIENT.";
-      createTooltip("PickClient", "clientDiv", tooltipPickClient, "1","-5","5","noeffect");
+      createTooltip("PickClient", "clientDiv", tooltipPickClient, "1","-10","5","noeffect");
 
       var tooltipMoreInfo = "**THIS IS THE MOST IMPORTANT FIELD : Take your time and add as much info as possible.**\n\n Note Aug 24th : \n\n Until I add the 'industry' feature to the brain, please include more info about the client: \n\n - L'industrie\n - La clientèle cible \n- Le ton \n- L'objectif de l'email";
       createTooltip("ExtraInfo", "infoTitle", tooltipMoreInfo, "1","-15","0","pulse-effect");
@@ -305,10 +589,9 @@ function initTooltips() {
 function initUISteps() {
   
   let numberOfStepsToHide = 7;
-  for (var i = 1; i < 8; i++) {
+  for (var i = 1; i < (numberOfStepsToHide+1); i++) {
   document.getElementById("step"+[i]).style.display = 'none';
   }
-  document.getElementById("step1").style.display = 'block';
 }
 
 async function sidebarInit() {
@@ -328,7 +611,7 @@ async function sidebarInit() {
       if (currentSection !== 1) {
         statusMessage.textContent = "Updating client list...";
       }
-      var result1 = await findAllData();
+      var result1 = await findAllData()
       var result2 = await getNamesArray(result1);
       var result3 = await getDropListNames();
       
@@ -343,6 +626,142 @@ async function sidebarInit() {
       console.error('An error occurred:', error);
     }
   }
+
+// setting the themes and their examples copy
+function getThemeExamples(theme) {
+  if (theme === "BF - Early Access VIP") {
+      let primaryText_CopyExamples = [
+          `Notre Vente VIP du Black Friday est en cours! 😍\n\nProfitez dun rabais de X% sur [PRODUITS]… ou pour faire vos achats des Fêtes à l'avance!\n\nCODE: XXXX.\n\n🚨 Offre d'une durée limitée. Magasinez nos rabais du Black Friday maintenant 👇`,
+          `Ton accès VIP à notre vente du Black Friday, c'est MAINTENANT!\n\n- Profite d'un rabais privilégié de X% sur [PRODUITS] avec le code XXXX (optionnel)\n- (autre perk si applicable)\n\nDépêche-toi de mettre la main sur [PRODUIT] avant qu'il soit épuisé, il ne te reste que X heures (ou autre urgency).\n\nClique ici pour magasiner nos meilleurs prix en primeur.`,
+          `👟BLACK FRIDAY VIP 👟\nNos membres VIP économisent X% sur [PRODUITS] dès aujourd'hui!\n\nUtilise ton code promo exclusif XXXX (optionnel) pour profiter de notre meilleure offre de l'année avant tout le monde!\n\nTu éviteras les ruptures de stock et t'assureras de te procurer tes [PRODUITS] préférés. (ou autre phrase en lien avec le client)\n\nClique ici pour économiser dès maintenant. 👇`
+      ];
+      let headline_CopyExamples = [
+          "X% pour les membres VIP",
+          "Profite de ton rabais VIP dès aujourd'hui!",
+          "Black Friday VIP en cours"
+      ];
+      let description_CopyExamples = [
+          "Magasine maintenant",
+          "Économise dès maintenant",
+          "Commande maintenant"
+      ];
+      return {
+          primary: primaryText_CopyExamples,
+          headline: headline_CopyExamples,
+          description: description_CopyExamples
+      };
+
+  } else if (theme === "Black Friday week") {
+      let primaryText_CopyExamples = [
+          `C'est le pré-Black Friday chez [NOM DU CLIENT]!\n\nProfitez de rabais allant jusqu'à X% dès maintenant sur [PRODUITS] durant toute la semaine.\n\nPourquoi attendre à vendredi quand vous pouvez économiser dès aujourd'hui?\n\nCliquez ici pour découvrir tous nos bas prix.👇`,
+          `⚡VENDREDI FOU À L'AVANCE ⚡\nNos meilleures offres de 2022 sont commencées!\n\nProfitez-en pour mettre la main sur nos [PRODUITS] à X% de rabais jusqu'au X novembre.\n\n(Phrase sur les bénéfices des produits ou par rapport au client).\n\nDécouvrez tous nos produits en promotion ici. 👇`
+      ];
+      let headline_CopyExamples = [
+          "LE VENDREDI FOU À L'AVANCE | Jusqu'à -X% sur [produits]",
+          "Vente du Pré-Black Friday | [RABAIS] | Jusqu'au X novembre",
+          "Semaine du Black Friday | [RABAIS] | Code XXXX"
+      ];
+      let description_CopyExamples = [
+          "Le Pré-Black Friday est commencé!",
+          "Nos meilleures offres de 2023!",
+          "Semaine du Black Friday : Jusqu'à -X%"
+      ];
+      return {
+          primary: primaryText_CopyExamples,
+          headline: headline_CopyExamples,
+          description: description_CopyExamples
+      }
+  } else if (theme === "Black Friday") {
+        let primaryText_CopyExamples = [
+            `🥳 BLACK FRIDAY 🥳\nÉconomise jusqu'à X% sur [PRODUITS]!\n\n[Énumération des produits en solde + bénéfices ou phrase à propos de la marque/du client].\n\nFais vite, le code promo XXXX est valide jusqu'au X novembre seulement!\n\nClique ici pour profiter des meilleurs prix de l'année maintenant. 👇`,
+            `🤑 BLACK FRIDAY 🤑\nNos plus GROS rabais de l'année sont en cours!\n\n- [énumération des rabais/offres]\n- [énumération des rabais/offres]\n- [énumération des rabais/offres]\n\nC'est le moment idéal pour faire le plein de [produits + leurs bénéfices ou phrase inspirante qui donne envie d'acheter].\n\nCliquez ici pour profiter de notre méga vente!`,
+            `BLACK FRIDAY\nTous les [produits] sont à X% de rabais avec le code promo XXXX (optionnel)!\n\n[Produits + leurs bénéfices ou phrase inspirante qui donne envie d'acheter].\n\nCommandez vos [produits] favoris à bas prix sans plus attendre 👇\n\n*Jusqu'au X novembre seulement.`
+        ];
+        let headline_CopyExamples = [
+            "Les plus gros rabais de 2023 sont là! 💸",
+            "Nos MEILLEURES offres de l'année! 😮",
+            "Jusqu'à -X% pour le Black Friday",
+            "BLACK FRIDAY : jusqu'à -X%!"
+        ];
+        let description_CopyExamples = [
+            "Magasine maintenant",
+            "Fais vite avant que la vente se termine!",
+            "Commande à rabais"
+        ];
+        return {
+            primary: primaryText_CopyExamples,
+            headline: headline_CopyExamples,
+            description: description_CopyExamples
+        };
+
+    } else if (theme === "Cyber Monday") {
+        let primaryText_CopyExamples = [
+            `LE CYBER MONDAY BAT SON PLEIN!\n\nPour l'occasion, [NOS PRODUITS] sont offerts à prix imbattables.\n\n[Énumération de produits en rabais], etc., économisez jusqu'à X% sur les produits qui vous font de l'œil avec le code promo XXXX.\n\nCliquez ici pour explorer nos rabais et profiter de notre plus grande vente de l'année. Les quantités sont limitées!`,
+            `🙌CYBER LUNDI 🙌\nNos meilleures offres de 2022 se poursuivent!\n\nNos rabais allant jusqu'à X% sur une variété de produits sont encore valides jusqu'au X novembre.\n\n(Phrase par rapport au produit ou au client).\n\nC'est votre toute dernière chance d'en profiter. Cliquez ici pour magasiner à bas prix avant que notre plus grande vente de l'année se termine 👇\n\n*Jusqu'au X novembre seulement.`
+        ];
+        let headline_CopyExamples = [
+            "Profitez des plus gros rabais de l'année!",
+            "Nos meilleures offres de 2023 continuent!",
+            "Bas prix jusqu'au X novembre seulement"
+        ];
+        let description_CopyExamples = [
+            "Magasine maintenant",
+            "Fais vite avant que la vente se termine!",
+            "Commande à rabais"
+        ];
+        return {
+            primary: primaryText_CopyExamples,
+            headline: headline_CopyExamples,
+            description: description_CopyExamples
+        };
+
+    } else if (theme === "BFCM - Last Chance") {
+        let primaryText_CopyExamples = [
+            `🚨DERNIÈRE CHANCE 🚨\nOFFRE VENDREDI FOU : jusqu'à X % de rabais sur les articles sélectionnés 🎉\nC'est votre chance de profiter des meilleurs soldes de l'année sur une large sélection [PRODUITS DÉTAIL] et plus encore!\nCliquez ici pour économiser dès maintenant!👇`,
+            `🚨DERNIÈRE CHANCE 🚨\nOFFRE VENDREDI FOU : jusqu'à X % de rabais sur les articles sélectionnés 🎉\nC'est votre chance de profiter des meilleurs soldes de l'année sur une large sélection [PRODUITS DÉTAIL] et plus encore!\nCliquez ici pour économiser dès maintenant!👇`
+        ];
+        let headline_CopyExamples = [
+            "DERNIÈRE CHANCE : -X% de rabais!",
+            "Nos offres du Black Friday se terminent",
+            "Derniers jours : promos du Black Friday",
+            "Jusqu'à X % de rabais"
+        ];
+        let description_CopyExamples = [
+            "Économisez gros!",
+            "Faites-vite avant la rupture de stock!",
+            "Offre d'une durée limitée"
+        ];
+        return {
+            primary: primaryText_CopyExamples,
+            headline: headline_CopyExamples,
+            description: description_CopyExamples
+        };
+
+    } else if (theme === "BFCM Extended") {
+        let primaryText_CopyExamples = [
+            `🙌LE CYBER MONDAY EST PROLONGÉ 🙌\nLe code promo XXXX pour économiser X% sur [PRODUITS] est encore valide!\n\nNotre vente a été un tel succès qu'on a décidé de t'en faire profiter jusqu'au X décembre.\n\nC'est l'occasion de cocher quelques cadeaux sur ta liste de Noël ou de t'offrir un [produit vraiment cool + bénéfice].\n\nClique ici pour commander aux meilleurs prix de l'année avant qu'il soit trop tard. 👇`,
+            `🙌LE BLACK FRIDAY SE POURSUIT 🙌\nNos MEILLEURES offres de l'année sont prolongées jusqu'au X décembre!\n\nSi vous avez manqué notre vente, c'est le moment de vous rattraper et de mettre la main sur des économies de X% sur [PRODUITS].\n\nQue ce soit pour [bénéfice du produit] ou pour cocher quelques cadeaux sur votre liste des fêtes, c'est le meilleur moment pour faire le plein!\n\nCliquez ici pour profiter de nos promotions limitées!`
+        ];
+        let headline_CopyExamples = [
+            "Profitez des plus gros rabais de l'année!",
+            "Le Black Friday/Cyber Monday continue! 🤑",
+            "Nos MEILLEURES offres de 2023 continuent!",
+            "Bas prix jusqu'au X décembre seulement"
+        ];
+        let description_CopyExamples = [
+            "Magasine maintenant",
+            "Fais vite avant que la vente se termine!",
+            "Commande à rabais"
+        ];
+        return {
+            primary: primaryText_CopyExamples,
+            headline: headline_CopyExamples,
+            description: description_CopyExamples
+        };
+    }
+    // If the theme doesn't match any of the above, return an empty object.
+    return {};
+}
 
 document.getElementById("clients").addEventListener("change", function() {
   var selectedClientName = this.options[this.selectedIndex].text;
@@ -408,31 +827,6 @@ var heroBannerText;
 var heroBannerCTA;
 var designTips;
 
-// const testFunctionClick = document.getElementById("testFunction");
-
-// testFunctionClick.addEventListener("click", function() {
-//   new Promise(function(resolve, reject) {
-//     google.script.run
-//       .withSuccessHandler((result) => {
-//         console.log("Success:", result);
-//         resolve(result);
-//       })
-//       .withFailureHandler((error) => {
-//         console.log("Error:", error);
-//         reject(error);
-//       })
-//       .getGPTResponseSuper("Benjamin's first Olympic Season", "email subject line, email preview text, hero banner title, hero banner text, hero banner cta, descriptive bloc title, descriptive bloc text, descriptive bloc cta", 3, "English", "20% off early bird price, valid from June 22nd to June 25th only.");
-//   })
-//     .then(function(result) {
-//       // Handle the resolved result here
-//       console.log("Promise resolved:", result);
-//     })
-//     .catch(function(error) {
-//       // Handle the rejected error here
-//       console.log("Promise rejected:", error);
-//     });
-// });
-
 const qaButtonClick = document.getElementById("qaButton");
 
 qaButtonClick.addEventListener("click", function() {
@@ -467,68 +861,155 @@ qaButtonClick.addEventListener("click", function() {
 
 // Setup "LoadTags" to execute ProcessTags
 document.getElementById("loadTags").addEventListener("click", function() {
-  var chosenDiv = document.getElementById("chosenContainer");
-  var elementButtons = chosenDiv.getElementsByClassName("element-button");
-  var tags = [];
+  if (platformToServe === "Email") {
+    var chosenDiv = document.getElementById("chosenContainer");
+    var elementButtons = chosenDiv.getElementsByClassName("element-button");
+    var tags = [];
 
-  // Convert HTMLCollection to array using spread operator
-  buttonArray = [...elementButtons];
+    // Convert HTMLCollection to array using spread operator
+    buttonArray = [...elementButtons];
 
-  buttonArray.forEach(function(button) {
-    tags.push(button.textContent);
-  });
-  setTimeout(() => {}, 1000)
-  
-  //console.log(tags);
-  // Step 2
-  processTags(tags);
-  
+    buttonArray.forEach(function(button) {
+      tags.push(button.textContent);
+    });
+    setTimeout(() => {}, 1000)
+    
+    console.log(tags);
+    // Step 2
+    processTags(tags);
+  } else if (platformToServe === "Facebook") {
+    var tags = ["Primary Text", "Headline", "Description"];
+    processTags(tags);
+  } else if (platformToServe === "Google") {
+    const buttons = document.querySelectorAll('.element-button');
+    const tags = [];
+
+    buttons.forEach(button => {
+      const tagText = button.textContent;
+      const inputField = button.previousSibling;  // Since we inserted the input field before the button
+      const repetitionCount = parseInt(inputField.value) || 0;
+
+      if (repetitionCount === 1) {
+        tags.push({
+          name: tagText + "_1"
+        });
+      } else {
+        for (let i = 1; i <= repetitionCount; i++) {
+          tags.push({
+            name: tagText + "_" + i
+          });
+        }
+      }
+    });
+
+    processTags(tags);  // Note: Make sure processTags can handle this new format!
+  }
 });
   
 function createTablesInDoc() { 
-  return new Promise((resolve, reject) => {
-    var chosenDiv = document.getElementById("chosenContainer");
-    var elementButtons = chosenDiv.getElementsByClassName("element-button");
-    var elementsArray = [];
+  if (platformToServe === "Email") {
+    return new Promise((resolve, reject) => {
+      var chosenDiv = document.getElementById("chosenContainer");
+      var elementButtons = chosenDiv.getElementsByClassName("element-button");
+      var elementsArray = [];
 
-    for (var i = 0; i < elementButtons.length; i++) {
-      var category = "category " + (i + 1);
-      var value = elementButtons[i].textContent;
-      var elementName = elementButtons[i].textContent;
+      for (var i = 0; i < elementButtons.length; i++) {
+        var category = "category " + (i + 1);
+        var value = elementButtons[i].textContent;
+        var elementName = elementButtons[i].textContent;
 
-      // Special handling for "email subject line" and "email preview text"
-      if (value === "Email Subject Line" || value === "Email Preview Text") {
-        value = "Email Misc";
-      } else {
-        // Get the category name by extracting the characters before the first space
-        var firstSpaceIndex = value.indexOf(' ');
-        if (firstSpaceIndex !== -1) {
-          value = value.substring(0, firstSpaceIndex);
+        // Special handling for "email subject line" and "email preview text"
+        if (value === "Email Subject Line" || value === "Email Preview Text") {
+          value = "Email Misc";
         } else {
-          value = "Other";  // Default category if no space is found
+          // Get the category name by extracting the characters before the first space
+          var firstSpaceIndex = value.indexOf(' ');
+          if (firstSpaceIndex !== -1) {
+            value = value.substring(0, firstSpaceIndex);
+          } else {
+            value = "Other";  // Default category if no space is found
+          }
+        }
+        // Check if the category already exists in the elementsArray
+        var categoryExists = false;
+        for (var j = 0; j < elementsArray.length; j++) {
+          if (elementsArray[j][0] === value) {
+            // Add the element to the existing category
+            elementsArray[j].push([elementName, "{" + elementName + "}"]);
+            categoryExists = true;
+            break;
+          }
+        }
+        if (!categoryExists) {
+          // Add a new category with the element
+          elementsArray.push([value, [elementName, "{" + elementName + "}"]]);
         }
       }
-      // Check if the category already exists in the elementsArray
-      var categoryExists = false;
-      for (var j = 0; j < elementsArray.length; j++) {
-        if (elementsArray[j][0] === value) {
-          // Add the element to the existing category
-          elementsArray[j].push([elementName, "{" + elementName + "}"]);
-          categoryExists = true;
-          break;
-        }
+      // Create the table via Code.gs
+      var lang = getLang();
+      google.script.run.withSuccessHandler(function(statusLog) {
+        resolve();
+      }).createTables(elementsArray, lang, platformToServe);
+    });
+  } else if (platformToServe === "Facebook") {
+    return new Promise((resolve, reject) => {
+
+        var elementsArray = [
+          [
+            "Facebook Ad", 
+            ["Primary Text", "{Primary Text}"], 
+            ["Headline", "{Headline}"], 
+            ["Description", "{Description}"]
+          ]
+        ]
+      
+      // Create the table via Code.gs
+      var lang = getLang();
+      google.script.run.withSuccessHandler(function(statusLog) {
+        resolve();
+      }).createTables(elementsArray, lang, platformToServe);
+    });
+  } else if (platformToServe === "Google") {
+
+    return new Promise((resolve, reject) => {
+      //WORK PIPELINE 2 OCT : Fix the tags and elements for Google - DONE
+      var chosenDiv = document.getElementById("chosenContainer");
+      var elementButtons = chosenDiv.getElementsByClassName("element-button");
+      const elementsArray = [];
+      function getElementsArray() {
+              
+        // Select all elements with the class 'element-button'
+        const buttons = document.querySelectorAll('.element-button');
+      
+        // Iterate through each button
+        buttons.forEach(button => {
+          const elementText = button.textContent;
+          const inputField = button.previousSibling;  // Since we inserted the input field before the button
+          const repetitionCount = parseInt(inputField.value) || 0;
+      
+          for (let i = 0; i < repetitionCount; i++) {
+            elementsArray.push([
+              elementText,
+              ["Text", "{Text}"],
+              ["Character count", "{Character count}"]
+            ]);
+          }
+        });
+      
+        return elementsArray;
       }
-      if (!categoryExists) {
-        // Add a new category with the element
-        elementsArray.push([value, [elementName, "{" + elementName + "}"]]);
-      }
-    }
-    // Create the table via Code.gs
-    var lang = getLang();
-    google.script.run.withSuccessHandler(function(statusLog) {
-      resolve();
-    }).createTables(elementsArray, lang);
-  });
+      
+      var testelements = getElementsArray();
+      console.log(JSON.stringify(testelements));
+
+
+          // Create the table via Code.gs
+          var lang = getLang();
+          google.script.run.withSuccessHandler(function(statusLog) {
+            resolve();
+          }).createTables(elementsArray, lang, platformToServe);
+        });
+  }
 }   
 
 function getCategory(tag) {
@@ -543,6 +1024,48 @@ function getCategory(tag) {
 
 function getElementName(tag) {
   return tag.trim(); // Remove leading and trailing whitespace
+}
+
+//Google Script Run function to simplify reading
+// for first field, put "functionName" in ""
+// for second field, input the var to use or null
+// for third field, input true if there's a promise, skip if no promise
+function GoogleScriptRun(functionName, varToPass = null, usePromise = false) {
+  if (usePromise) {
+    return new Promise((resolve, reject) => {
+      if (varToPass !== null) {
+        google.script.run
+        .withSuccessHandler(response => resolve(response))
+        .withFailureHandler(error => reject(error))
+        [functionName](varToPass);
+      } else {
+        google.script.run
+        .withSuccessHandler(response => resolve(response))
+        .withFailureHandler(error => reject(error))
+        [functionName]();
+      }
+    });
+  } 
+
+  if (varToPass !== null) {
+    google.script.run
+    .withSuccessHandler(response => {
+      // Do something with the response if needed
+    })
+    .withFailureHandler(error => {
+      // Handle error if needed
+    })
+    [functionName](varToPass);
+  } else {
+    google.script.run
+    .withSuccessHandler(response => {
+      // Do something with the response if needed
+    })
+    .withFailureHandler(error => {
+      // Handle error if needed
+    })
+    [functionName]();
+  }
 }
 
 function updateStoredFinalObjectResult() {
@@ -578,7 +1101,7 @@ function processTags(tags) {
   table.id = 'mainTable';
 
   // Iterate over each tag and create table rows
-  tags.forEach(function (tag) {
+  function handleTag(tag) {
     // Create unique IDs for buttons and tagsWithDelimitersCell
     var buttonId = 'button_' + tag.replace(/\s+/g, '-').replace('{', '').replace('}', '');
     var voteButtonId = 'voteButton_' + tag.replace(/\s+/g, '-').replace('{', '').replace('}', '');
@@ -843,7 +1366,20 @@ function processTags(tags) {
                 })
               }
           }
-      });
+      })
+      tagList.appendChild(table);
+    }
+
+    tags.forEach(function (tagEntry) {
+      // Check if it's from Google (object format) or other platforms (string format)
+      if (typeof tagEntry === 'string') {
+        handleTag(tagEntry);
+      } else if (typeof tagEntry === 'object' && tagEntry.name && tagEntry.count) {
+        for (let i = 0; i < tagEntry.count; i++) {
+          handleTag(tagEntry.name);
+        }
+      }
+    });
     if (processTagsAddedListeners === 0) {
       processTagsAddedListeners = 1;
       const handleUpdateButtonClick = document.getElementById("update");
@@ -856,6 +1392,7 @@ function processTags(tags) {
             finalObjectResult = {};
             //console.log("this ran once when adding listeners to the updatebutton")
             finalObjectResult = await updateStoredFinalObjectResult();
+            console.log("finalObjectResult: " + JSON.stringify(finalObjectResult));
             await updateDocumentPromise(finalObjectResult);
           } catch (error) {
             console.error('An error occurred:', error);
@@ -915,157 +1452,12 @@ function processTags(tags) {
           })
         }
     }
-  });
+  };
 
   // Append the table to the tag list element
-  tagList.appendChild(table);
+  
 
   //end of table generating code
-   
-
-    //end of updatedocument
-    // function "bidon" to isolate design phase -- remove "function bidon() {} to enable design phase"
-  //   function bidon() {
-  //   //create elements for design phase
-    
-  //   //Change gpt-request-status
-  //   var topContainer = document.getElementById("topContainer");
-  //   topContainer.setAttribute("gpt-request-status", "generate-design-tips");
-
-  //   // Get the text content of the required divs
-  //   try {
-  //     heroBannerTitle = document.getElementById("HeroBanner-Title").textContent.trim();
-  //     heroBannerSubtitle = document.getElementById("HeroBanner-Text").textContent.trim();
-  //     heroBannerCTA = document.getElementById("HeroBanner-CTA").textContent.trim();
-
-  //     // If an error occurs within the try block, the catch block will handle it
-  //   } catch (error) {
-  //     // Code to handle the error
-  //     console.error('An error occurred:', error.message);
-  //     var statusMessage = document.getElementById("statusMessage");
-  //     // Set the message to indicate the running state
-  //     statusMessage.textContent = "Make sure your tags include : 'hero banner title', 'hero banner text' and 'hero banner cta'";
-  //   }
-
-  //   // Clear the content of div with id="tableContainer"
-  //   var tableContainer = document.getElementById("tableContainer");
-  //   tableContainer.innerHTML = "";
-
-  //   // Generate a new table with 4 rows
-  //   for (var i = 1; i <= designOptions; i++) {
-  //   // Create a new table for each design option
-  //   var newTable = document.createElement("table");
-  //   newTable.id = 'designTable' + i;
-
-  //   // Create the first row with two divs
-  //   var row1 = document.createElement("tr");
-
-  //   var cell1 = document.createElement("td");
-  //   var div1 = document.createElement("div");
-  //   div1.textContent = "Option " + i;
-  //   // Apply CSS styles to div1
-
-  //   var cell2 = document.createElement("td");
-  //   var div2 = document.createElement("div");
-
-  //   // Create a button element
-  //   var deleteButton = document.createElement("button");
-  //   deleteButton.id = 'deleteDesignIdea' + i;
-  //   deleteButton.innerHTML = "&#128465"; // Unicode character for trash can
-  //   deleteButton.style.fontSize = "12px"; // Set the font size to make the button small
-
-  //   // Apply CSS styles to the button
-  //   //deleteButton.style.boxShadow = "0 0 5px rgba(0, 0, 0, 0.3)";
-  //   deleteButton.style.transition = "box-shadow 0.3s ease-in-out";
-
-  //   // Add event listeners for hover and click animations
-  //   deleteButton.addEventListener("mouseover", function() {
-  //     this.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.5)";
-  //   });
-
-  //   deleteButton.addEventListener("mouseout", function() {
-  //     this.style.boxShadow = "0 0 5px rgba(0, 0, 0, 0.3)";
-  //   });
-
-  //   deleteButton.addEventListener("click", createDeleteTableHandler(i)); // Call a separate function to handle the deletion
-
-  //   // Append the button to the second div
-  //   div2.appendChild(deleteButton);
-
-  //   cell1.appendChild(div1);
-  //   cell2.appendChild(div2);
-  //   row1.appendChild(cell1);
-  //   row1.appendChild(cell2);
-
-  //   newTable.appendChild(row1);
-  //   // Create the second row with the response from the API call
-  //   var row2 = document.createElement("tr");
-  //   var cell3 = document.createElement("td");
-  //   cell3.colSpan = 2;
-  //   cell3.id = "cell3_option" + i;
-  //   cell3.className = "cell3_option";
-  //   //var response = getGPTDesignResponse(lang, heroBannerTitle, heroBannerText, heroBannerCTA, subject, info);
-  //   //cell3.textContent = "Response: " + JSON.stringify(response.result);
-    
-  //   row2.appendChild(cell3);
-  //   newTable.appendChild(row2);
-
-  //   // Append the new table to the table container
-  //   var tableContainer = document.getElementById("tableContainer");
-  //   tableContainer.appendChild(newTable);
-
-  // }
-  //   var addButton = document.createElement("button");
-  //   addButton.id = "addDesignTips";
-  //   addButton.className = "option-button";
-  //   addButton.textContent = "Add Design Tip";
-
-  //   tableContainer.appendChild(addButton);
- 
-
-
-  //  // Find the textarea with class "large-input"
-  //  var textarea = document.querySelector(".large-input");
-  //   textarea.value = "Focus on the sale"; // Change the text
-
-  //   //Scroll back to the top for best UX
-  //   document.documentElement.scrollTop = 0; // For modern browsers
-  //   document.body.scrollTop = 0; // For older browsers
-
-  //   // Add an animation to the textarea
-  //   textarea.classList.add("textarea-animation");
-  //   setTimeout(function() {
-  //     textarea.classList.remove("textarea-animation");
-  //   }, 1000);
-
-  //   const handleAddDesignTipsButtonClick = document.getElementById("addDesignTips");
-
-  //   handleAddDesignTipsButtonClick.addEventListener("click", function() {
-  //   var designTips = document.getElementsByClassName("cell3_option");
-  //   var designTipsText = [];
-
-  //   for (var i = 0; i < designTips.length; i++) {
-  //     var designTip = designTips[i];
-  //     var textContent = designTip.textContent.trim(); // Trim the text content
-  //     designTipsText.push(textContent);
-  //   }
-
-  //   console.log(designTipsText);
-  //   google.script.run.addDesignTips(designTipsText);
-  // });
-  
-  // }
-  // //end of function bidon()
-
-
-
-    
-    //create elements for design phase
-    
-        //Change gpt-request-status
-    //add the code to change and prepare design stuff, see same script a bit above
-  }
-
 
 //END OF PROCESS TAG FUNCTION
 //----------------------------------------------------------------------------------------------------------------
@@ -1183,61 +1575,109 @@ function updateTextContentCells(response, optionsCount) {
 
 // extract the traits from a specific client from MongoDB
 function extractTraits(response) {
-  if (response && response.document && response.document.traits) {
-    const traits = response.document.traits;
-    const traitArray = traits.split(',').map(trait => trait.trim());
+  if (platformToServe === "Email") {
+    if (response && response.document && response.document.traits) {
+      const traits = response.document.traits;
+      const traitArray = traits.split(',').map(trait => trait.trim());
+      
+      const clientTraits = {};
+      for (var i = 0; i < traitArray.length; i++) {
+        const key = 'trait' + (i + 1);
+        clientTraits[key] = i < traitArray.length ? traitArray[i] : '';
+      }
     
-    const clientTraits = {};
-    for (var i = 0; i < traitArray.length; i++) {
-      const key = 'trait' + (i + 1);
-      clientTraits[key] = i < traitArray.length ? traitArray[i] : '';
+      return clientTraits;
+    } else {
+      return {};
     }
+  } else if (platformToServe === "Facebook") {
+    if (response && response.document && response.document.traits_fb) {
+      const traits = response.document.traits_fb;
+      const traitArray = traits.split(',').map(trait => trait.trim());
+      
+      const clientTraits = {};
+      for (var i = 0; i < traitArray.length; i++) {
+        const key = 'trait' + (i + 1);
+        clientTraits[key] = i < traitArray.length ? traitArray[i] : '';
+      }
+    
+      return clientTraits;
+    }
+  } else if (platformToServe === "Google") {
+    if (response.document.traits_google) {
+
+      const traits = response.document.traits_google;
+      const traitArray = traits.split(',').map(trait => trait.trim());
+      console.log("i see google and the traits are: " + traits)
+      const clientTraits = {};
+      for (var i = 0; i < traitArray.length; i++) {
+        const key = 'trait' + (i + 1);
+        clientTraits[key] = i < traitArray.length ? traitArray[i] : '';
+      }
+    
+      return clientTraits;
+    }
+  }
   
-    return clientTraits;
-  } else {
-    return {};
+  return {};
+}
+
+function getUpvotesAndDownvotes() {
+  if (platformToServe === "Email") {
+    elementCopyExamples = {};
+    let clientMongoDocumentUpvotes = clientMongoDocument.document.upvotes;
+    let clientMongoDocumentDownvotes = clientMongoDocument.document.downvotes;
+
+    for (let element of promptElements) {
+      if (clientMongoDocumentUpvotes && clientMongoDocumentUpvotes.hasOwnProperty(element + "_upvotes")) {
+        let examplesArray = clientMongoDocumentUpvotes[element + "_upvotes"];
+          let lastFiveExamples = examplesArray.slice(-numberOfExamples);
+          elementCopyExamples[element + "_upvotes"] = lastFiveExamples;
+      }
+    }
+    for (let element of promptElements) {
+      if (clientMongoDocumentDownvotes && clientMongoDocumentDownvotes.hasOwnProperty(element + "_downvotes")) {
+          let examplesArray = clientMongoDocumentDownvotes[element + "_downvotes"];
+          let lastFiveExamples = examplesArray.slice(-numberOfExamples);
+          elementCopyExamples[element + "_downvotes"] = lastFiveExamples;
+
+      }
+    }
+  } else if ((platformToServe === "Facebook") || (platformToServe === "Google")) {
+    elementCopyExamples = {};
+    let clientMongoDocumentUpvotes = clientMongoDocument.document.upvotes;
+    let clientMongoDocumentDownvotes = clientMongoDocument.document.downvotes;
+
+    for (let element of promptElements) {
+      if (clientMongoDocumentUpvotes && clientMongoDocumentUpvotes.hasOwnProperty(element + "_upvotes")) {
+        let examplesArray = clientMongoDocumentUpvotes[element + "_upvotes"];
+          let lastFiveExamples = examplesArray.slice(-numberOfExamples);
+          elementCopyExamples[element + "_upvotes"] = lastFiveExamples;         
+      }
+    }
+    for (let element of promptElements) {
+      if (clientMongoDocumentDownvotes && clientMongoDocumentDownvotes.hasOwnProperty(element + "_downvotes")) {
+          let examplesArray = clientMongoDocumentDownvotes[element + "_downvotes"];
+          let lastFiveExamples = examplesArray.slice(-numberOfExamples);
+          elementCopyExamples[element + "_downvotes"] = lastFiveExamples;
+      }
+    }
   }
 }
 
-// function extractUpvotes(response) {
-//   if (response && response.document && response.document.upvotes) {
-//     var upvotesObject = response.document.upvotes;
-//     return upvotesObject;
-//   } else {
-//     return null; // or some default value
-//   }
-// }
-
-// function extractTraits(response) {
-//   if (response && response.document && response.document.traits) {
-//     const traits = response.document.traits;
-//     const traitArray = traits.split(',').map(trait => trait.trim());
-    
-//     const clientTraits = {};
-//     for (var i = 0; i < traitArray.length; i++) {
-//       const key = 'trait' + (i + 1);
-//       clientTraits[key] = i < traitArray.length ? traitArray[i] : '';
-//     }
-  
-//     return clientTraits;
-//   } else {
-//     return {};
-//   }
-// }
-
-function combineTraits(preferenceObject, clientTraits2) {
+function combineTraits(preferenceObject, clientTraits2, platformToServe) {
   // Get the first key name from the apiResponse object
   let preferenceObjectParsed = JSON.parse(preferenceObject);
-
+  
+  //console.log("preferenceObjectParsed: " + JSON.stringify(preferenceObjectParsed));
+  
   let firstKey = Object.keys(preferenceObjectParsed)[0];
   let firstKeyValue = preferenceObjectParsed[firstKey];
-  //console.log(firstKey);
-  //console.log(firstKeyValue);
+
   traitsArray = [];
   for(let i = 0; i < firstKeyValue.length; i++) {
     traitsArray.push(firstKeyValue[i].preference);
   }
-
   for (let key in clientTraits2) {
     if (clientTraits2.hasOwnProperty(key)) {
       // Push each value into the traitsArray
@@ -1299,9 +1739,11 @@ function combineTraits(preferenceObject, clientTraits2) {
 
 
 function getSubject() {
-  var subjectInput = document.getElementById("subject");
-  var prompt = subjectInput.value;
-  return prompt;
+  if (platformToServe !== "Google"){
+    var subjectInput = document.getElementById("subject");
+    var prompt = subjectInput.value;
+    return prompt;
+  }
 }
 
 function getLang() {
@@ -1314,6 +1756,19 @@ function getInfo() {
   var infoInput = document.getElementById("info");
   var info = infoInput.value;
   return info;
+}
+
+function getTheme() {
+  var themeInput = document.getElementById("themeDropdown");
+  var theme = themeInput.value;
+  console.log("THEME: " + theme)
+  return theme;
+}
+
+function getClient() {
+  var clientInput = document.getElementById("clients");
+  var client = clientInput.value;
+  return client;
 }
 
 function getPromptElements() {
@@ -1371,176 +1826,347 @@ const gptRequest = document.getElementById("gptRequest");
 gptRequest.addEventListener("submit", (e) => {
   e.preventDefault();
 
-
-  //   var promptElements = [];
-  //   var searchPattern = /\{([^}]+)\}/g;
-  //   var inputs = document.querySelectorAll("#mainTable td.text-content-cell");
-
-  //      inputs.forEach(function (input) {
-  //     var tagText = input.textContent;
-  //     //console.log("Tag Text:", tagText); // Log the tag text for debugging
-
-  //     var matches = tagText.match(searchPattern);
-  //     //console.log("Matches:", matches); // Log the matches for debugging
-
-  //     if (matches) {
-  //       for (var i = 0; i < matches.length; i++) {
-  //         var tag = matches[i].replace('{', '').replace('}', '');
-  //         promptElements.push(tag);
-  //       }
-  //     }
-  //   });
-  //   return promptElements;
-  // }
-
-  var prompt = getSubject();
+  if (platformToServe !== "Google") {
+    var prompt = getSubject();
+    var subject = getSubject();
+  }
   var lang = getLang();
   var info = getInfo();
-  //console.log(getPromptElements)
   promptElements = getPromptElements();
-  var subject = getSubject();
+  if (platformToServe === "Facebook") {
+    var theme = getTheme();
+  }
+  var client = getClient();
+  var themeExamples = getThemeExamples(theme);
+   //WORK PIPELINE 2 OCT : Setup google : get Ad Type, main keywords, USP, campaign objective
 
-  // Make the API call
-  var statusMessage = document.getElementById("statusMessage");
-  // Set the message to indicate the running state
-  statusMessage.textContent = "Talking to ChatGPT...";
-  //console.log("storedPromptElements: " + storedPromptElements);
-  //console.log("ok prompt: " + prompt + " and ok prompt elements: " + promptElements) + "and ok lang: " + lang;
-
-  new Promise((resolve, reject) => {
-  // Add your condition based on gpt-request-status here
-  var topContainer = document.getElementById("topContainer");
-  var gptRequestStatus = topContainer.getAttribute("gpt-request-status");
-
-
-  if (gptRequestStatus === "generate-copy") {
-    clientTraits = "";
+  setStatusMessage("Talking to ChatGPT...")
   
-    // Find the right client traits
-    var clientName = document.getElementById("clients").value;
-    function findOneDataPromise(clientName) {
-      return new Promise((resolve, reject) => {
-        google.script.run
-          .withSuccessHandler(response => {
-            resolve(response);
-          })
-          .withFailureHandler(error => {
-            reject(error);
-          })
-          .findOneDataFromMongoDB(clientName);
-      });
-    }
-    var foundOneData = findOneDataPromise(clientName)
-    .then(response => {
-      //console.log("Success949:", response);
-      return response; // Return the response to use it further if needed
-    })
-    .then(foundOneData => {
-      clientTraits = extractTraits(foundOneData);
-      clientMongoDocument = foundOneData;
-      return clientTraits;
-    }).then(clientTraits => {
-      elementCopyExamples = {};
-      let clientMongoDocumentUpvotes = clientMongoDocument.document.upvotes;
-      let clientMongoDocumentDownvotes = clientMongoDocument.document.downvotes;
+  // For Email
+  if (platformToServe === "Email") {
+    new Promise((resolve, reject) => {
+    // Add your condition based on gpt-request-status here
+    var topContainer = document.getElementById("topContainer");
+    var gptRequestStatus = topContainer.getAttribute("gpt-request-status");
 
-      for (let element of promptElements) {
-        if (clientMongoDocumentUpvotes && clientMongoDocumentUpvotes.hasOwnProperty(element + "_upvotes")) {
-            let examplesArray = clientMongoDocumentUpvotes[element + "_upvotes"];
-            let lastFiveExamples = examplesArray.slice(-numberOfExamples);
-            elementCopyExamples[element + "_upvotes"] = lastFiveExamples;
-        }
-      }
-
-      for (let element of promptElements) {
-        if (clientMongoDocumentDownvotes && clientMongoDocumentDownvotes.hasOwnProperty(element + "_downvotes")) {
-            let examplesArray = clientMongoDocumentDownvotes[element + "_downvotes"];
-            let lastFiveExamples = examplesArray.slice(-numberOfExamples);
-            elementCopyExamples[element + "_downvotes"] = lastFiveExamples;
-        }
-      }  
-    }).then(result => {
-      //console.log(clientTraits);    
-    // Run getGPTResponse
-    google.script.run
-    .withSuccessHandler((response) => {
-      //console.log("Success:", response.result);  // Only logs the 'result' part of the response
-      console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
-      globalApiResponse = response.result;  // Only use the 'result' part of the response
-      updateStoredFinalObjectResult()
-      resolve(response.result);  // Only resolve the 'result' part of the response
-    })
-    .withFailureHandler((error) => {
-      console.log("Error:", error);
-      reject(error);
-    })
-    .getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, clientTraits, elementCopyExamples, numberOfExamples);
-    //get date and time of gpt request    
-    var timeStamp = getDateAndTime();
-    //make the api call
-    google.script.run
-    .withSuccessHandler((response) => {
-      //console.log("statusLog:", response);
-    })
-    .logUsageOnServer(prompt, timeStamp, version, lang, info, requestedCorrections, clientName);
-  });
-  } else {
-    // Run getGPTDesignResponse
-    google.script.run
+    if (gptRequestStatus === "generate-copy") {
+      clientTraits = "";
+      // Find the right client traits
+      var foundOneData = GoogleScriptRun("findOneDataFromMongoDB", client, true)
+      .then(response => {
+        //console.log("Success949:", response);
+        return response; // Return the response to use it further if needed
+      })
+      .then(foundOneData => {
+        clientTraits = extractTraits(foundOneData);
+        clientMongoDocument = foundOneData;
+        return clientTraits;
+      }).then(clientTraits => {
+        getUpvotesAndDownvotes()
+      }).then(result => {
+        //console.log(clientTraits);    
+      // Run getGPTResponse
+      google.script.run
       .withSuccessHandler((response) => {
-        //console.log("Success:", response.result);
-        resolve(response.result);
+        //console.log("Success:", response.result);  // Only logs the 'result' part of the response
+        console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
+        globalApiResponse = response.result;  // Only use the 'result' part of the response
+        updateStoredFinalObjectResult()
+        resolve(response.result);  // Only resolve the 'result' part of the response
       })
       .withFailureHandler((error) => {
         console.log("Error:", error);
         reject(error);
       })
-      .getGPTDesignResponse(lang, heroBannerTitle, heroBannerText, heroBannerCTA, subject, info);
-  }
-})
-  .then((result) => {
-    statusMessage.textContent = "Translating with ChatGPT...";
-    if (lang === "English") {
-      // Skip requestTranslation and continue to the next step
-      return Promise.resolve(result);
+      .getGPTResponseSuper(prompt, promptElements, optionsTotal, lang, info, clientTraits, elementCopyExamples, numberOfExamples);
+      //get date and time of gpt request    
+      var timeStamp = getDateAndTime();
+      //make the api call
+      google.script.run
+      .withSuccessHandler((response) => {
+        //console.log("statusLog:", response);
+      })
+      .logUsageOnServer(prompt, timeStamp, version, lang, info, requestedCorrections, clientName);
+    });
     } else {
-      // Proceed with requestTranslation
+      // Run getGPTDesignResponse
+      google.script.run
+        .withSuccessHandler((response) => {
+          //console.log("Success:", response.result);
+          resolve(response.result);
+        })
+        .withFailureHandler((error) => {
+          console.log("Error:", error);
+          reject(error);
+        })
+        .getGPTDesignResponse(lang, heroBannerTitle, heroBannerText, heroBannerCTA, subject, info);
+    }
+  })
+    .then((result) => {
+      statusMessage.textContent = "Translating with ChatGPT...";
+      if (lang === "English") {
+        // Skip requestTranslation and continue to the next step
+        return Promise.resolve(result);
+      } else {
+        // Proceed with requestTranslation
+        return new Promise((resolve, reject) => {
+          //console.log("Success:", result);
+          google.script.run
+            .withSuccessHandler((response) => {
+              //console.log("Success:", response.result);
+              //console.log("Success:", response.statusLog);
+              globalApiResponse = response.result;
+              resolve(response.result);
+            })
+            .withFailureHandler((error) => {
+              console.log("Error:", error);
+              reject(error);
+            })
+            .requestTranslation1(result, lang, platformToServe);
+        });
+      }
+    })
+    .then((result) => {
+      statusMessage.textContent = "Negociation with Open AI servers...";
+      // Handle the API response
       return new Promise((resolve, reject) => {
-        //console.log("Success:", result);
+        updateTextContentCells(result, optionsCount);
+        resolve(result);
+      });
+    })
+    .then((result) => {
+      statusMessage.textContent = "Script completed.";
+      // Process each tag and call showOptionsOnHover
+      promptElements.forEach((tag) => {
+        showOptionsOnHover(tag, optionsCount);
+      });
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      statusMessage.textContent = "Script encountered an error.";
+    });
+
+  // For Facebook
+  } else if (platformToServe === "Facebook") {
+    new Promise((resolve, reject) => {
+      // Add your condition based on gpt-request-status here
+      var topContainer = document.getElementById("topContainer");
+      var gptRequestStatus = topContainer.getAttribute("gpt-request-status");
+  
+      if (gptRequestStatus === "generate-copy") {
+        clientTraits = "";
+        // Find the right client traits
+        var foundOneData = GoogleScriptRun("findOneDataFromMongoDB", client, true)
+        .then(response => {
+          //console.log("Success949:", response);
+          return response; // Return the response to use it further if needed
+        })
+        .then(foundOneData => {
+          // WORK PIPELINE 30 AUG DONE : Make sure extract traits grab the Facebook traits
+          clientTraits = extractTraits(foundOneData);
+          clientMongoDocument = foundOneData;
+          return clientTraits;
+        }).then(clientTraits => {
+          // WORK PIPELINE 30 AUG DONE : Create upvotes for FB and grab FB's ones
+          console.log("prompt elmements : " + promptElements)
+          getUpvotesAndDownvotes()
+        }).then(result => {
+        // Run getGPTResponse
+        google.script.run
+        .withSuccessHandler((response) => {
+          //console.log("Success:", response.result);  // Only logs the 'result' part of the response
+          console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
+          globalApiResponse = response.result;  // Only use the 'result' part of the response
+          updateStoredFinalObjectResult()
+          resolve(response.result);  // Only resolve the 'result' part of the response
+        })
+        .withFailureHandler((error) => {
+          console.log("Error:", error);
+          reject(error);
+        })
+        // WORK PIPELINE 30 AUG DONE : Add theme, correct traits, copy examples, etc.
+        .getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info, clientTraits, elementCopyExamples, numberOfExamples, theme, themeExamples);
+        //get date and time of gpt request    
+        var timeStamp = getDateAndTime();
+        //make the api call
+        google.script.run
+        .withSuccessHandler((response) => {
+          //console.log("statusLog:", response);
+        })
+        // WORK PIPELINE 30 AUG DONE: Add the facebook stuff to log
+        .logUsageOnServer(prompt, timeStamp, version, lang, info, requestedCorrections, clientName);
+      });
+      } else {
+        // Run getGPTDesignResponse
         google.script.run
           .withSuccessHandler((response) => {
             //console.log("Success:", response.result);
-            //console.log("Success:", response.statusLog);
-            globalApiResponse = response.result;
             resolve(response.result);
           })
           .withFailureHandler((error) => {
             console.log("Error:", error);
             reject(error);
           })
-          .requestTranslation1(result, lang);
+          .getGPTDesignResponse(lang, heroBannerTitle, heroBannerText, heroBannerCTA, subject, info);
+      }
+    })
+      .then((result) => {
+        statusMessage.textContent = "Translating with ChatGPT...";
+        if (lang === "English") {
+          // Skip requestTranslation and continue to the next step
+          return Promise.resolve(result);
+        } else {
+          // Proceed with requestTranslation
+          return new Promise((resolve, reject) => {
+            //console.log("Success:", result);
+            google.script.run
+              .withSuccessHandler((response) => {
+                //console.log("Success:", response.result);
+                //console.log("Success:", response.statusLog);
+                globalApiResponse = response.result;
+                resolve(response.result);
+              })
+              .withFailureHandler((error) => {
+                console.log("Error:", error);
+                reject(error);
+              })
+              // WORK PIPELINE 30 AUG DONE : Make new function for FB... ??
+              .requestTranslation1(result, lang, platformToServe);
+          });
+        }
+      })
+      .then((result) => {
+        statusMessage.textContent = "Negociation with Open AI servers...";
+        // Handle the API response
+        return new Promise((resolve, reject) => {
+          // WORK PIPELINE 30 AUG DONE : Fix function updatetext for FB
+          updateTextContentCells(result, optionsCount);
+          resolve(result);
+        });
+      })
+      .then((result) => {
+        statusMessage.textContent = "Script completed.";
+        // Process each tag and call showOptionsOnHover
+        promptElements.forEach((tag) => {
+          showOptionsOnHover(tag, optionsCount);
+        });
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        statusMessage.textContent = "Script encountered an error.";
       });
-    }
-  })
-  .then((result) => {
-    statusMessage.textContent = "Negociation with Open AI servers...";
-    // Handle the API response
-    return new Promise((resolve, reject) => {
-      updateTextContentCells(result, optionsCount);
-      resolve(result);
-    });
-  })
-  .then((result) => {
-    statusMessage.textContent = "Script completed.";
-    // Process each tag and call showOptionsOnHover
-    promptElements.forEach((tag) => {
-      showOptionsOnHover(tag, optionsCount);
-    });
-  })
-  .catch((error) => {
-    console.error("Error:", error);
-    statusMessage.textContent = "Script encountered an error.";
-  });
+      //WORK PIPELINE 2 OCT : add else if for google
+  } else if (platformToServe === "Google") {
+
+    new Promise((resolve, reject) => {
+      // Add your condition based on gpt-request-status here
+      var topContainer = document.getElementById("topContainer");
+      var gptRequestStatus = topContainer.getAttribute("gpt-request-status");
+  
+      if (gptRequestStatus === "generate-copy") {
+        clientTraits = "";
+        // Find the right client traits
+        var foundOneData = GoogleScriptRun("findOneDataFromMongoDB", client, true)
+        .then(response => {
+          //console.log("Success949:", response);
+          return response; // Return the response to use it further if needed
+        })
+        .then(foundOneData => {
+          clientTraits = extractTraits(foundOneData);
+          clientMongoDocument = foundOneData;
+          return clientTraits;
+        }).then(clientTraits => {
+          console.log("prompt elmements : " + promptElements)
+          getUpvotesAndDownvotes()
+        }).then(result => {
+        // Run getGPTResponse
+        google.script.run
+        .withSuccessHandler((response) => {
+          //console.log("Success:", response.result);  // Only logs the 'result' part of the response
+          console.log("statusLog:", response.statusLog); // Logs the statusLog for debugging
+          globalApiResponse = response.result;  // Only use the 'result' part of the response
+          updateStoredFinalObjectResult()
+          resolve(response.result);  // Only resolve the 'result' part of the response
+        })
+        .withFailureHandler((error) => {
+          console.log("Error:", error);
+          reject(error);
+        })
+        // WORK PIPELINE 30 AUG DONE : Add theme, correct traits, copy examples, etc.
+        // rendu ici 23 oct 9.26 PM
+        .getGPTResponseSuper_fb(prompt, promptElements, optionsTotal, lang, info, clientTraits, elementCopyExamples, numberOfExamples, theme, themeExamples);
+        //get date and time of gpt request    
+        var timeStamp = getDateAndTime();
+        //make the api call
+        google.script.run
+        .withSuccessHandler((response) => {
+          //console.log("statusLog:", response);
+        })
+        // WORK PIPELINE 30 AUG DONE: Add the facebook stuff to log
+        .logUsageOnServer(prompt, timeStamp, version, lang, info, requestedCorrections, clientName);
+      });
+      } else {
+        // Run getGPTDesignResponse
+        google.script.run
+          .withSuccessHandler((response) => {
+            //console.log("Success:", response.result);
+            resolve(response.result);
+          })
+          .withFailureHandler((error) => {
+            console.log("Error:", error);
+            reject(error);
+          })
+          .getGPTDesignResponse(lang, heroBannerTitle, heroBannerText, heroBannerCTA, subject, info);
+      }
+    })
+      .then((result) => {
+        statusMessage.textContent = "Translating with ChatGPT...";
+        if (lang === "English") {
+          // Skip requestTranslation and continue to the next step
+          return Promise.resolve(result);
+        } else {
+          // Proceed with requestTranslation
+          return new Promise((resolve, reject) => {
+            //console.log("Success:", result);
+            google.script.run
+              .withSuccessHandler((response) => {
+                //console.log("Success:", response.result);
+                //console.log("Success:", response.statusLog);
+                globalApiResponse = response.result;
+                resolve(response.result);
+              })
+              .withFailureHandler((error) => {
+                console.log("Error:", error);
+                reject(error);
+              })
+              // WORK PIPELINE 30 AUG DONE : Make new function for FB... ??
+              .requestTranslation1(result, lang, platformToServe);
+          });
+        }
+      })
+      .then((result) => {
+        statusMessage.textContent = "Negociation with Open AI servers...";
+        // Handle the API response
+        return new Promise((resolve, reject) => {
+          // WORK PIPELINE 30 AUG DONE : Fix function updatetext for FB
+          updateTextContentCells(result, optionsCount);
+          resolve(result);
+        });
+      })
+      .then((result) => {
+        statusMessage.textContent = "Script completed.";
+        // Process each tag and call showOptionsOnHover
+        promptElements.forEach((tag) => {
+          showOptionsOnHover(tag, optionsCount);
+        });
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        statusMessage.textContent = "Script encountered an error.";
+      });
+  }
+
+
 
 });
 
@@ -1573,13 +2199,6 @@ function createDeleteTableHandler(index) {
     }
   };
 }
-//-------
-
-window.onload = function() {
-  // Function to move an element button between sections
-  //aaaa CODE COUCOU
-
-};
 
 var inputFieldOtherElement = document.getElementById("otherElementInput");
 
@@ -1609,138 +2228,379 @@ inputFieldTraits.addEventListener("keypress", function(event) {
 });
 
 
+///Menu navigation code - email
 
-document.getElementById("goNextButton").addEventListener('click', function() {
-  if ((currentSection < totalSections) && (currentSection !== 4)) {
-    //Check if client is selected
+function initNavSystemEmail() {
+  document.getElementById("goNextButton").addEventListener('click', function() {
+    if ((currentSection < totalSections) && (currentSection !== 4)) {
+      //Check if client is selected
+      
+      var clientName = document.getElementById("clients").value;
+      //console.log(clientName)
+      if ((currentSection === 1) && ((clientName === "INVALID") || (clientName ===""))){
+        var statusMessage = document.getElementById("statusMessage");
+        statusMessage.textContent = "Please select a client or create a new one first";
+
+      } else {
+        //if client is selected, display next step
+      document.getElementById('step' + currentSection).style.display = 'none';
+      var fixedStepNumberForTooltips = currentSection + 1;
+      var getAllTooltipOfNextStep = document.getElementsByClassName("tooltipStep"+fixedStepNumberForTooltips)
+      for (var i = 0; i < getAllTooltipOfNextStep.length; i++) {
+        getAllTooltipOfNextStep[i].style.display = "block";
+      }
     
-    var clientName = document.getElementById("clients").value;
-    //console.log(clientName)
-    if ((currentSection === 1) && ((clientName === "INVALID") || (clientName ===""))){
-      var statusMessage = document.getElementById("statusMessage");
-      statusMessage.textContent = "Please select a client or create a new one first";
+      var getAllTooltipOfCurrentStep = document.getElementsByClassName("tooltipStep"+currentSection)
+      for (var i = 0; i < getAllTooltipOfCurrentStep.length; i++) {
+        getAllTooltipOfCurrentStep[i].style.display = "none";
+      }
+      currentSection++;
 
-    } else {
-      //if client is selected, display next step
-    document.getElementById('step' + currentSection).style.display = 'none';
-    var fixedStepNumberForTooltips = currentSection + 1;
-    var getAllTooltipOfNextStep = document.getElementsByClassName("tooltipStep"+fixedStepNumberForTooltips)
-    for (var i = 0; i < getAllTooltipOfNextStep.length; i++) {
-      getAllTooltipOfNextStep[i].style.display = "block";
-    }
-  
-    var getAllTooltipOfCurrentStep = document.getElementsByClassName("tooltipStep"+currentSection)
-    for (var i = 0; i < getAllTooltipOfCurrentStep.length; i++) {
-      getAllTooltipOfCurrentStep[i].style.display = "none";
-    }
-    currentSection++;
+      if ((currentSection === 3) && (firstTimeStep3 === 0)) {
+        //show button refresh is first time step3
+        simulateQaButtonkButtonClick()
+        firstTimeStep3 = 1;
+        var qaButton = document.getElementById("qaButton");
+        qaButton.classList.remove("hideButton");
+        const checkCondition = () => {
+          var emailSubjectLineField = document.getElementById("Email-Subject-Line");
+            if (emailSubjectLineField.textContent !== "Email Subject Line") {
+            storedEmailSubject = emailSubjectLineField.textContent;
+            document.getElementById('step' + currentSection).style.display = 'block';
+          } else {
+          setTimeout(checkCondition, 500);  // Check again after a delay
+          }
+          };
+          checkCondition();
+      } else {
+        document.getElementById('step' + currentSection).style.display = 'block';
 
-    if ((currentSection === 3) && (firstTimeStep3 === 0)) {
-      //show button refresh is first time step3
-      simulateQaButtonkButtonClick()
-      firstTimeStep3 = 1;
-      var qaButton = document.getElementById("qaButton");
-      qaButton.classList.remove("hideButton");
-      const checkCondition = () => {
+      }
+    }
+      if (currentSection === totalSections) {
+        this.disabled = true;
+        this.style.backgroundColor = '#f1f1f1'; 
+      }
+      
+      if (currentSection > 1) {
+        document.getElementById('goBackButton').disabled = false;
+        document.getElementById('goBackButton').style.backgroundColor = '#3498db'; 
+      }
+    }
+    else if (currentSection === 4) {
+      var traits = document.getElementById("traits").value;
+      if (traits !== "") {
+        simulateGptMagicButtonClick()
+        document.getElementById('step' + currentSection).style.display = 'none';
+        currentSection--;
+            
+        const checkCondition = (retryCount = 0, maxRetries = 30) => {
         var emailSubjectLineField = document.getElementById("Email-Subject-Line");
-        if (emailSubjectLineField.textContent !== "Email Subject Line") {
+        
+        if (emailSubjectLineField.textContent !== storedEmailSubject) {
           storedEmailSubject = emailSubjectLineField.textContent;
           document.getElementById('step' + currentSection).style.display = 'block';
         } else {
-        setTimeout(checkCondition, 500);  // Check again after a delay
-        }
-        };
-        checkCondition();
-    } else {
-      document.getElementById('step' + currentSection).style.display = 'block';
 
+          if (retryCount < maxRetries) {
+            setTimeout(() => checkCondition(retryCount + 1), 500); // Check again after a delay
+          } else {
+            console.log("Max reached, displaying answers")
+            var statusMessage = document.getElementById("statusMessage");
+            statusMessage.textContent = "Max waiting delay reached, displaying copy";
+            storedEmailSubject = emailSubjectLineField.textContent;
+            document.getElementById('step' + currentSection).style.display = 'block';
+          }
+        }
+      };
+
+      checkCondition();
+        // document.getElementById('step' + currentSection).style.display = 'block';
+      } else {
+        var statusMessage = document.getElementById("statusMessage");
+        statusMessage.textContent = "Please input valid corrections";
+      }
     }
+  });
+
+  document.getElementById('goBackButton').addEventListener('click', function() {
+    if (currentSection > 1) {
+      //show tooltips for right steps
+      var fixedStepNumberForTooltips = currentSection - 1;
+      var getAllTooltipOfNextStep = document.getElementsByClassName("tooltipStep"+fixedStepNumberForTooltips)
+      for (var i = 0; i < getAllTooltipOfNextStep.length; i++) {
+        getAllTooltipOfNextStep[i].style.display = "block";
+      }
+    
+      var getAllTooltipOfCurrentStep = document.getElementsByClassName("tooltipStep"+currentSection)
+      for (var i = 0; i < getAllTooltipOfCurrentStep.length; i++) {
+        getAllTooltipOfCurrentStep[i].style.display = "none";
+      }
+      //show content for right steps
+      document.getElementById('step' + currentSection).style.display = 'none';
+      currentSection--;
+      document.getElementById('step' + currentSection).style.display = 'block';
+      goNextButton.innerText = "Next"
+      
+      if (currentSection === 1) {
+        this.disabled = true;
+        this.style.backgroundColor = '#f1f1f1'; 
+      }
+
+      if (currentSection < totalSections) {
+        document.getElementById('goNextButton').disabled = false;
+        document.getElementById('goNextButton').style.backgroundColor = '#3498db'; 
+      }
+    }
+  });
+}
+
+// navigation system - facebook
+
+function hideSectionAndTooltips(step) {
+  document.getElementById('step' + step).style.display = 'none';
+  let tooltips = document.getElementsByClassName("tooltipStep" + step);
+  for (let tooltip of tooltips) {
+    tooltip.style.display = "none";
   }
+}
+
+function showSectionAndTooltips(step) {
+  document.getElementById('step' + step).style.display = 'block';
+  let tooltips = document.getElementsByClassName("tooltipStep" + step);
+  for (let tooltip of tooltips) {
+    tooltip.style.display = "block";
+  }
+}
+
+function setStatusMessage(message) {
+  document.getElementById("statusMessage").textContent = message;
+}
+
+function initNavSystemFacebook() {
+  document.getElementById("goNextButton").addEventListener('click', function() {
+    if (currentSection >= totalSections) {
+      return;
+    }
+
+    switch (currentSection) {
+      //WORK PIPELINE 2 OCT : Long step, fix QA button to get good values and get good output for google
+      case 1:
+        let clientName = document.getElementById("clients").value;
+        let adTheme = document.getElementById("themeDropdown").value;
+        if (clientName === "INVALID" || clientName === "")  {
+          setStatusMessage("Please select a client or create a new one first");
+          return; // Exit the function early
+        } else if (adTheme === "NONE" || adTheme === "") {
+          setStatusMessage("Please select a theme to start");
+          return; // Exit the function early
+        }
+        hideSectionAndTooltips(currentSection);
+        if (firstTimeStep3 === 0) {
+          simulateQaButtonkButtonClick();
+          firstTimeStep3 = 1;
+          document.getElementById("qaButton").classList.remove("hideButton");
+          currentSection = 3;
+          checkConditionBeforeDisplayStep3();
+          break;
+        } else {
+          currentSection = 3;
+          showSectionAndTooltips(currentSection);
+          break;
+        }
+        break;
+      //generated copy to correction  
+      case 3:
+        hideSectionAndTooltips(currentSection);
+        currentSection++;
+        showSectionAndTooltips(currentSection);
+        break;
+      case 4:
+        let traits = document.getElementById("traits").value;
+        if (traits !== "") {
+          hideSectionAndTooltips(currentSection);
+          simulateGptMagicButtonClick();
+          currentSection--;
+          checkCondition();
+          break;
+        } else {
+          setStatusMessage("Please input valid corrections");
+          break;
+        }
+        
+        default:
+        // For all other cases (this is a safe guard, might not be necessary depending on your totalSections)
+        console.error("Invalid section!");
+        break;
+    }
+
+    // The rest of your general logic, like disabling buttons, can stay outside of the switch
     if (currentSection === totalSections) {
       this.disabled = true;
       this.style.backgroundColor = '#f1f1f1'; 
     }
-    
     if (currentSection > 1) {
       document.getElementById('goBackButton').disabled = false;
       document.getElementById('goBackButton').style.backgroundColor = '#3498db'; 
     }
-  }
-  else if (currentSection === 4) {
-    var traits = document.getElementById("traits").value;
-    if (traits !== "") {
-      simulateGptMagicButtonClick()
-      document.getElementById('step' + currentSection).style.display = 'none';
-      currentSection--;
-          
-      const checkCondition = (retryCount = 0, maxRetries = 30) => {
-      var emailSubjectLineField = document.getElementById("Email-Subject-Line");
-      //console.log("emailSubjectLineField: " + emailSubjectLineField.textContent);
-      //console.log("storedEmailSubject: " + storedEmailSubject);
-      
-      if (emailSubjectLineField.textContent !== storedEmailSubject) {
-        storedEmailSubject = emailSubjectLineField.textContent;
-        document.getElementById('step' + currentSection).style.display = 'block';
-      } else {
+  });
 
-        if (retryCount < maxRetries) {
-          setTimeout(() => checkCondition(retryCount + 1), 500); // Check again after a delay
-        } else {
-          console.log("Max reached, displaying answers")
-          var statusMessage = document.getElementById("statusMessage");
-          statusMessage.textContent = "Max waiting delay reached, displaying copy";
-          storedEmailSubject = emailSubjectLineField.textContent;
-          document.getElementById('step' + currentSection).style.display = 'block';
+  document.getElementById('goBackButton').addEventListener('click', function() {
+    switch (currentSection) {
+      //generate copy to subject
+      case 3:
+        hideSectionAndTooltips(currentSection);
+        currentSection = 1;
+        showSectionAndTooltips(currentSection);
+        document.getElementById('goBackButton').disabled = true;
+        document.getElementById('goBackButton').style.backgroundColor = '#f1f1f1'; 
+        break;
+      case 4:
+        hideSectionAndTooltips(currentSection);
+        currentSection--;
+        showSectionAndTooltips(currentSection);
+        break;
+    }
+  }
+)};
+ //WORK PIPELINE 2 OCT : Revise the google nav system
+function initNavSystemGoogle() {
+  document.getElementById("goNextButton").addEventListener('click', function() {
+    if (currentSection >= totalSections) {
+      return;
+    }
+
+    switch (currentSection) {
+      //subject to generate copy
+      case 1:
+        let clientName = document.getElementById("clients").value;
+        let adTheme = document.getElementById("themeDropdown").value;
+        if (clientName === "INVALID" || clientName === "")  {
+          setStatusMessage("Please select a client or create a new one first");
+          return; // Exit the function early
+        } else if (adTheme === "NONE" || adTheme === "") {
+          setStatusMessage("Please select a theme to start");
+          return; // Exit the function early
         }
-      }
-    };
+        hideSectionAndTooltips(currentSection);
+        currentSection++;
+        showSectionAndTooltips(currentSection);
+        break;
+        case 2:
+          //add logique for step 2->step3
+        if (firstTimeStep3 === 0) {
+          simulateQaButtonkButtonClick();
+          firstTimeStep3 = 1;
+          document.getElementById("qaButton").classList.remove("hideButton");
+          hideSectionAndTooltips(currentSection);
+          currentSection = 3;
+          checkConditionBeforeDisplayStep3Google();
+          break;
+        } else {
+          currentSection = 3;
+          showSectionAndTooltips(currentSection);
+          break;
+        }
+        break;
+      //generated copy to correction  
+      case 3:
+        
+        hideSectionAndTooltips(currentSection);
+        currentSection++;
+        showSectionAndTooltips(currentSection);
+        break;
+      case 4:
+        let traits = document.getElementById("traits").value;
+        if (traits !== "") {
+          hideSectionAndTooltips(currentSection);
+          simulateGptMagicButtonClick();
+          currentSection--;
+          //checkCondition();
+          break;
+        } else {
+          setStatusMessage("Please input valid corrections");
+          break;
+        }
+        
+        default:
+        // For all other cases (this is a safe guard, might not be necessary depending on your totalSections)
+        console.error("Invalid section!");
+        break;
+    }
 
-    checkCondition();
-      // document.getElementById('step' + currentSection).style.display = 'block';
-    } else {
-      var statusMessage = document.getElementById("statusMessage");
-      statusMessage.textContent = "Please input valid corrections";
-    }
-  }
-});
-
-document.getElementById('goBackButton').addEventListener('click', function() {
-  if (currentSection > 1) {
-    //show tooltips for right steps
-    var fixedStepNumberForTooltips = currentSection - 1;
-    var getAllTooltipOfNextStep = document.getElementsByClassName("tooltipStep"+fixedStepNumberForTooltips)
-    for (var i = 0; i < getAllTooltipOfNextStep.length; i++) {
-      getAllTooltipOfNextStep[i].style.display = "block";
-    }
-  
-    var getAllTooltipOfCurrentStep = document.getElementsByClassName("tooltipStep"+currentSection)
-    for (var i = 0; i < getAllTooltipOfCurrentStep.length; i++) {
-      getAllTooltipOfCurrentStep[i].style.display = "none";
-    }
-    //show content for right steps
-    document.getElementById('step' + currentSection).style.display = 'none';
-    currentSection--;
-    document.getElementById('step' + currentSection).style.display = 'block';
-    goNextButton.innerText = "Next"
-    
-    if (currentSection === 1) {
+    // The rest of your general logic, like disabling buttons, can stay outside of the switch
+    if (currentSection === totalSections) {
       this.disabled = true;
       this.style.backgroundColor = '#f1f1f1'; 
     }
+    if (currentSection > 1) {
+      document.getElementById('goBackButton').disabled = false;
+      document.getElementById('goBackButton').style.backgroundColor = '#3498db'; 
+    }
+  });
 
-    if (currentSection < totalSections) {
-      document.getElementById('goNextButton').disabled = false;
-      document.getElementById('goNextButton').style.backgroundColor = '#3498db'; 
+  document.getElementById('goBackButton').addEventListener('click', function() {
+    switch (currentSection) {
+      //generate copy to subject
+      case 3:
+        hideSectionAndTooltips(currentSection);
+        currentSection = 1;
+        showSectionAndTooltips(currentSection);
+        document.getElementById('goBackButton').disabled = true;
+        document.getElementById('goBackButton').style.backgroundColor = '#f1f1f1'; 
+        break;
+      case 4:
+        hideSectionAndTooltips(currentSection);
+        currentSection--;
+        showSectionAndTooltips(currentSection);
+        break;
     }
   }
-});
+)};
 
-// document.getElementById("goNextButton").addEventListener('click', function() {
-//   if (currentSection === 3) {
-//     simulateQaButtonkButtonClick()
+const checkCondition = (retryCount = 0, maxRetries = 30) => {
+  if (platformToServe === "Facebook") {
+  var primaryText = document.getElementById("Primary-Text");
 
-//   }
-// });
+  if (primaryText.textContent !== storedEmailSubject) {
+    storedEmailSubject = primaryText.textContent;
+    showSectionAndTooltips(currentSection);
+  } else {
+
+    if (retryCount < maxRetries) {
+      setTimeout(() => checkCondition(retryCount + 1), 500); // Check again after a delay
+    } else {
+      console.log("Max reached, displaying answers")
+      var statusMessage = document.getElementById("statusMessage");
+      statusMessage.textContent = "Max waiting delay reached, displaying copy";
+      storedEmailSubject = primaryText.textContent;
+      showSectionAndTooltips(currentSection);
+    }
+  }
+  } 
+  //to add conditions for Google
+}
+
+
+const checkConditionBeforeDisplayStep3 = () => {
+  var primaryText = document.getElementById("Primary-Text");
+  if (primaryText.textContent !== "Primary Text") {
+    storedEmailSubject = primaryText.textContent;
+    showSectionAndTooltips(currentSection);
+  } else {
+  setTimeout(checkConditionBeforeDisplayStep3, 500);  // Check again after a delay
+  }
+};
+
+const checkConditionBeforeDisplayStep3Google = () => {
+  var primaryText = document.getElementById("Primary-Text");
+  if (1) {
+    showSectionAndTooltips(currentSection);
+  } else {
+  setTimeout(checkConditionBeforeDisplayStep3, 500);  // Check again after a delay
+  }
+};
+
 
 document.getElementById("goStep5").addEventListener('click', function() {
   document.getElementById('step' + currentSection).style.display = 'none';
@@ -1780,3 +2640,35 @@ function simulateGptMagicButtonClick() {
   gptMagicButton.click(); // Simulate a click event on the addElementButton
 }
 
+function addTextFieldsForGoogle() {
+  // Select all elements with the class 'element-button'
+  const buttons = document.querySelectorAll('.element-button');
+
+  // Iterate through each button and append a tiny text field within its parent div
+  buttons.forEach(button => {
+    // Create an input field with a maximum length of 2 characters
+    const inputField = document.createElement('input');
+    inputField.setAttribute('type', 'text');
+    inputField.setAttribute('maxlength', '2');
+    inputField.style.width = '2ch'; // Width to fit 2 characters
+    inputField.style.marginRight = '2px';
+
+    // Append the input field to the button's parent div
+    button.parentNode.insertBefore(inputField, button);
+  });
+}
+
+function removeTinyTextFields() {
+  // Select all elements with the class 'element-button'
+  const buttons = document.querySelectorAll('.element-button');
+
+  // Iterate through each button and remove the following input field
+  buttons.forEach(button => {
+    const nextElement = button.nextElementSibling;
+    
+    // If the next element is an input field, remove it
+    if (nextElement && nextElement.tagName === 'INPUT') {
+      nextElement.remove();
+    }
+  });
+}
