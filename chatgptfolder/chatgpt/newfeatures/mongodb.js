@@ -127,7 +127,7 @@ function findAllData() {
                 resolve(documentNamesObj);
             })
             .withFailureHandler(error => {
-                console.log("Error:", error);
+                //console.log("Error @ findalldata:", error);
                 reject(error);
             })
             .findAllDataFromMongoDB();
@@ -277,7 +277,10 @@ handleGptMagicButtonClick.addEventListener("click", function() {
     var statusMessage = document.getElementById("statusMessage");
     var traits = document.getElementById("traits").value;
     //traitsArray.push(traits); // push it later after having formatted the input
-    var subject = getSubject();
+    if (platformToServe !== "Google") {
+      var subject = getSubject();
+    }
+
     var lang = getLang();
     var info = getInfo();
 
@@ -358,7 +361,7 @@ handleGptMagicButtonClick.addEventListener("click", function() {
                 console.log("Error:", error);
                 reject(error);
             })
-            .requestTranslation1(result, lang);
+            .requestTranslation1(result, lang, platformToServe);
         });
         }
     })
@@ -387,7 +390,7 @@ handleGptMagicButtonClick.addEventListener("click", function() {
         return new Promise((resolve, reject) => {
         //upate array with traits from input and from mongoDB
         //console.log(result);
-        traitsString = combineTraits(result, clientTraits2);
+        traitsString = combineTraits(result, clientTraits2, platformToServe);
         const checkCondition = () => {
         const divElement = document.querySelector("#Email-Subject-Line");
         if (traitsString) {
@@ -404,7 +407,7 @@ handleGptMagicButtonClick.addEventListener("click", function() {
         //console.log(traitsString);
         return new Promise((resolve, reject) => {
         //upate array with traits from input and from mongoDB
-        google.script.run.updateDataFromMongoDB(clientName, traitsString);
+        google.script.run.updateDataFromMongoDB(clientName, traitsString, platformToServe);
         resolve(traitsString);  
         })
     })
