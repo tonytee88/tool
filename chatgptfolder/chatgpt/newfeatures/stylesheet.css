@@ -1,11 +1,11 @@
   /* Global Styles */
   body {
     font-family: Arial, sans-serif;
-    display:flex;
+   /* display:flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: space-between;*/
     background-color : #f1f1f1;
-
+    /*align-items: center;*/
   }
   
   /* #pageBG {
@@ -26,7 +26,7 @@
   }
 
   #midContainer {
-    padding-bottom: 144px;
+    padding-bottom: 118px;
     /*background: linear-gradient(to bottom, #ffffff, #f1f1f1);*/
   
   }
@@ -226,7 +226,7 @@ textarea.large-input {
   font-weight: bold;
 }
 
-.element-button {
+.element-button, .element-button-google {
   display: inline-block;
   margin-right: 5px;
   margin-bottom: 5px;
@@ -242,7 +242,7 @@ textarea.large-input {
   margin-bottom: 5px;
 }
 
-#testFunction {
+#testFunction, #navigation {
   display:none;
 }
 
@@ -266,8 +266,9 @@ textarea.large-input {
 
 .sticky {
   position: fixed;
+  left: 0;   /* Ensures it starts at the very left */
+  right: 0; /* Ensures it spans to the very right */
   bottom: 0;
-  width: 100%;
   background-color: #ddd;
   padding: 10px;
   text-align: center;
@@ -283,6 +284,7 @@ textarea.large-input {
 
 #clientDiv {
   display: flex;
+  gap: 2px;
 }
 
 #notification {
@@ -328,3 +330,55 @@ textarea.large-input {
   padding: 10px;
   width: 240px;
 }
+
+/*.platformContainer {
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 350px;
+  z-index:10;
+}*/
+
+.platformCard {
+  width: 200px;
+  height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #3498db;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 3px 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+  margin-top: 24px;
+}
+
+.platformCard:hover {
+  transform: scale(1.1);
+}
+
+#platformCardContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content:center;
+  align-items: center;
+  gap: 20px; /* For spacing between the cards */
+  width: 100%;
+  flex-wrap: wrap; 
+}
+
+#adType {
+  display:flex;
+  justify-content: baseline;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 10px;
+
+}
+
+#labelText {
+  font-weight:lighter;
+}
+
