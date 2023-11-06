@@ -39,7 +39,7 @@ let platformToServe = "";
 const version = "2.0.0";
 var notifText = "Release v2.0.0 - November 2nd \n"+
 "- Facebook Ads added! \n" +
-"- Google Ads in beta (still buggy) \n" +
+"- Google Ads in alpha (still buggy, do not use) \n" +
 "- Added 3 options for Facebook \n"; +
 "- Fixed a lot of bugs along the way \n";
 
