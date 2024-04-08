@@ -94,18 +94,21 @@ async function initTrees() {
 }
 
 function createPreElements(count, category) {
-    const trunk = document.getElementById(category.toLowerCase()); // get the specific trunkContainer by category
+    const total = 30; // Total points for each category
+    const trunk = document.getElementById(category.toLowerCase()); // Get the specific trunkContainer by category
 
-    // Clear any existing trunks first, this will prevent duplicating trunks every time you initialize
+    // Clear any existing content first, this will prevent duplicating elements every time you initialize
     trunk.innerHTML = ''; 
 
-    for (let i = 0; i < count; i++) {
-        const preElement = document.createElement("pre");
-        preElement.innerText = "|   |"; // ASCII representation for a tree trunk segment. Adjust as needed.
-        
-        // This will prepend (or insert at the beginning) the new trunk segment
-        trunk.appendChild(preElement);
-    }
+    // Calculate the proportion of filled blocks out of a total of 10 blocks
+    let filledBlockCount = Math.round((count / total) * 10);
+    let emptyBlockCount = 10 - filledBlockCount;
+    
+    // Now we create our progress bar using these counts
+    const progressBar = document.createElement("pre");
+    progressBar.innerText = '█'.repeat(filledBlockCount) + '░'.repeat(emptyBlockCount) + ` (${count}/${total})`;
+    
+    trunk.appendChild(progressBar);
 }
 
 
