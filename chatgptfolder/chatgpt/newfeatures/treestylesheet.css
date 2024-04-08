@@ -20,25 +20,31 @@ button:active {
 
 .tree1 {
     display: flex;
-    flex-direction: column; /* This will make new trunks appear at the bottom */
-    align-items: center; /* To center align tree trunk and head */
-    justify-content: flex-end; /* Push content to the bottom */
-    height: 100%; /* Take the full height available to the tree */
-    font-size: 10px;;
+    flex-direction: column;
+    align-items: center;
+    width: 160px; /* Fixed width for each tree */
+}
+
+.treeHead {
+    text-align: center;
+    margin: 0;
+    padding: 0;
 }
 
 .trunkContainer {
     display: flex;
-    flex-direction: column-reverse;
-    padding: 0;
-    margin: 0;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
 }
 
 .treeContainer {
     display: flex;
-    flex-direction: row;
-    justify-content: center;
-    height: calc(100% - 150px); /* subtracting approx height of tabContainer, adjust as needed */
+    flex-wrap: wrap; /* Allows items to wrap onto the next line */
+    justify-content: space-around; /* Distributes space around items */
+    align-items: flex-start; /* Aligns items at the top */
+    gap: 20px; /* Space between items */
+    padding: 20px; /* Padding around the container */
 }
 
 .trunkSegment {
