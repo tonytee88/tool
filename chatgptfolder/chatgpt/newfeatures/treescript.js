@@ -41,6 +41,7 @@ function createCategoryElements() {
         treeHead.className = 'treeHead';
         treeHead.id = `${category.name.toLowerCase()}Head`;
         treeHead.textContent = category.name;
+        treeHead.style.color = category.color; // Set the text color for each category
         treeDiv.appendChild(treeHead);
 
         const trunkContainer = document.createElement('div');
@@ -51,6 +52,7 @@ function createCategoryElements() {
         treeContainer.appendChild(treeDiv);
     });
 }
+
 
 function showGarden() {
     const plusContent = document.getElementById("plusContent");
