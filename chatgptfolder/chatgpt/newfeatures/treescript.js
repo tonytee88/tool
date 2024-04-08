@@ -10,15 +10,8 @@ document.addEventListener('DOMContentLoaded', async (event) => {
     initButton.addEventListener('click', function() {
         console.log("Initializing categories...");
 
-        // Assuming your categories array is accessible here
-        // This should be replaced with the actual categories data you plan to use
-        const categoriesData = [
-            // Sample category object, replace this with your actual category data
-            { name: "Sample", totalGoal: 10, color: "#FF0000" }
-        ];
-
         // Call the initialize function
-        initializeCategoryDocuments(categoriesData).then(() => {
+        initializeCategoryDocuments(categories).then(() => {
             console.log("Initialization complete!");
         }).catch(error => {
             console.error("An error occurred during initialization:", error);
@@ -186,15 +179,17 @@ async function initializeCategoryDocuments(categories) {
     
     for (const category of categories) {
         try {
+            const initialNote = []; // Starting with an empty notes array
+
             const response = await fetch(endpointUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    category: category.name,
-                    color: category.color,
-                    totalGoal: category.totalGoal
+                    name: category.name,
+                    count: 0, // Initializing count to 0
+                    notes: initialNote, // Passing the empty notes array
                 }),
             });
 
