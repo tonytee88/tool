@@ -270,19 +270,18 @@ async function getAndLoadIdeas() {
         const filteredIdeas = ideas.filter(idea => idea.trim() !== "");
 
         filteredIdeas.forEach(idea => {
-            // Create a div element for each idea, using the color from the array
+            // Create a div element for each idea, applying the color for border
             const ideaTag = document.createElement('div');
             ideaTag.className = 'ideaTag';
-            ideaTag.style.backgroundColor = color;
-            ideaTag.style.color = "#ffffff";  // Use a light color for the text for better readability
+            ideaTag.style.border = `2px solid ${color}`;  // Set the border color
+            ideaTag.style.color = "#ffffff";  // White text for readability
             ideaTag.innerText = idea;
 
-            // Add event listener for idea tags
+            // Add event listener for click actions on idea tags
             ideaTag.addEventListener('click', () => {
                 const noteInput = document.getElementById('noteInput');
                 const categoryDropdown = document.getElementById('categoryDropdown');
 
-                // Logic for moving the idea tag to the input area or back to the list
                 if (addPointsContainerState === 0) {
                     const noteInputContainer = document.getElementById('noteInputContainer');
                     noteInputContainer.insertAdjacentElement('afterend', ideaTag);
