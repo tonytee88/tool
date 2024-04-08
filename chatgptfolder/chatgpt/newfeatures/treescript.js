@@ -149,9 +149,15 @@ function createPreElements(count, category) {
     let filledBlockCount = Math.round((count / category.totalGoal) * 10);
     let emptyBlockCount = 10 - filledBlockCount;
 
-    // Now we create our progress bar using these counts
+    // Create a span for the filled part of the progress bar to apply color
+    const filledSpan = document.createElement("span");
+    filledSpan.style.color = category.color; // Set color from the category
+    filledSpan.innerText = '█'.repeat(filledBlockCount);
+
+    // Create the progress bar text
     const progressBar = document.createElement("pre");
-    progressBar.innerText = '█'.repeat(filledBlockCount) + '░'.repeat(emptyBlockCount) + ` (${count}/${category.totalGoal})`;
+    progressBar.appendChild(filledSpan); // Add the colored filled part
+    progressBar.append('░'.repeat(emptyBlockCount) + ` (${count}/${category.totalGoal})`); // Add the empty part and the text
 
     trunk.appendChild(progressBar);
 }
