@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     initTrees();
     getAndLoadIdeas();
 });
-
+//test
 function showGarden() {
     const plusContent = document.getElementById("plusContent");
     const treeContainer = document.querySelector(".treeContainer");
