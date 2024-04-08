@@ -61,7 +61,6 @@ function showGarden() {
     
     plusContent.style.display = "none";
     exploreContent.style.display = "none";
-    treeContainer.style.display = "flex";
 }
 
 function showPlus() {
