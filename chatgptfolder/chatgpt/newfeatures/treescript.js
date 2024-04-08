@@ -94,21 +94,28 @@ async function initTrees() {
 }
 
 function createPreElements(count, category) {
-    const total = 30; // Total points for each category
-    const trunk = document.getElementById(category.toLowerCase()); // Get the specific trunkContainer by category
+    const trunk = document.getElementById(category.toLowerCase());
+    trunk.innerHTML = '';
 
-    // Clear any existing content first, this will prevent duplicating elements every time you initialize
-    trunk.innerHTML = ''; 
+    // Hardcoded total value
+    let total = 30;
 
-    // Calculate the proportion of filled blocks out of a total of 10 blocks
-    let filledBlockCount = Math.round((count / total) * 10);
-    let emptyBlockCount = 10 - filledBlockCount;
-    
-    // Now we create our progress bar using these counts
-    const progressBar = document.createElement("pre");
-    progressBar.innerText = '█'.repeat(filledBlockCount) + '░'.repeat(emptyBlockCount) + ` (${count}/${total})`;
-    
-    trunk.appendChild(progressBar);
+    // Update trunk (progress bar) based on count
+    let progressBar = '';
+    for (let i = 0; i < total; i++) {
+        progressBar += i < count ? '■' : '□'; // Filled block for achieved points, empty for remaining
+    }
+    trunk.textContent = progressBar;
+
+    // Assuming the next sibling element is where the score is displayed
+    let scoreDisplay = trunk.nextElementSibling;
+    if (!scoreDisplay) {
+        // If the score display doesn't exist, create it
+        scoreDisplay = document.createElement('div');
+        scoreDisplay.className = 'scoreDisplay';
+        trunk.parentNode.appendChild(scoreDisplay);
+    }
+    scoreDisplay.textContent = `Score: ${count}/${total}`;
 }
 
 
