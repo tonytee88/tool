@@ -1,11 +1,57 @@
 let addPointsContainerState = 0; 
 
-document.addEventListener('DOMContentLoaded', (event) => {
+document.addEventListener('DOMContentLoaded', async (event) => {
+    createCategoryElements();
     incrementCategory();
-    initTrees();
+    await initTrees();
     getAndLoadIdeas();
 });
-//test1
+
+const categoryDetails = [
+    { name: "Cooking", totalGoal: 50, color: "#FF7F50" }, // Coral
+    { name: "Work", totalGoal: 20, color: "#FFD700" }, // Gold
+    { name: "Social", totalGoal: 10, color: "#6A5ACD" }, // Slate Blue
+    { name: "Give Back", totalGoal: 5, color: "#98FB98" }, // Pale Green
+
+    { name: "Husband Duty", totalGoal: 5, color: "#FF69B4" }, // Hot Pink
+    { name: "Fatherhood", totalGoal: 30, color: "#00FA9A" }, // Medium Spring Green
+    { name: "Body Health", totalGoal: 50, color: "#4682B4" }, // Steel Blue
+    { name: "Home Ownership", totalGoal: 20, color: "#DAA520" }, // Goldenrod
+
+    { name: "Create-Ship", totalGoal: 10, color: "#DA70D6" }, // Orchid
+    { name: "Share", totalGoal: 10, color: "#F08080" }, // Light Coral
+    { name: "Learn", totalGoal: 5, color: "#20B2AA" }, // Light Sea Green
+    { name: "Surprise", totalGoal: 5, color: "#9ACD32" }, // Yellow Green
+
+    { name: "What", totalGoal: 1, color: "#40E0D0" }, // Turquoise
+    { name: "Who", totalGoal: 1, color: "#FFA07A" }, // Light Salmon
+    { name: "How", totalGoal: 1, color: "#BA55D3" }, // Medium Orchid
+    { name: "Why", totalGoal: 1, color: "#FF8C00" }  // Dark Orange
+];
+
+function createCategoryElements() {
+    const treeContainer = document.querySelector('.treeContainer');
+    treeContainer.innerHTML = '';  // Clear existing content
+
+    categoryDetails.forEach(category => {
+        const treeDiv = document.createElement('div');
+        treeDiv.className = 'tree1';
+
+        const treeHead = document.createElement('pre');
+        treeHead.className = 'treeHead';
+        treeHead.id = `${category.name.toLowerCase()}Head`;
+        treeHead.textContent = category.name;
+        treeDiv.appendChild(treeHead);
+
+        const trunkContainer = document.createElement('div');
+        trunkContainer.className = 'trunkContainer';
+        trunkContainer.id = category.name.toLowerCase();
+        treeDiv.appendChild(trunkContainer);
+
+        treeContainer.appendChild(treeDiv);
+    });
+}
+
 function showGarden() {
     const plusContent = document.getElementById("plusContent");
     const treeContainer = document.querySelector(".treeContainer");
@@ -85,29 +131,26 @@ async function updateMongoAndTrees(selectedCategory, add, noteValue) {
 }
 
 async function initTrees() {
-    const categories = ["Husband", "Fatherhood", "Home", "Money", "Brain", "Body"];
-
     for (let category of categories) {
-        let count = await treeMongoGetCount(category);
+        let count = await treeMongoGetCount(category.name);
         createPreElements(count, category);
     }
 }
 
 function createPreElements(count, category) {
-    const total = 30; // Total points for each category
-    const trunk = document.getElementById(category.toLowerCase()); // Get the specific trunkContainer by category
+    const trunk = document.getElementById(category.name.toLowerCase()); // Get the specific trunkContainer by category
 
-    // Clear any existing content first, this will prevent duplicating elements every time you initialize
-    trunk.innerHTML = ''; 
+    // Clear any existing content first
+    trunk.innerHTML = '';
 
     // Calculate the proportion of filled blocks out of a total of 10 blocks
-    let filledBlockCount = Math.round((count / total) * 10);
+    let filledBlockCount = Math.round((count / category.totalGoal) * 10);
     let emptyBlockCount = 10 - filledBlockCount;
-    
+
     // Now we create our progress bar using these counts
     const progressBar = document.createElement("pre");
-    progressBar.innerText = '█'.repeat(filledBlockCount) + '░'.repeat(emptyBlockCount) + ` (${count}/${total})`;
-    
+    progressBar.innerText = '█'.repeat(filledBlockCount) + '░'.repeat(emptyBlockCount) + ` (${count}/${category.totalGoal})`;
+
     trunk.appendChild(progressBar);
 }
 
@@ -221,26 +264,25 @@ async function getAndLoadIdeas() {
     // Clear previous ideas
     ideasList.innerHTML = '';
 
-    for (const category of Object.keys(categoryColors)) {
+    // Iterate over each category from the categories array
+    for (const { name: category, color } of categories) {
         const ideas = await treeMongoFetchIdeas(category);
         const filteredIdeas = ideas.filter(idea => idea.trim() !== "");
-        
+
         filteredIdeas.forEach(idea => {
+            // Create a div element for each idea, using the color from the array
             const ideaTag = document.createElement('div');
             ideaTag.className = 'ideaTag';
-            ideaTag.style.backgroundColor = categoryColors[category];
-            ideaTag.style.color = "#000000"
-            if (category === "Home") {
-                ideaTag.style.color = "#000000"
-            }
+            ideaTag.style.backgroundColor = color;
+            ideaTag.style.color = "#ffffff";  // Use a light color for the text for better readability
             ideaTag.innerText = idea;
 
+            // Add event listener for idea tags
             ideaTag.addEventListener('click', () => {
-                console.log("you clicked me once!");
                 const noteInput = document.getElementById('noteInput');
                 const categoryDropdown = document.getElementById('categoryDropdown');
 
-                // If there's no ideaTag in addPointsContainer, move the clicked ideaTag there
+                // Logic for moving the idea tag to the input area or back to the list
                 if (addPointsContainerState === 0) {
                     const noteInputContainer = document.getElementById('noteInputContainer');
                     noteInputContainer.insertAdjacentElement('afterend', ideaTag);
@@ -248,19 +290,15 @@ async function getAndLoadIdeas() {
                     categoryDropdown.value = category;
                     ideaTag.style.marginTop = '2px';
                     addPointsContainerState = 1;
-                } 
-                // If there's an ideaTag inside addPointsContainer and it's the clicked one, move it back to ideasList
-                else if (addPointsContainerState === 1 && ideaTag.parentElement === addPointsContainer) {
+                } else if (addPointsContainerState === 1 && ideaTag.parentElement === addPointsContainer) {
                     ideaTag.style.marginTop = '0px';
                     ideasList.appendChild(ideaTag);
                     addPointsContainerState = 0;
-                } 
-                // If another ideaTag was inside addPointsContainer, replace it
-                else if (addPointsContainerState === 1) {
+                } else if (addPointsContainerState === 1) {
                     const existingIdeaTag = addPointsContainer.querySelector('.ideaTag');
                     existingIdeaTag.style.marginTop = '0px';
                     ideasList.appendChild(existingIdeaTag);
-                    
+
                     const noteInputContainer = document.getElementById('noteInputContainer');
                     noteInputContainer.insertAdjacentElement('afterend', ideaTag);
                     noteInput.value = idea;
@@ -268,21 +306,12 @@ async function getAndLoadIdeas() {
                     ideaTag.style.marginTop = '2px';
                 }
             });
-            
+
+            // Append the idea tag to the ideas list
             ideasList.appendChild(ideaTag);
         });
     }
 }
-
-const categoryColors = {
-    "Husband": "#f28d35",  // Example color
-    "Fatherhood": "#35a2f2",
-    "Home": "#87c040",
-    "Money": "#e835f2",
-    "Brain": "#35f2a2",
-    "Body": "#f23572",
-    // ... Add more categories and colors if needed
-};
 
 async function treeMongoFetchIdeas(category) {
     try {
