@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
     getAndLoadIdeas();
 });
 
-const categoryDetails = [
+const categories = [
     { name: "Cooking", totalGoal: 50, color: "#FF7F50" }, // Coral
     { name: "Work", totalGoal: 20, color: "#FFD700" }, // Gold
     { name: "Social", totalGoal: 10, color: "#6A5ACD" }, // Slate Blue
@@ -33,7 +33,7 @@ function createCategoryElements() {
     const treeContainer = document.querySelector('.treeContainer');
     treeContainer.innerHTML = '';  // Clear existing content
 
-    categoryDetails.forEach(category => {
+    categories.forEach(category => {
         const treeDiv = document.createElement('div');
         treeDiv.className = 'tree1';
 
