@@ -5,6 +5,25 @@ document.addEventListener('DOMContentLoaded', async (event) => {
     incrementCategory();
     await initTrees();
     getAndLoadIdeas();
+
+    const initButton = document.getElementById('initializeCategories');
+    initButton.addEventListener('click', function() {
+        console.log("Initializing categories...");
+
+        // Assuming your categories array is accessible here
+        // This should be replaced with the actual categories data you plan to use
+        const categoriesData = [
+            // Sample category object, replace this with your actual category data
+            { name: "Sample", totalGoal: 10, color: "#FF0000" }
+        ];
+
+        // Call the initialize function
+        initializeCategoryDocuments(categoriesData).then(() => {
+            console.log("Initialization complete!");
+        }).catch(error => {
+            console.error("An error occurred during initialization:", error);
+        });
+    });
 });
 
 const categories = [
@@ -162,6 +181,34 @@ function createPreElements(count, category) {
     trunk.appendChild(progressBar);
 }
 
+async function initializeCategoryDocuments(categories) {
+    const endpointUrl = 'https://j7-magic-tool.vercel.app/api/treeMongoCreate';
+    
+    for (const category of categories) {
+        try {
+            const response = await fetch(endpointUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    category: category.name,
+                    color: category.color,
+                    totalGoal: category.totalGoal
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log(`Response for ${category.name}:`, data.message);
+        } catch (error) {
+            console.error(`Error initializing category ${category.name}:`, error);
+        }
+    }
+}
 
 async function treeMongoAdd(category, add, note) {
     try {
