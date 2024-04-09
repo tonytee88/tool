@@ -1,6 +1,7 @@
 let addPointsContainerState = 0; 
 
 document.addEventListener('DOMContentLoaded', async (event) => {
+    populateCategoryDropdowns();
     createCategoryElements();
     incrementCategory();
     await initTrees();
@@ -65,6 +66,25 @@ function createCategoryElements() {
     });
 }
 
+function populateCategoryDropdowns() {
+    const categoryDropdown = document.getElementById("categoryDropdown");
+    const categoryDropdownForIdeas = document.getElementById("categoryDropdownForIdeas");
+
+    // Empty existing options
+    categoryDropdown.innerHTML = '';
+    categoryDropdownForIdeas.innerHTML = '';
+
+    categories.forEach(category => {
+        const option = document.createElement("option");
+        option.value = category.name;
+        option.textContent = category.name;
+
+        const optionForIdeas = option.cloneNode(true); // Clone the option for the second dropdown
+
+        categoryDropdown.appendChild(option);
+        categoryDropdownForIdeas.appendChild(optionForIdeas);
+    });
+}
 
 function showGarden() {
     const plusContent = document.getElementById("plusContent");
