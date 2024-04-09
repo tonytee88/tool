@@ -147,7 +147,7 @@ async function handlePhotoUpload(file) {
     const fileName = `${Date.now()}_${file.name}`;
     console.log("File name: "+fileName);
     const fileType = file.type;
-    
+    console.log("File type: "+fileType);
     try {
         // Request a pre-signed URL from your server
         const response = await fetch('https://j7-magic-tool.vercel.app/api/s3PhotoUpload', {
