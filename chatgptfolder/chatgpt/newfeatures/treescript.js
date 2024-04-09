@@ -121,6 +121,23 @@ function incrementCategory() {
     const modal = document.getElementById("imageUploadModal");
     const span = document.getElementsByClassName("close")[0];
 
+    // Camera input
+    const cameraInput = document.createElement("input");
+    cameraInput.type = "file";
+    cameraInput.accept = "image/*";
+    cameraInput.capture = "camera";
+    cameraInput.style.display = "none";
+
+    // Gallery input
+    const galleryInput = document.createElement("input");
+    galleryInput.type = "file";
+    galleryInput.accept = "image/*";
+    galleryInput.style.display = "none";
+
+    // Append inputs to the body (hidden)
+    document.body.appendChild(cameraInput);
+    document.body.appendChild(galleryInput);
+
     addOne.onclick = function() {
         modal.style.display = "block";
     }
@@ -135,24 +152,13 @@ function incrementCategory() {
         }
     }
 
-    // Configure "Take Photo" button to activate the device camera
     const takePhotoButton = document.getElementById("takePhoto");
     takePhotoButton.onclick = function() {
-        const cameraInput = document.createElement("input");
-        cameraInput.type = "file";
-        cameraInput.accept = "image/*";
-        cameraInput.capture = "camera";
-        cameraInput.onchange = handlePhotoUpload;
         cameraInput.click();
     };
 
-    // Configure "Select Photo" button to open the photo selector
     const selectPhotoButton = document.getElementById("selectPhoto");
     selectPhotoButton.onclick = function() {
-        const galleryInput = document.createElement("input");
-        galleryInput.type = "file";
-        galleryInput.accept = "image/*";
-        galleryInput.onchange = handlePhotoUpload;
         galleryInput.click();
     };
 
@@ -160,12 +166,15 @@ function incrementCategory() {
     function handlePhotoUpload(event) {
         const file = event.target.files[0];
         if (file) {
-            // Here you can handle the file, e.g., upload it or display it
             console.log("Photo selected:", file.name);
-            // Close the modal after selecting the photo
             modal.style.display = "none";
+            // Additional processing can go here
         }
     }
+
+     // Set event listeners for inputs
+     cameraInput.onchange = handlePhotoUpload;
+     galleryInput.onchange = handlePhotoUpload;
 
     addOne.addEventListener('click', async function() {
         const dropdown = document.getElementById("categoryDropdown");
