@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
 
     const initButton = document.getElementById('initializeCategories');
     initButton.addEventListener('click', function() {
-        console.log("Initializing categories...");
+        console.log("Initializing categories...1");
 
         // Call the initialize function
         initializeCategoryDocuments(categories).then(() => {
