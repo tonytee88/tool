@@ -201,6 +201,9 @@ button:hover {
 
 #addPointsBottomContainer {
     margin-top: 10px;
+    display:flex;
+    flex-direction: row;
+    gap: 1px;
 }
 
 .card {
