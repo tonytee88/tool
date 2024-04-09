@@ -67,6 +67,24 @@
 <div id="initializeContainer" style="margin: 20px;">
     <button id="initializeCategories">Initialize Categories</button>
 </div>
+
+<!-- Image Upload Modal -->
+<div id="imageUploadModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <div id="imageOptions">
+            <div class="image-option">
+                <label for="cameraInput">
+                    <img src="camera-icon.png" alt="Camera" />
+                </label>
+                <input type="file" id="cameraInput" accept="image/*" capture style="display:none;" />
+            </div>
+            <!-- Placeholder for recent images -->
+        </div>
+    </div>
+</div>
+
+
     <script src="treescript.js"></script>
 </body>
 </html>

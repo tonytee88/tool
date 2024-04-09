@@ -118,6 +118,27 @@ function showExplore () {
 
 function incrementCategory() {
     const addOne = document.getElementById("addOne");
+    const modal = document.getElementById("imageUploadModal");
+    const span = document.getElementsByClassName("close")[0];
+
+    addOne.onclick = function() {
+        modal.style.display = "block";
+    }
+
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    const cameraInput = document.getElementById("cameraInput");
+    cameraInput.onchange = function(event) {
+        // You can add logic here to upload the image or display it.
+    }
 
     addOne.addEventListener('click', async function() {
         const dropdown = document.getElementById("categoryDropdown");
@@ -126,23 +147,23 @@ function incrementCategory() {
         const noteValue = noteInput.value;
         const add = 1;
 
-        // Create an input element to accept an image
-        let imageInput = document.createElement('input');
-        imageInput.type = 'file';
-        imageInput.accept = 'image/*';
-        imageInput.capture = 'camera';
+        // // Create an input element to accept an image
+        // let imageInput = document.createElement('input');
+        // imageInput.type = 'file';
+        // imageInput.accept = 'image/*';
+        // imageInput.capture = 'camera';
 
-        // Prompt the user to select or take a photo
-        imageInput.click();
+        // // Prompt the user to select or take a photo
+        // imageInput.click();
 
-        imageInput.onchange = async () => {
-            const file = imageInput.files[0];
-            let photoUrl = ''; // Initialize photo URL as empty
+        // imageInput.onchange = async () => {
+        //     const file = imageInput.files[0];
+        //     let photoUrl = ''; // Initialize photo URL as empty
 
-            if (file) {
-                // Placeholder function for uploading image and getting the URL
-                photoUrl = await uploadImageAndGetUrl(file);
-            }
+            // if (file) {
+            //     // Placeholder function for uploading image and getting the URL
+            //     photoUrl = await uploadImageAndGetUrl(file);
+            // }
 
             const addPointsContainer = document.getElementById('addPointsContainer');
             const ideaTag = addPointsContainer.querySelector('.ideaTag');
@@ -166,9 +187,9 @@ function incrementCategory() {
             setTimeout(() => {
                 addOne.classList.remove('clicked-animation');
             }, 500);
-        };
-    });
-}
+        });
+    };
+
 
 async function updateMongoAndTrees(selectedCategory, add, noteValue) {
     try {
