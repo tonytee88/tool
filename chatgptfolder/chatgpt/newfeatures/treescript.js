@@ -136,7 +136,7 @@ function incrementCategory() {
 
     // Append inputs to the body (hidden)
     //document.body.appendChild(cameraInput);
-    document.body.appendChild(galleryInput);
+    //document.body.appendChild(galleryInput);
 
     // addOne.onclick = function() {
     //     modal.style.display = "block";
