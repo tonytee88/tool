@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
 
     const initButton = document.getElementById('initializeCategories');
     initButton.addEventListener('click', function() {
-        console.log("Initializing categories...1");
+        console.log("Initializing categories...2");
 
         // Call the initialize function
         initializeCategoryDocuments(categories).then(() => {
@@ -190,7 +190,12 @@ async function initializeCategoryDocuments(categories) {
                 body: JSON.stringify({
                     name: category.name,
                     count: 0, // Initializing count to 0
-                    notes: initialNote, // Passing the empty notes array
+                    totalGoal: category.totalGoal,
+                    notes: [{
+                        activityNote: "Sample activity note",
+                        photoUrl: "https://example.com/sample-photo.jpg",
+                        dateStamp: "APR-08-2024"
+                      }]
                 }),
             });
 
