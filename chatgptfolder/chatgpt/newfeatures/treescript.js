@@ -137,46 +137,59 @@ selectPhotoButton.onclick = function() {
 
 galleryInput.onchange = handlePhotoSelection;
 
-// Handle the photo upload process - make an api call (serverless amazon s3)
 async function handlePhotoUpload(file) {
     if (!file) {
         console.error('No file provided for upload.');
         return;
     }
     
-    // Generate the filename on the client-side for example purposes.
-    // You could also generate this on the server-side in your pre-signed URL endpoint.
+    // Generate a unique filename using the current timestamp and original file name
     const fileName = `${Date.now()}_${file.name}`;
     const fileType = file.type;
     
     try {
-        // Obtain the pre-signed URL and the target file URL from your server
+        // Request a pre-signed URL from your server
         const response = await fetch('https://j7-magic-tool.vercel.app/api/s3PhotoUpload', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ fileName, fileType }),
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ fileName, fileType }),
         });
-    
+
+        if (!response.ok) {
+            throw new Error(`Server responded with ${response.status}: ${response.statusText}`);
+        }
+
         const { preSignedUrl, fileUrl } = await response.json();
-    
-        // Perform the file upload to S3 using the pre-signed URL
-        await fetch(preSignedUrl, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': fileType,
-        },
-        body: file,
+
+        // Check if the pre-signed URL and file URL are received correctly
+        if (!preSignedUrl || !fileUrl) {
+            throw new Error('Pre-signed URL or file URL is missing in the response');
+        }
+
+        // Upload the file directly to S3 using the pre-signed URL
+        const uploadResponse = await fetch(preSignedUrl, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': fileType,
+            },
+            body: file,
         });
-    
+
+        // Check if the upload was successful
+        if (!uploadResponse.ok) {
+            throw new Error(`Failed to upload file. Server responded with ${uploadResponse.status}`);
+        }
+
         console.log('File uploaded:', fileUrl);
         return fileUrl;
     } catch (error) {
         console.error('Error uploading file:', error);
+        // Depending on your application's structure, you might want to handle this error further (e.g., user notification).
         throw error;
     }
-    }
+}
 
 function incrementCategory() {
     const addOne = document.getElementById("addOne");
