@@ -126,33 +126,48 @@ function incrementCategory() {
         const noteValue = noteInput.value;
         const add = 1;
 
-        // Check for ideaTag in addPointsContainer
-        const addPointsContainer = document.getElementById('addPointsContainer');
-        const ideaTag = addPointsContainer.querySelector('.ideaTag');
+        // Create an input element to accept an image
+        let imageInput = document.createElement('input');
+        imageInput.type = 'file';
+        imageInput.accept = 'image/*';
+        imageInput.capture = 'camera';
 
-        if (ideaTag) {
-            const ideaValue = ideaTag.innerText; // Assuming the idea text is the innerText of the ideaTag
-            ideaTag.remove(); // Delete the ideaTag currently in the addPointsContainer
+        // Prompt the user to select or take a photo
+        imageInput.click();
 
-            // Delete data in mongo
-            await treeMongoDeleteIdea(selectedCategory, ideaValue);
-            addPointsContainerState = 0;
-            // Reload the tags
-            await getAndLoadIdeas();
-        }
+        imageInput.onchange = async () => {
+            const file = imageInput.files[0];
+            let photoUrl = ''; // Initialize photo URL as empty
 
-        updateMongoAndTrees(selectedCategory, add, noteValue);
-        noteInput.value ="";
+            if (file) {
+                // Placeholder function for uploading image and getting the URL
+                photoUrl = await uploadImageAndGetUrl(file);
+            }
 
-        // Add animation to the +1 button
-        addOne.classList.add('clicked-animation'); // Assuming you have defined this class in your CSS
+            const addPointsContainer = document.getElementById('addPointsContainer');
+            const ideaTag = addPointsContainer.querySelector('.ideaTag');
 
-        // Remove the animation class after 500ms (or adjust the time based on your desired animation length)
-        setTimeout(() => {
-            addOne.classList.remove('clicked-animation');
-        }, 500);
+            if (ideaTag) {
+                const ideaValue = ideaTag.innerText;
+                ideaTag.remove();
+
+                // Delete data in mongo
+                await treeMongoDeleteIdea(selectedCategory, ideaValue);
+                addPointsContainerState = 0;
+                await getAndLoadIdeas();
+            }
+
+            // Now you include the photo URL in your update
+            updateMongoAndTrees(selectedCategory, add, noteValue, photoUrl);
+            noteInput.value = "";
+
+            // Add animation to the +1 button
+            addOne.classList.add('clicked-animation');
+            setTimeout(() => {
+                addOne.classList.remove('clicked-animation');
+            }, 500);
+        };
     });
-
 }
 
 async function updateMongoAndTrees(selectedCategory, add, noteValue) {
