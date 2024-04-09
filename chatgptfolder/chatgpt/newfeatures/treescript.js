@@ -145,6 +145,7 @@ async function handlePhotoUpload(file) {
     
     // Generate a unique filename using the current timestamp and original file name
     const fileName = `${Date.now()}_${file.name}`;
+    console.log("File name: "+fileName);
     const fileType = file.type;
     
     try {
