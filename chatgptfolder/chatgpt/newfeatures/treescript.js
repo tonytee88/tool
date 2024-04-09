@@ -367,6 +367,7 @@ async function getAndLoadIdeas() {
                     addPointsContainerState = 1;
                 } else if (addPointsContainerState === 1 && ideaTag.parentElement === addPointsContainer) {
                     ideaTag.style.marginTop = '0px';
+                    noteInput.value = "";
                     ideasList.appendChild(ideaTag);
                     addPointsContainerState = 0;
                 } else if (addPointsContainerState === 1) {
