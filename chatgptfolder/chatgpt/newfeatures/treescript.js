@@ -116,17 +116,26 @@ function showExplore () {
     plusContent.style.display = "none";
 }
 
-function incrementCategory() {
-    const addOne = document.getElementById("addOne");
+let selectedFile = null;
 
-    const galleryInput = document.createElement("input");
-    galleryInput.type = "file";
-    galleryInput.accept = "image/*";
-  
-    const selectPhotoButton = document.getElementById("selectPhoto");
-    selectPhotoButton.onclick = function() {
+function handlePhotoSelection(event) {
+    selectedFile = event.target.files[0];
+    if (selectedFile) {
+        console.log("Photo selected:", selectedFile.name);
+        // You can add additional UI feedback here
+    }
+}
+
+const galleryInput = document.createElement("input");
+galleryInput.type = "file";
+galleryInput.accept = "image/*";
+
+const selectPhotoButton = document.getElementById("selectPhoto");
+selectPhotoButton.onclick = function() {
     galleryInput.click();
-    };
+};
+
+galleryInput.onchange = handlePhotoSelection;
 
     // Handle the photo upload process - make an api call (serverless amazon s3)
     async function handlePhotoUpload(file) {
@@ -168,16 +177,24 @@ function incrementCategory() {
           throw error;
         }
       }
+
+function incrementCategory() {
+    const addOne = document.getElementById("addOne");
       
-
-     galleryInput.onchange = handlePhotoUpload;
-
     addOne.addEventListener('click', async function() {
         const dropdown = document.getElementById("categoryDropdown");
         const selectedCategory = dropdown.value;
         const noteInput = document.getElementById("noteInput");
         const noteValue = noteInput.value;
         const add = 1;
+
+        let photoUrl = "";
+
+        // If a photo is selected, upload it
+        if (selectedFile) {
+            photoUrl = await handlePhotoUpload(selectedFile);
+            selectedFile = null; // Reset the selected file
+        }
 
         const addPointsContainer = document.getElementById('addPointsContainer');
         const ideaTag = addPointsContainer.querySelector('.ideaTag');
@@ -193,7 +210,7 @@ function incrementCategory() {
         }
 
             // Now you include the photo URL in your update
-            updateMongoAndTrees(selectedCategory, add, noteValue, photoUrl);
+            await updateMongoAndTrees(selectedCategory, add, noteValue, photoUrl);
             noteInput.value = "";
 
             // Add animation to the +1 button
@@ -205,9 +222,9 @@ function incrementCategory() {
     };
 
 
-async function updateMongoAndTrees(selectedCategory, add, noteValue) {
+async function updateMongoAndTrees(selectedCategory, add, noteValue, photoUrl) {
     try {
-        await treeMongoAdd(selectedCategory, add, noteValue);
+        await treeMongoAdd(selectedCategory, add, noteValue, photoUrl);
         initTrees();
     } catch (error) {
         console.error('Error updating MongoDB and Trees', error);
@@ -281,14 +298,14 @@ async function initializeCategoryDocuments(categories) {
     }
 }
 
-async function treeMongoAdd(category, add, note) {
+async function treeMongoAdd(category, add, note, photoUrl) {
     try {
         const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoAdd', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ category, add, note }),
+            body: JSON.stringify({ category, add, note, photoUrl }),
         });
 
         if (!response.ok) {
