@@ -176,7 +176,7 @@ function createPreElements(count, category) {
 
 async function initializeCategoryDocuments(categories) {
     const endpointUrl = 'https://j7-magic-tool.vercel.app/api/treeMongoCreate';
-    
+    console.log(category.name);
     for (const category of categories) {
         try {
             const initialNote = []; // Starting with an empty notes array
