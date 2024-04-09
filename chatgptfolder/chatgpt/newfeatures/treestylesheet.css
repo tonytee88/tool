@@ -125,6 +125,7 @@ html {
     justify-content: center;
     align-items: center;
     gap: 10px;
+    justify-content: center;
 }
 
 @keyframes buttonClick {
@@ -276,23 +277,7 @@ button:hover {
     color: transparent; /* hides the text */
 }
 
-
 /* upload photo ui */
-
-.close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
-
 .image-option {
     display: inline-block;
     margin: 10px;
