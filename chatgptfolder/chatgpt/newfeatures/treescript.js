@@ -122,40 +122,40 @@ function incrementCategory() {
     const span = document.getElementsByClassName("close")[0];
 
     // Camera input
-    const cameraInput = document.createElement("input");
-    cameraInput.type = "file";
-    cameraInput.accept = "image/*";
-    cameraInput.capture = "camera";
-    cameraInput.style.display = "none";
+    // const cameraInput = document.createElement("input");
+    // cameraInput.type = "file";
+    // cameraInput.accept = "image/*";
+    // cameraInput.capture = "camera";
+    // cameraInput.style.display = "none";
 
     // Gallery input
     const galleryInput = document.createElement("input");
     galleryInput.type = "file";
     galleryInput.accept = "image/*";
-    galleryInput.style.display = "none";
+    //galleryInput.style.display = "none";
 
     // Append inputs to the body (hidden)
-    document.body.appendChild(cameraInput);
+    //document.body.appendChild(cameraInput);
     document.body.appendChild(galleryInput);
 
-    addOne.onclick = function() {
-        modal.style.display = "block";
-    }
+    // addOne.onclick = function() {
+    //     modal.style.display = "block";
+    // }
 
-    span.onclick = function() {
-        modal.style.display = "none";
-    }
+    // span.onclick = function() {
+    //     modal.style.display = "none";
+    // }
 
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
-    }
+    // window.onclick = function(event) {
+    //     if (event.target == modal) {
+    //         modal.style.display = "none";
+    //     }
+    // }
 
-    const takePhotoButton = document.getElementById("takePhoto");
-    takePhotoButton.onclick = function() {
-        cameraInput.click();
-    };
+    // const takePhotoButton = document.getElementById("takePhoto");
+    // takePhotoButton.onclick = function() {
+    //     cameraInput.click();
+    // };
 
     const selectPhotoButton = document.getElementById("selectPhoto");
     selectPhotoButton.onclick = function() {
@@ -173,7 +173,7 @@ function incrementCategory() {
     }
 
      // Set event listeners for inputs
-     cameraInput.onchange = handlePhotoUpload;
+    // cameraInput.onchange = handlePhotoUpload;
      galleryInput.onchange = handlePhotoUpload;
 
     addOne.addEventListener('click', async function() {
