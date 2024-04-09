@@ -118,62 +118,58 @@ function showExplore () {
 
 function incrementCategory() {
     const addOne = document.getElementById("addOne");
-    const modal = document.getElementById("imageUploadModal");
-    const span = document.getElementsByClassName("close")[0];
 
-    // Camera input
-    // const cameraInput = document.createElement("input");
-    // cameraInput.type = "file";
-    // cameraInput.accept = "image/*";
-    // cameraInput.capture = "camera";
-    // cameraInput.style.display = "none";
-
-    // Gallery input
     const galleryInput = document.createElement("input");
     galleryInput.type = "file";
     galleryInput.accept = "image/*";
-    //galleryInput.style.display = "none";
-
-    // Append inputs to the body (hidden)
-    //document.body.appendChild(cameraInput);
-    //document.body.appendChild(galleryInput);
-
-    // addOne.onclick = function() {
-    //     modal.style.display = "block";
-    // }
-
-    // span.onclick = function() {
-    //     modal.style.display = "none";
-    // }
-
-    // window.onclick = function(event) {
-    //     if (event.target == modal) {
-    //         modal.style.display = "none";
-    //     }
-    // }
-
-    // const takePhotoButton = document.getElementById("takePhoto");
-    // takePhotoButton.onclick = function() {
-    //     cameraInput.click();
-    // };
-
+  
     const selectPhotoButton = document.getElementById("selectPhoto");
     selectPhotoButton.onclick = function() {
-        galleryInput.click();
+    galleryInput.click();
     };
 
-    // Handle the photo upload process
-    function handlePhotoUpload(event) {
-        const file = event.target.files[0];
-        if (file) {
-            console.log("Photo selected:", file.name);
-            modal.style.display = "none";
-            // Additional processing can go here
+    // Handle the photo upload process - make an api call (serverless amazon s3)
+    async function handlePhotoUpload(file) {
+        if (!file) {
+          console.error('No file provided for upload.');
+          return;
         }
-    }
+      
+        // Generate the filename on the client-side for example purposes.
+        // You could also generate this on the server-side in your pre-signed URL endpoint.
+        const fileName = `${Date.now()}_${file.name}`;
+        const fileType = file.type;
+      
+        try {
+          // Obtain the pre-signed URL and the target file URL from your server
+          const response = await fetch('https://j7-magic-tool.vercel.app/api/s3PhotoUpload', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ fileName, fileType }),
+          });
+      
+          const { preSignedUrl, fileUrl } = await response.json();
+      
+          // Perform the file upload to S3 using the pre-signed URL
+          await fetch(preSignedUrl, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': fileType,
+            },
+            body: file,
+          });
+      
+          console.log('File uploaded:', fileUrl);
+          return fileUrl;
+        } catch (error) {
+          console.error('Error uploading file:', error);
+          throw error;
+        }
+      }
+      
 
-     // Set event listeners for inputs
-    // cameraInput.onchange = handlePhotoUpload;
      galleryInput.onchange = handlePhotoUpload;
 
     addOne.addEventListener('click', async function() {
@@ -183,36 +179,18 @@ function incrementCategory() {
         const noteValue = noteInput.value;
         const add = 1;
 
-        // // Create an input element to accept an image
-        // let imageInput = document.createElement('input');
-        // imageInput.type = 'file';
-        // imageInput.accept = 'image/*';
-        // imageInput.capture = 'camera';
+        const addPointsContainer = document.getElementById('addPointsContainer');
+        const ideaTag = addPointsContainer.querySelector('.ideaTag');
 
-        // // Prompt the user to select or take a photo
-        // imageInput.click();
+        if (ideaTag) {
+            const ideaValue = ideaTag.innerText;
+            ideaTag.remove();
 
-        // imageInput.onchange = async () => {
-        //     const file = imageInput.files[0];
-        //     let photoUrl = ''; // Initialize photo URL as empty
-
-            // if (file) {
-            //     // Placeholder function for uploading image and getting the URL
-            //     photoUrl = await uploadImageAndGetUrl(file);
-            // }
-
-            const addPointsContainer = document.getElementById('addPointsContainer');
-            const ideaTag = addPointsContainer.querySelector('.ideaTag');
-
-            if (ideaTag) {
-                const ideaValue = ideaTag.innerText;
-                ideaTag.remove();
-
-                // Delete data in mongo
-                await treeMongoDeleteIdea(selectedCategory, ideaValue);
-                addPointsContainerState = 0;
-                await getAndLoadIdeas();
-            }
+            // Delete data in mongo
+            await treeMongoDeleteIdea(selectedCategory, ideaValue);
+            addPointsContainerState = 0;
+            await getAndLoadIdeas();
+        }
 
             // Now you include the photo URL in your update
             updateMongoAndTrees(selectedCategory, add, noteValue, photoUrl);
