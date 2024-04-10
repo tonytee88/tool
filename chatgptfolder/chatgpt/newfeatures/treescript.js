@@ -818,7 +818,8 @@ garbageBin.addEventListener('drop', async event => {
     if (ideaTag) {
         // Extracting category and idea text from the tag
         const idParts = id.split('-');
-        const category = idParts.slice(0, -1).join('-');
+        const categoryIndex = idParts.length - 2;
+        const category = idParts[categoryIndex];
         const idea = ideaTag.innerText;
         console.log("trying to delete:" +idea + category);
         // API call to delete the idea
