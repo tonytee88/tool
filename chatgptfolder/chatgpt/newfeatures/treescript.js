@@ -786,10 +786,9 @@ async function loadWall() {
     const notes = await treeMongoGetNotes();
 
      // Filter notes based on photoUrl and activityNote
-     const filteredNotes = notes.filter(note => 
-        note.photoUrl.includes("mpgi-bucket.s3.amazonaws.com/images") && 
-        note.activityNote !== "Sample activity note"
-    );
+     const filteredNotes = notes.filter(note =>
+        note.photoUrl && note.photoUrl.includes("mpgi-bucket.s3.amazonaws.com/images") &&
+        note.activityNote && note.activityNote !== "Sample activity note");
 
     // Create and append cards for each note
     filteredNotes.forEach(note => {
