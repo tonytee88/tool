@@ -512,6 +512,7 @@ async function treeMongoFetchIdeas(category) {
         }
 
         const data = await response.json();
+        console.log('Response data:', data);
         // Check if the ideas property is available in the nested document object
         if (data.ideas && Array.isArray(data.document.ideas)) {
             return data.ideas;
