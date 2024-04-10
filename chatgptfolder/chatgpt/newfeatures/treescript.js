@@ -454,8 +454,8 @@ async function getAndLoadIdeas() {
 
         const filteredIdeas = ideas.filter(idea => idea.trim() !== "" && idea !== "Sample activity note");
 
-        filteredIdeas.forEach((idea, index) => {
-            let uniqueIdentifier = `${category.replace(/\s+/g, '-')}-${index}-${Date.now()}`;
+        filteredIdeas.forEach((idea) => {
+            let uniqueIdentifier = `${category.replace(/\s+/g, '-')}-${Date.now()}`;
 
             // Create a div element for each idea, applying the color for border
             const ideaTag = document.createElement('div');
