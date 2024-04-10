@@ -229,7 +229,7 @@ function incrementCategory() {
             noteInput.value = "";
 
             // Show success feedback with a checkmark
-            addOne.innerHTML = "✔️";
+            addOne.innerHTML = "<span style='color: green;'>✔️</span>";
             addOne.disabled = true; // Optionally disable the button to prevent multiple clicks
 
             // Revert the button back to its original state after 5 seconds
@@ -238,11 +238,6 @@ function incrementCategory() {
                 addOne.disabled = false; // Re-enable the button
             }, 5000);
 
-            // Add animation to the +1 button
-            addOne.classList.add('clicked-animation');
-            setTimeout(() => {
-                addOne.classList.remove('clicked-animation');
-            }, 500);
         });
     };
 
