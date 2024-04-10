@@ -330,7 +330,7 @@ button:hover {
 
 .garbage-bin {
     position: fixed;
-    bottom: 20px;
+    bottom: 60px;
     left: 50%;
     transform: translateX(-50%);
     font-size: 48px;
@@ -340,7 +340,7 @@ button:hover {
 /* Highlighting effect when dragging over the bin */
 .garbage-bin.highlight {
     color: red; 
-    animation: shake 0.5s;
+    animation: shake 2s;
 }
 
 @keyframes shake {
