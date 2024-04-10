@@ -290,8 +290,8 @@ button:hover {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin: 10px;
-    padding: 10px;
+    margin: 2px;
+    padding: 2px;
     border: 1px solid #ccc; /* Add a border for better visual separation */
     border-radius: 5px; /* Optional: rounded corners for a smoother look */
     background-color: #333; /* Dark theme background */
@@ -301,8 +301,8 @@ button:hover {
 }
 
 .notePhoto img {
-    max-width: 90%; /* Limit image width to 90% of its container */
-    max-height: 60vh; /* Limit image height to 60% of viewport height */
+    max-width: 100%; /* Limit image width to 90% of its container */
+    max-height: 80vh; /* Limit image height to 60% of viewport height */
     object-fit: cover; /* Resize image to cover the container while maintaining its aspect ratio */
 }
 
