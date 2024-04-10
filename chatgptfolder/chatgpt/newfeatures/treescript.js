@@ -454,7 +454,7 @@ async function getAndLoadIdeas() {
 
         const filteredIdeas = ideas.filter(idea => idea.trim() !== "" && idea !== "Sample activity note");
 
-        filteredIdeas.forEach(idea => {
+        filteredIdeas.forEach(idea, index => {
             let uniqueIdentifier = `${category.replace(/\s+/g, '-')}-${index}-${Date.now()}`;
 
             // Create a div element for each idea, applying the color for border
@@ -465,6 +465,7 @@ async function getAndLoadIdeas() {
             ideaTag.innerText = idea;
             ideaTag.setAttribute('draggable', true);
             ideaTag.setAttribute('id', `idea-${uniqueIdentifier}`);
+            console.log(uniqueIdentifier);
 
             // Add event listeners for drag actions
             setupDragListeners(ideaTag);
