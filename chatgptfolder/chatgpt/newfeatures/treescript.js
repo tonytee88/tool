@@ -452,7 +452,7 @@ async function getAndLoadIdeas() {
 
         const ideas = await treeMongoFetchIdeas(category);
         console.log("ideas: " + ideas);
-        const filteredIdeas = ideas.filter(idea => idea.activityNote && idea.activityNote.trim() !== "");
+        const filteredIdeas = ideas.filter(idea => idea.trim() !== "" && idea !== "Sample activity note");
         console.log("filteredIdeas: " + filteredIdeas);
         filteredIdeas.forEach(idea => {
             // Create a div element for each idea, applying the color for border
