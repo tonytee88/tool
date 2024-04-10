@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
     createCategoryElements();
     incrementCategory();
     await initTrees();
-    //getAndLoadIdeas();
+    getAndLoadIdeas();
 
     const initButton = document.getElementById('initializeCategories');
     initButton.addEventListener('click', function() {
@@ -92,7 +92,7 @@ function showGarden() {
     const exploreContent = document.getElementById("exploreContent");
     const wallContent = document.getElementById("wallContent");
     
-    getAndLoadIdeas()
+    getAndLoadIdeas();
     plusContent.style.display = "none";
     exploreContent.style.display = "none";
     treeContainer.style.display = "grid";
@@ -447,7 +447,8 @@ async function getAndLoadIdeas() {
     ideasList.innerHTML = '';
 
     // Iterate over each category from the categories array
-    for (const { name: category, color } of categories) {
+    //for (const { name: category, color } of categories) {
+    for (const category of categories) {
         const ideas = await treeMongoFetchIdeas(category);
         const filteredIdeas = ideas.filter(idea => idea.trim() !== "");
 
@@ -739,4 +740,16 @@ async function callApi(currentDate, keywords) {
 
 //Wall MPGI
 //find active tree + fetchNotesFromActiveTree : return object with activity note, photourl, date, category
-//
+//create card + id and classes
+function createCard(note) {
+    // Create card element based on note data
+    const card = document.createElement('div');
+    card.className = 'noteCard';
+    card.innerHTML = `
+        <div class="notePhoto"><img src="${note.photoUrl}" alt="Photo"></div>
+        <div class="noteText">${note.activityNote}</div>
+        <div class="noteDate">${note.dateStamp}</div>
+        <div class="noteCategory">${note.category}</div>
+    `;
+    return card;
+}
