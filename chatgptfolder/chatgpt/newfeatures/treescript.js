@@ -451,7 +451,7 @@ async function getAndLoadIdeas() {
     for (const { name: category, color } of categories) {
 
         const ideas = await treeMongoFetchIdeas(category);
-        const filteredIdeas = ideas.filter(idea => idea.trim() !== "");
+        const filteredIdeas = ideas.filter(idea => ideas.trim() !== "");
 
         filteredIdeas.forEach(idea => {
             // Create a div element for each idea, applying the color for border
@@ -512,7 +512,6 @@ async function treeMongoFetchIdeas(category) {
         }
 
         const data = await response.json();
-        console.log('Response data:', data);
         // Check if the ideas property is available in the nested document object
         if (data.ideas && Array.isArray(data.ideas)) {
             return data.ideas;
