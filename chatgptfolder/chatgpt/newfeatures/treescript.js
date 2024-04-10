@@ -451,9 +451,9 @@ async function getAndLoadIdeas() {
     for (const { name: category, color } of categories) {
 
         const ideas = await treeMongoFetchIdeas(category);
-        console.log("ideas: " + ideas);
+
         const filteredIdeas = ideas.filter(idea => idea.trim() !== "" && idea !== "Sample activity note");
-        console.log("filteredIdeas: " + filteredIdeas);
+
         filteredIdeas.forEach(idea => {
             // Create a div element for each idea, applying the color for border
             const ideaTag = document.createElement('div');
@@ -757,6 +757,7 @@ async function treeMongoGetNotes() {
 
         // Expecting an array of notes as the response
         const notes = await response.json();
+        console.log("notes: " + notes)
         return notes;
     } catch (error) {
         console.error('Error fetching notes:', error);
