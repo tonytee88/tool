@@ -133,6 +133,7 @@ function showWall () {
     exploreContent.style.display = "none";
     plusContent.style.display = "none";
     wallContent.style.display = "block";
+    loadWall();
 }
 
 let selectedFile = null;
