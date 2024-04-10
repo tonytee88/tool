@@ -163,8 +163,6 @@ async function handlePhotoUpload(file) {
         }
 
         const { preSignedUrl, fileUrl } = await response.json();
-        console.log("preSignedUrl: " + preSignedUrl);
-        console.log("fileUrl: "+fileUrl);
         // Check if the pre-signed URL and file URL are received correctly
         if (!preSignedUrl || !fileUrl) {
             throw new Error('Pre-signed URL or file URL is missing in the response');
@@ -229,6 +227,16 @@ function incrementCategory() {
             // Now you include the photo URL in your update
             await updateMongoAndTrees(selectedCategory, add, noteValue, photoUrl);
             noteInput.value = "";
+
+            // Show success feedback with a checkmark
+            addOne.innerHTML = "✔️";
+            addOne.disabled = true; // Optionally disable the button to prevent multiple clicks
+
+            // Revert the button back to its original state after 5 seconds
+            setTimeout(() => {
+                addOne.innerHTML = "+1";
+                addOne.disabled = false; // Re-enable the button
+            }, 5000);
 
             // Add animation to the +1 button
             addOne.classList.add('clicked-animation');
