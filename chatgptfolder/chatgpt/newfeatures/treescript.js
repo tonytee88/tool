@@ -163,7 +163,8 @@ async function handlePhotoUpload(file) {
         }
 
         const { preSignedUrl, fileUrl } = await response.json();
-
+        console.log("preSignedUrl: " + preSignedUrl);
+        console.log("fileUrl: "+fileUrl);
         // Check if the pre-signed URL and file URL are received correctly
         if (!preSignedUrl || !fileUrl) {
             throw new Error('Pre-signed URL or file URL is missing in the response');
