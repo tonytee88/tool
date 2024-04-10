@@ -92,6 +92,7 @@ function showGarden() {
     const exploreContent = document.getElementById("exploreContent");
     const wallContent = document.getElementById("wallContent");
     
+    getAndLoadIdeas()
     plusContent.style.display = "none";
     exploreContent.style.display = "none";
     treeContainer.style.display = "grid";
@@ -735,3 +736,7 @@ async function callApi(currentDate, keywords) {
         console.error('Error calling the API', error);
     } 
 }
+
+//Wall MPGI
+//find active tree + fetchNotesFromActiveTree : return object with activity note, photourl, date, category
+//
