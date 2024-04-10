@@ -455,12 +455,16 @@ async function getAndLoadIdeas() {
         const filteredIdeas = ideas.filter(idea => idea.trim() !== "" && idea !== "Sample activity note");
 
         filteredIdeas.forEach(idea => {
+            const uniqueIdentifier = `${ideaTag}_dragId`;
+
             // Create a div element for each idea, applying the color for border
             const ideaTag = document.createElement('div');
             ideaTag.className = 'ideaTag';
             ideaTag.style.border = `2px solid ${color}`;  // Set the border color
             ideaTag.style.color = "#ffffff";  // White text for readability
             ideaTag.innerText = idea;
+            ideaTag.setAttribute('draggable', true);
+            ideaTag.setAttribute('id', uniqueIdentifier);
 
             // Add event listener for click actions on idea tags
             ideaTag.addEventListener('click', () => {
@@ -795,3 +799,39 @@ async function loadWall() {
         wallContent.appendChild(card);
     });
 }
+
+const garbageBin = document.getElementById('garbageBin');
+garbageBin.addEventListener('dragover', event => {
+    event.preventDefault(); // Necessary to allow dropping
+});
+
+garbageBin.addEventListener('drop', async event => {
+    event.preventDefault();
+    const id = event.dataTransfer.getData('text/plain');
+    const ideaTag = document.getElementById(id);
+
+    if (ideaTag) {
+        // Extracting category and idea text from the tag
+        const category = ideaTag.closest('.categoryContainer').getAttribute('data-category');
+        const idea = ideaTag.textContent;
+
+        // API call to delete the idea
+        await treeMongoDeleteIdea(category, idea);
+
+        // Remove the tag from DOM
+        ideaTag.remove();
+    }
+
+    garbageBin.classList.remove('highlight');
+});
+
+document.querySelectorAll('.ideaTag').forEach(ideaTag => {
+    ideaTag.addEventListener('dragstart', event => {
+        event.dataTransfer.setData('text/plain', event.target.id);
+        document.getElementById('garbageBin').classList.add('highlight');
+    });
+
+    ideaTag.addEventListener('dragend', () => {
+        document.getElementById('garbageBin').classList.remove('highlight');
+    });
+});

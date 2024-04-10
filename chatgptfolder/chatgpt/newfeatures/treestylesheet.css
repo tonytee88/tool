@@ -326,3 +326,24 @@ button:hover {
         max-height: 50vh; /* Adjust image height on smaller screens */
     }
 }
+
+
+.garbage-bin {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 48px;
+    cursor: pointer;
+}
+
+/* Highlighting effect when dragging over the bin */
+.garbage-bin.highlight {
+    color: red; 
+    animation: shake 0.5s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(-50%) rotate(-5deg); }
+    50% { transform: translateX(-50%) rotate(5deg); }
+}
