@@ -467,11 +467,9 @@ async function getAndLoadIdeas() {
             ideaTag.setAttribute('id', `idea-${uniqueIdentifier}`);
             console.log(uniqueIdentifier);
 
-            // Add event listeners for drag actions
-            setupDragListeners(ideaTag);
-
             // Append the idea tag to the ideas list
             ideasList.appendChild(ideaTag);
+            setupDragListeners(ideaTag, category);
 
             // Add event listener for click actions on idea tags
             ideaTag.addEventListener('click', () => {
