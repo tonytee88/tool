@@ -819,7 +819,7 @@ garbageBin.addEventListener('drop', async event => {
         // Extracting category and idea text from the tag
         const idParts = id.split('-');
         const category = idParts.slice(0, -1).join('-');
-        const idea = ideaTag.textContent;
+        const idea = ideaTag.innerText;
         console.log("trying to delete:" +idea + category);
         // API call to delete the idea
         await treeMongoDeleteIdea(category, idea);
