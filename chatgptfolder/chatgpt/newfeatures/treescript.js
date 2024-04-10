@@ -90,30 +90,48 @@ function showGarden() {
     const plusContent = document.getElementById("plusContent");
     const treeContainer = document.querySelector(".treeContainer");
     const exploreContent = document.getElementById("exploreContent");
+    const wallContent = document.getElementById("wallContent");
     
     plusContent.style.display = "none";
     exploreContent.style.display = "none";
     treeContainer.style.display = "grid";
+    wallContent.style.display = "none";
 }
 
 function showPlus() {
     const plusContent = document.getElementById("plusContent");
     const treeContainer = document.querySelector(".treeContainer");
     const exploreContent = document.getElementById("exploreContent");
+    const wallContent = document.getElementById("wallContent");
 
     treeContainer.style.display = "none";
     exploreContent.style.display = "none";
     plusContent.style.display = "block";
+    wallContent.style.display = "none";
 }
 
 function showExplore () {
     const plusContent = document.getElementById("plusContent");
     const treeContainer = document.querySelector(".treeContainer");
     const exploreContent = document.getElementById("exploreContent");
+    const wallContent = document.getElementById("wallContent");
 
     treeContainer.style.display = "none";
     exploreContent.style.display = "block";
     plusContent.style.display = "none";
+    wallContent.style.display = "none";
+}
+
+function showWall () {
+    const plusContent = document.getElementById("plusContent");
+    const treeContainer = document.querySelector(".treeContainer");
+    const exploreContent = document.getElementById("exploreContent");
+    const wallContent = document.getElementById("wallContent");
+
+    treeContainer.style.display = "none";
+    exploreContent.style.display = "none";
+    plusContent.style.display = "none";
+    wallContent.style.display = "block";
 }
 
 let selectedFile = null;

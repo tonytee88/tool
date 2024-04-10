@@ -158,7 +158,7 @@ button {
     box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Button shadow for depth */
 }
 
-#gardenTab, #plusTab, #exploreTab {
+#gardenTab, #plusTab, #exploreTab, #wallTab {
     background-color: #383838;
     box-shadow: none;
     font-size: 18px;    /* Bigger font size */
