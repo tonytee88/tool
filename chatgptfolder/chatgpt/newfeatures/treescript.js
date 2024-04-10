@@ -447,8 +447,8 @@ async function getAndLoadIdeas() {
     ideasList.innerHTML = '';
 
     // Iterate over each category from the categories array
-    //for (const { name: category, color } of categories) {
-    for (const category of categories) {
+    for (const { name: category, color } of categories) {
+
         const ideas = await treeMongoFetchIdeas(category);
         const filteredIdeas = ideas.filter(idea => idea.trim() !== "");
 
@@ -511,6 +511,7 @@ async function treeMongoFetchIdeas(category) {
         }
 
         const data = await response.json();
+        console.log("data.document.ideas: " + data.document.ideas)
         // Check if the ideas property is available in the nested document object
         if (data.document && Array.isArray(data.document.ideas)) {
             return data.document.ideas;
@@ -752,4 +753,20 @@ function createCard(note) {
         <div class="noteCategory">${note.category}</div>
     `;
     return card;
+}
+//function loadWall
+async function loadWall() {
+    const wallContent = document.getElementById('wallContent');
+    wallContent.innerHTML = ''; // Clear existing content
+
+    const notes = await fetchNotesFromActiveTree();
+
+    // Sort notes by date, descending
+    notes.sort((a, b) => new Date(b.dateStamp) - new Date(a.dateStamp));
+
+    // Create and append cards for each note
+    notes.forEach(note => {
+        const card = createCard(note);
+        wallContent.appendChild(card);
+    });
 }
