@@ -757,7 +757,7 @@ async function treeMongoGetNotes() {
 
         // Expecting an array of notes as the response
         const notes = await response.json();
-        console.log("notes: " + notes)
+        console.log("notes: " + JSON.stringify(notes))
         return notes;
     } catch (error) {
         console.error('Error fetching notes:', error);
