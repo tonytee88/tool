@@ -740,9 +740,30 @@ async function callApi(currentDate, keywords) {
 
 //Wall MPGI
 //find active tree + fetchNotesFromActiveTree : return object with activity note, photourl, date, category
+async function treeMongoGetNotes() {
+    try {
+        const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoGetNotes', {
+            method: 'GET', // Should likely be a GET request if fetching data
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        // Expecting an array of notes as the response
+        const notes = await response.json();
+        return notes;
+    } catch (error) {
+        console.error('Error fetching notes:', error);
+        return [];  // Return an empty array in case of error
+    }
+}
+
 //create card + id and classes
 function createCard(note) {
-    // Create card element based on note data
     const card = document.createElement('div');
     card.className = 'noteCard';
     card.innerHTML = `
@@ -753,15 +774,13 @@ function createCard(note) {
     `;
     return card;
 }
+
 //function loadWall
 async function loadWall() {
     const wallContent = document.getElementById('wallContent');
     wallContent.innerHTML = ''; // Clear existing content
 
-    const notes = await fetchNotesFromActiveTree();
-
-    // Sort notes by date, descending
-    notes.sort((a, b) => new Date(b.dateStamp) - new Date(a.dateStamp));
+    const notes = await treeMongoGetNotes();
 
     // Create and append cards for each note
     notes.forEach(note => {
