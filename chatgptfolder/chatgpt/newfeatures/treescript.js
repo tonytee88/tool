@@ -455,7 +455,7 @@ async function getAndLoadIdeas() {
         const filteredIdeas = ideas.filter(idea => idea.trim() !== "" && idea !== "Sample activity note");
 
         filteredIdeas.forEach(idea => {
-            const uniqueIdentifier = `${ideaTag}_dragId`;
+            let uniqueIdentifier = `${category.replace(/\s+/g, '-')}-${index}-${Date.now()}`;
 
             // Create a div element for each idea, applying the color for border
             const ideaTag = document.createElement('div');
@@ -464,7 +464,13 @@ async function getAndLoadIdeas() {
             ideaTag.style.color = "#ffffff";  // White text for readability
             ideaTag.innerText = idea;
             ideaTag.setAttribute('draggable', true);
-            ideaTag.setAttribute('id', uniqueIdentifier);
+            ideaTag.setAttribute('id', `idea-${uniqueIdentifier}`);
+
+            // Add event listeners for drag actions
+            setupDragListeners(ideaTag);
+
+            // Append the idea tag to the ideas list
+            ideasList.appendChild(ideaTag);
 
             // Add event listener for click actions on idea tags
             ideaTag.addEventListener('click', () => {
@@ -825,7 +831,7 @@ garbageBin.addEventListener('drop', async event => {
     garbageBin.classList.remove('highlight');
 });
 
-document.querySelectorAll('.ideaTag').forEach(ideaTag => {
+function setupDragListeners(ideaTag) {
     ideaTag.addEventListener('dragstart', event => {
         event.dataTransfer.setData('text/plain', event.target.id);
         document.getElementById('garbageBin').classList.add('highlight');
@@ -834,4 +840,4 @@ document.querySelectorAll('.ideaTag').forEach(ideaTag => {
     ideaTag.addEventListener('dragend', () => {
         document.getElementById('garbageBin').classList.remove('highlight');
     });
-});
+}
