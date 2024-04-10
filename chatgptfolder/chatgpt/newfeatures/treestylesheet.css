@@ -283,3 +283,46 @@ button:hover {
     margin: 10px;
     cursor: pointer;
 }
+
+/* wall css */
+.noteCard {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #ccc; /* Add a border for better visual separation */
+    border-radius: 5px; /* Optional: rounded corners for a smoother look */
+    background-color: #333; /* Dark theme background */
+    color: white; /* Light text for readability */
+    max-width: 100%; /* Ensure card doesn't overflow screen width */
+    box-sizing: border-box; /* Include padding and border in the element's total width */
+}
+
+.notePhoto img {
+    max-width: 90%; /* Limit image width to 90% of its container */
+    max-height: 60vh; /* Limit image height to 60% of viewport height */
+    object-fit: cover; /* Resize image to cover the container while maintaining its aspect ratio */
+}
+
+.noteText,
+.noteDate,
+.noteCategory {
+    text-align: center; /* Center-align text */
+    width: 100%; /* Full width */
+    padding: 5px; /* Add some padding for spacing */
+    overflow-wrap: break-word; /* Prevent long words from overflowing */
+}
+
+/* Additional responsive adjustments for smaller screens */
+@media (max-width: 480px) {
+    .noteCard {
+        margin: 5px;
+        padding: 5px;
+    }
+
+    .notePhoto img {
+        max-height: 50vh; /* Adjust image height on smaller screens */
+    }
+}
