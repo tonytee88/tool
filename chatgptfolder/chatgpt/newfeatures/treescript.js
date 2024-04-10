@@ -180,7 +180,9 @@ async function handlePhotoUpload(file) {
 
         // Check if the upload was successful
         if (!uploadResponse.ok) {
-            throw new Error(`Failed to upload file. Server responded with ${uploadResponse.status}`);
+            const errorText = await uploadResponse.text();  // Get detailed error message
+            console.error(`Failed to upload file. Server responded with ${uploadResponse.status}: ${errorText}`);
+            throw new Error(`Failed to upload file. Server responded with ${uploadResponse.status}: ${errorText}`);
         }
 
         console.log('File uploaded:', fileUrl);
