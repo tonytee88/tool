@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
     createCategoryElements();
     incrementCategory();
     await initTrees();
-    getAndLoadIdeas();
+    //getAndLoadIdeas();
 
     const initButton = document.getElementById('initializeCategories');
     initButton.addEventListener('click', function() {
