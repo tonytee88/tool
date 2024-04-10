@@ -451,6 +451,7 @@ async function getAndLoadIdeas() {
     for (const { name: category, color } of categories) {
 
         const ideas = await treeMongoFetchIdeas(category);
+        console.log("ideas: " + ideas);
         const filteredIdeas = ideas.filter(idea => idea.activityNote && idea.activityNote.trim() !== "");
         console.log("filteredIdeas: " + filteredIdeas);
         filteredIdeas.forEach(idea => {
