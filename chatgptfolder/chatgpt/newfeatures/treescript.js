@@ -790,7 +790,7 @@ async function loadWall() {
     );
 
     // Create and append cards for each note
-    notes.forEach(note => {
+    filteredNotes.forEach(note => {
         const card = createCard(note);
         wallContent.appendChild(card);
     });
