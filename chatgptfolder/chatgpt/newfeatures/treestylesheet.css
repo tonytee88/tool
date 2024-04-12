@@ -347,3 +347,35 @@ button:hover {
     0%, 100% { transform: translateX(-50%) rotate(-5deg); }
     50% { transform: translateX(-50%) rotate(5deg); }
 }
+
+/* CHAT STUFF */
+
+#chatResponseContainer {
+    padding: 10px;
+    height: 150px;
+    overflow: auto;
+    background-color: #f3f3f3;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+}
+
+#chatInputContainer {
+    display: flex;
+}
+
+#chatInput {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+#chatButton {
+    padding: 10px 20px;
+    border: none;
+    background-color: #007BFF;
+    color: white;
+    cursor: pointer;
+}
+button:hover {
+    background-color: #0056b3;
+}

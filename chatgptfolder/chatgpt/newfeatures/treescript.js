@@ -842,3 +842,35 @@ function setupDragListeners(ideaTag) {
         document.getElementById('garbageBin').classList.remove('highlight');
     });
 }
+
+async function sendChat() {
+    const chatInput = document.getElementById('chatInput');
+    const chatResponse = document.getElementById('chatResponse');
+
+    const prompt = chatInput.value.trim();
+    if (!prompt) {
+        alert("Please enter a message to send.");
+        return;
+    }
+
+    try {
+        const response = await fetch('https://j7-magic-tool.vercel.app/api/agenticMongoGet', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ prompt })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        chatResponse.innerText = data.response; // Assuming the server returns { response: '...' }
+        chatInput.value = ''; // Clear input after sending
+    } catch (error) {
+        console.error('Error sending chat:', error);
+        chatResponse.innerText = 'Error: ' + error.message;
+    }
+}
