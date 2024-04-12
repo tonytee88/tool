@@ -860,6 +860,9 @@ async function sendChat() {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ query: prompt })
+        }).catch(err => {
+            console.error('Fetch error:', err);
+            throw err;  // Rethrow to handle it in the outer catch block
         });
 
         if (!response.ok) {
