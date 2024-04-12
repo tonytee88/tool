@@ -859,15 +859,24 @@ async function sendChat() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ prompt })
+            body: JSON.stringify({ query: prompt })
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            throw new Error(`Server responded with ${response.status}: ${response.statusText}`);
         }
 
         const data = await response.json();
-        chatResponse.innerText = data.response; // Assuming the server returns { response: '...' }
+        
+        // Assuming the server returns data in the format { results: [{ idea, tagline }, ...] }
+        if (data.results && data.results.length > 0) {
+            // Constructing a response string from results
+            const responseText = data.results.map(result => `${result.idea} - ${result.tagline}`).join('\n');
+            chatResponse.innerText = responseText;
+        } else {
+            chatResponse.innerText = 'No results found.';
+        }
+        
         chatInput.value = ''; // Clear input after sending
     } catch (error) {
         console.error('Error sending chat:', error);
