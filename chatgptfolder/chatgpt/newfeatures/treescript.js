@@ -886,3 +886,37 @@ async function sendChat() {
         chatResponse.innerText = 'Error: ' + error.message;
     }
 }
+
+function submitData() {
+    var idea = document.getElementById('ideaInput').value;
+    var tagline = document.getElementById('taglineInput').value;
+
+    createIdea(idea, tagline);
+  }
+
+  // Example function to post data via API
+  async function createIdea(idea, tagline) {
+    const endpointUrl = 'https://j7-magic-tool.vercel.app/api/agenticAiCreate'; // Change to your actual domain
+
+    try {
+        const response = await fetch(endpointUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                idea: idea,
+                tagline: tagline
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log(`Response:`, data.message);
+    } catch (error) {
+        console.error(`Error creating idea:`, error);
+    }
+}

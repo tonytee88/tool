@@ -379,3 +379,24 @@ button:hover {
 button:hover {
     background-color: #0056b3;
 }
+/* test field to add embeddings */
+.data-entry {
+    background-color: #f9f9f9;
+    padding: 10px;
+    margin: 10px;
+  }
+  .data-entry input[type="text"] {
+    padding: 8px;
+    margin: 5px;
+    width: 300px; /* Adjust width as needed */
+  }
+  .data-entry button {
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  .data-entry button:hover {
+    background-color: #0056b3;
+  }
