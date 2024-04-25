@@ -62,8 +62,45 @@ function createCategoryElements() {
         trunkContainer.id = category.name.toLowerCase();
         treeDiv.appendChild(trunkContainer);
 
+        // Add click event to each category head to fetch and display notes
+        treeHead.addEventListener('click', () => fetchAndDisplayNotes(category.name));
+
         treeContainer.appendChild(treeDiv);
     });
+}
+
+async function fetchAndDisplayNotes(categoryName) {
+    try {
+        const response = await fetch(`https://j7-magic-tool.vercel.app/api/treeMongoGetNotes?category=${encodeURIComponent(categoryName)}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const notes = await response.json();
+        displayNotes(notes, categoryName.toLowerCase());
+    } catch (error) {
+        console.error('Error fetching notes:', error);
+    }
+}
+
+function displayNotes(notes, categoryId) {
+    const categoryDiv = document.getElementById(categoryId);
+    const notesList = document.createElement('ul');  // Create a list to display notes
+
+    notes.forEach(note => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${note.activityNote} - ${note.dateStamp}`;
+        notesList.appendChild(listItem);
+    });
+
+    categoryDiv.innerHTML = '';  // Clear previous content if any
+    categoryDiv.appendChild(notesList);  // Append the list to the category div
 }
 
 function populateCategoryDropdowns() {
