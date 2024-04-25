@@ -102,9 +102,11 @@ async function fetchCategoryNotes(categoryName) {
 
 function displayNotes(notes) {
     const historyContainer = document.getElementById('history');
-    // Sort notes by date, earliest first
-    notes.sort((a, b) => new Date(a.dateStamp) - new Date(b.dateStamp));
-    notes.forEach(note => {
+    // Sort notes by date, earliest first, and filter out unwanted notes
+    const filteredNotes = notes.filter(note => note.activityNote !== "Sample activity note");
+    filteredNotes.sort((a, b) => new Date(a.dateStamp) - new Date(b.dateStamp));
+
+    filteredNotes.forEach(note => {
         const entry = document.createElement('div');
         entry.className = 'historyEntry';
         // Display date first, then activity note

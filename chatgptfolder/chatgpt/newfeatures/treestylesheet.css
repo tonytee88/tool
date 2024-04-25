@@ -404,13 +404,16 @@ button:hover {
 
   .historyContainer {
     padding: 10px;
-    background-color: #f4f4f4;  /* Light grey background */
-    color: #333;                /* Dark text for readability */
+    background-color: #282828; /* Dark background */
+    color: #EDEDED;  /* Lighter text color */
+    
 }
 
 .historyEntry {
-    margin: 5px 0;
-    padding-left: 0;  /* Removes indentation */
-    list-style: none;  /* Removes bullet points */
-    white-space: nowrap;  /* Keeps the text on one line */
+    text-align: left;  /* Aligns text to the left */
+    padding: 8px;      /* Adds some padding for better readability */
+    margin: 5px 0;     /* Adds vertical spacing between entries */
+    white-space: nowrap; /* Keeps the text on one line */
+    overflow: hidden;  /* Ensures that text doesn't overflow the div */
+    text-overflow: ellipsis; /* Adds an ellipsis if the text is too long to fit */
 }
