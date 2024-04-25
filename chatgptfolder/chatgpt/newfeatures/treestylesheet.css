@@ -401,3 +401,16 @@ button:hover {
   .data-entry button:hover {
     background-color: #0056b3;
   }
+
+  .historyContainer {
+    padding: 10px;
+    background-color: #f4f4f4;  /* Light grey background */
+    color: #333;                /* Dark text for readability */
+}
+
+.historyEntry {
+    margin: 5px 0;
+    padding-left: 0;  /* Removes indentation */
+    list-style: none;  /* Removes bullet points */
+    white-space: nowrap;  /* Keeps the text on one line */
+}

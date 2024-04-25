@@ -57,50 +57,60 @@ function createCategoryElements() {
         treeHead.style.color = category.color; // Set the text color for each category
         treeDiv.appendChild(treeHead);
 
+        treeHead.addEventListener('click', async () => {
+            document.getElementById('history').innerHTML = '';  // Clear the history div
+            const notes = await fetchCategoryNotes(category.name);
+            displayNotes(notes);
+        });
+
         const trunkContainer = document.createElement('div');
         trunkContainer.className = 'trunkContainer';
         trunkContainer.id = category.name.toLowerCase();
         treeDiv.appendChild(trunkContainer);
 
-        // Add click event to each category head to fetch and display notes
-        treeHead.addEventListener('click', () => fetchAndDisplayNotes(category.name));
-
         treeContainer.appendChild(treeDiv);
     });
 }
 
-async function fetchAndDisplayNotes(categoryName) {
-    try {
-        const response = await fetch(`https://j7-magic-tool.vercel.app/api/treeMongoGetNotes?category=${encodeURIComponent(categoryName)}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const notes = await response.json();
-        displayNotes(notes, categoryName.toLowerCase());
-    } catch (error) {
-        console.error('Error fetching notes:', error);
+async function fetchCategoryNotes(categoryName) {
+    const response = await fetch(`https://j7-magic-tool.vercel.app/api/treeMongoGetNotes?category=${categoryName}`);
+    if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
     }
+    return await response.json();
 }
 
-function displayNotes(notes, categoryId) {
-    const categoryDiv = document.getElementById(categoryId);
-    const notesList = document.createElement('ul');  // Create a list to display notes
+// async function fetchAndDisplayNotes(categoryName) {
+//     try {
+//         const response = await fetch(`https://j7-magic-tool.vercel.app/api/treeMongoGetNotes?category=${encodeURIComponent(categoryName)}`, {
+//             method: 'GET',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//         });
 
+//         if (!response.ok) {
+//             throw new Error(`HTTP error! Status: ${response.status}`);
+//         }
+
+//         const notes = await response.json();
+//         displayNotes(notes, categoryName.toLowerCase());
+//     } catch (error) {
+//         console.error('Error fetching notes:', error);
+//     }
+// }
+
+function displayNotes(notes) {
+    const historyContainer = document.getElementById('history');
+    // Sort notes by date, earliest first
+    notes.sort((a, b) => new Date(a.dateStamp) - new Date(b.dateStamp));
     notes.forEach(note => {
-        const listItem = document.createElement('li');
-        listItem.textContent = `${note.activityNote} - ${note.dateStamp}`;
-        notesList.appendChild(listItem);
+        const entry = document.createElement('div');
+        entry.className = 'historyEntry';
+        // Display date first, then activity note
+        entry.textContent = `${note.dateStamp} - ${note.activityNote}`;
+        historyContainer.appendChild(entry);
     });
-
-    categoryDiv.innerHTML = '';  // Clear previous content if any
-    categoryDiv.appendChild(notesList);  // Append the list to the category div
 }
 
 function populateCategoryDropdowns() {
