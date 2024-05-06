@@ -140,12 +140,14 @@ function showGarden() {
     const treeContainer = document.querySelector(".treeContainer");
     const exploreContent = document.getElementById("exploreContent");
     const wallContent = document.getElementById("wallContent");
+    const historyContainer = documnt.getElementById("history");
     
     getAndLoadIdeas();
     plusContent.style.display = "none";
     exploreContent.style.display = "none";
     treeContainer.style.display = "grid";
     wallContent.style.display = "none";
+    historyContainer.style.display = "block";
 }
 
 function showPlus() {
@@ -153,11 +155,13 @@ function showPlus() {
     const treeContainer = document.querySelector(".treeContainer");
     const exploreContent = document.getElementById("exploreContent");
     const wallContent = document.getElementById("wallContent");
+    const historyContainer = documnt.getElementById("history");
 
     treeContainer.style.display = "none";
     exploreContent.style.display = "none";
     plusContent.style.display = "block";
     wallContent.style.display = "none";
+    historyContainer.style.display = "none";
 }
 
 function showExplore () {
@@ -165,23 +169,26 @@ function showExplore () {
     const treeContainer = document.querySelector(".treeContainer");
     const exploreContent = document.getElementById("exploreContent");
     const wallContent = document.getElementById("wallContent");
+    const historyContainer = documnt.getElementById("history");
 
     treeContainer.style.display = "none";
     exploreContent.style.display = "block";
     plusContent.style.display = "none";
     wallContent.style.display = "none";
-}
+    historyContainer.style.display = "none";}
 
 function showWall () {
     const plusContent = document.getElementById("plusContent");
     const treeContainer = document.querySelector(".treeContainer");
     const exploreContent = document.getElementById("exploreContent");
     const wallContent = document.getElementById("wallContent");
+    const historyContainer = documnt.getElementById("history");
 
     treeContainer.style.display = "none";
     exploreContent.style.display = "none";
     plusContent.style.display = "none";
     wallContent.style.display = "block";
+    historyContainer.style.display = "none";
     loadWall();
 }
 
@@ -815,7 +822,6 @@ async function treeMongoGetNotes() {
 
         // Expecting an array of notes as the response
         const notes = await response.json();
-        console.log("Notes received:", notes);  // Log to check what is received
         return notes;
     } catch (error) {
         console.error('Error fetching notes:', error);
@@ -842,7 +848,6 @@ async function loadWall() {
     wallContent.innerHTML = ''; // Clear existing content
 
     const notes = await treeMongoGetNotes();
-    console.log("Notes received in loadWall:", notes); // Debug log to check what notes are received
 
     // Filter notes based on photoUrl and activityNote
     const filteredNotes = notes.filter(note => {
@@ -851,11 +856,8 @@ async function loadWall() {
         return hasValidPhotoUrl && hasValidActivityNote;
     });
 
-    console.log("Filtered notes:", filteredNotes); // Log filtered notes to check what's passed to the UI
-
     // Create and append cards for each filtered note
     filteredNotes.forEach(note => {
-        console.log("Processing note:", note); // Log each note being processed
         const card = createCard(note);
         wallContent.appendChild(card);
     });
