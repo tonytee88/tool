@@ -816,7 +816,7 @@ async function treeMongoGetNotes() {
         // Expecting an array of notes as the response
         const notes = await response.json();
         console.log("Notes received:", notes);  // Log to check what is received
-        return notes.documents;
+        return notes;
     } catch (error) {
         console.error('Error fetching notes:', error);
         return [];  // Return an empty array in case of error
@@ -850,6 +850,7 @@ async function loadWall() {
 
     // Create and append cards for each note
     filteredNotes.forEach(note => {
+        console.log(note)
         const card = createCard(note);
         wallContent.appendChild(card);
     });
