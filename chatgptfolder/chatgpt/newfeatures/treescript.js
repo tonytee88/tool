@@ -514,7 +514,7 @@ async function getAndLoadIdeas() {
             ideaTag.innerText = idea;
             ideaTag.setAttribute('draggable', true);
             ideaTag.setAttribute('id', `idea-${uniqueIdentifier}`);
-            console.log(uniqueIdentifier);
+            //console.log(uniqueIdentifier);
 
             // Append the idea tag to the ideas list
             ideasList.appendChild(ideaTag);
