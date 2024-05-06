@@ -842,19 +842,25 @@ async function loadWall() {
     wallContent.innerHTML = ''; // Clear existing content
 
     const notes = await treeMongoGetNotes();
+    console.log("Notes received in loadWall:", notes); // Debug log to check what notes are received
 
-     // Filter notes based on photoUrl and activityNote
-     const filteredNotes = notes.filter(note =>
-        note.photoUrl && note.photoUrl.includes("mpgi-bucket.s3.amazonaws.com/images") &&
-        note.activityNote && note.activityNote !== "Sample activity note");
+    // Filter notes based on photoUrl and activityNote
+    const filteredNotes = notes.filter(note => {
+        const hasValidPhotoUrl = note.photoUrl && note.photoUrl.includes("mpgi-bucket.s3.amazonaws.com/images");
+        const hasValidActivityNote = note.activityNote && note.activityNote !== "Sample activity note";
+        return hasValidPhotoUrl && hasValidActivityNote;
+    });
 
-    // Create and append cards for each note
+    console.log("Filtered notes:", filteredNotes); // Log filtered notes to check what's passed to the UI
+
+    // Create and append cards for each filtered note
     filteredNotes.forEach(note => {
-        console.log(note)
+        console.log("Processing note:", note); // Log each note being processed
         const card = createCard(note);
         wallContent.appendChild(card);
     });
 }
+
 
 const garbageBin = document.getElementById('garbageBin');
 garbageBin.addEventListener('dragover', event => {
