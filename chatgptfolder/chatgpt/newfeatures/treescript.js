@@ -140,7 +140,7 @@ function showGarden() {
     const treeContainer = document.querySelector(".treeContainer");
     const exploreContent = document.getElementById("exploreContent");
     const wallContent = document.getElementById("wallContent");
-    const historyContainer = documnt.getElementById("history");
+    const historyContainer = document.getElementById("history");
     
     getAndLoadIdeas();
     plusContent.style.display = "none";
@@ -155,7 +155,7 @@ function showPlus() {
     const treeContainer = document.querySelector(".treeContainer");
     const exploreContent = document.getElementById("exploreContent");
     const wallContent = document.getElementById("wallContent");
-    const historyContainer = documnt.getElementById("history");
+    const historyContainer = document.getElementById("history");
 
     treeContainer.style.display = "none";
     exploreContent.style.display = "none";
@@ -169,7 +169,7 @@ function showExplore () {
     const treeContainer = document.querySelector(".treeContainer");
     const exploreContent = document.getElementById("exploreContent");
     const wallContent = document.getElementById("wallContent");
-    const historyContainer = documnt.getElementById("history");
+    const historyContainer = document.getElementById("history");
 
     treeContainer.style.display = "none";
     exploreContent.style.display = "block";
@@ -182,7 +182,7 @@ function showWall () {
     const treeContainer = document.querySelector(".treeContainer");
     const exploreContent = document.getElementById("exploreContent");
     const wallContent = document.getElementById("wallContent");
-    const historyContainer = documnt.getElementById("history");
+    const historyContainer = document.getElementById("history");
 
     treeContainer.style.display = "none";
     exploreContent.style.display = "none";
