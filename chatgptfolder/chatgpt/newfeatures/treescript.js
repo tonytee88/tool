@@ -340,8 +340,13 @@ function createPreElements(count, category) {
     // Clear any existing content first
     trunk.innerHTML = '';
 
-    // Calculate the proportion of filled blocks out of a total of 10 blocks
-    let filledBlockCount = Math.round((count / category.totalGoal) * 10);
+    // Determine the filled and empty block counts
+    let filledBlockCount;
+    if (count >= category.totalGoal) {
+        filledBlockCount = 10; // Full progress if current score is greater than or equal to total goal
+    } else {
+        filledBlockCount = Math.round((count / category.totalGoal) * 10);
+    }
     let emptyBlockCount = 10 - filledBlockCount;
 
     // Create a span for the filled part of the progress bar to apply color
