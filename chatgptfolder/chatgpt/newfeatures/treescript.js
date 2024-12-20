@@ -1,7 +1,10 @@
 let addPointsContainerState = 0; 
 let categories = [];
+
+document.addEventListener("DOMContentLoaded", async () => {
+    await getCategories1(); // Fetch and set categories globally
+});
 document.addEventListener('DOMContentLoaded', async (event) => {
-    await getCategories1();
     populateCategoryDropdowns();
     createCategoryElements();
     incrementCategory();
@@ -451,8 +454,8 @@ async function getCategories1() {
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
-
         const data = await response.json();
+        categories = data.categories;
         console.log("Reconstructed Categories:", data.categories);
     } catch (error) {
         console.error("Error fetching categories:", error);
