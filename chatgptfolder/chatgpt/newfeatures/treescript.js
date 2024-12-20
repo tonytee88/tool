@@ -24,27 +24,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
-// const categories = [
-//     { name: "Cooking", totalGoal: 50, color: "#FF7F50" }, // Coral
-//     { name: "Work", totalGoal: 20, color: "#FFD700" }, // Gold
-//     { name: "Social", totalGoal: 10, color: "#6A5ACD" }, // Slate Blue
-//     { name: "Give Back", totalGoal: 5, color: "#98FB98" }, // Pale Green
+const categoriesForNewRun = [
+    { name: "Cooking", totalGoal: 50, color: "#FF7F50" }, // Coral
+    { name: "Work", totalGoal: 20, color: "#FFD700" }, // Gold
+    { name: "Social", totalGoal: 10, color: "#6A5ACD" }, // Slate Blue
+    { name: "Give Back", totalGoal: 5, color: "#98FB98" }, // Pale Green
 
-//     { name: "Husband Duty", totalGoal: 5, color: "#FF69B4" }, // Hot Pink
-//     { name: "Fatherhood", totalGoal: 30, color: "#00FA9A" }, // Medium Spring Green
-//     { name: "Body Health", totalGoal: 50, color: "#4682B4" }, // Steel Blue
-//     { name: "Home Ownership", totalGoal: 20, color: "#DAA520" }, // Goldenrod
+    { name: "Husband Duty", totalGoal: 5, color: "#FF69B4" }, // Hot Pink
+    { name: "Fatherhood", totalGoal: 30, color: "#00FA9A" }, // Medium Spring Green
+    { name: "Body Health", totalGoal: 50, color: "#4682B4" }, // Steel Blue
+    { name: "Home Ownership", totalGoal: 20, color: "#DAA520" }, // Goldenrod
 
-//     { name: "Create-Ship", totalGoal: 10, color: "#DA70D6" }, // Orchid
-//     { name: "Share", totalGoal: 10, color: "#F08080" }, // Light Coral
-//     { name: "Learn", totalGoal: 5, color: "#20B2AA" }, // Light Sea Green
-//     { name: "Surprise", totalGoal: 5, color: "#9ACD32" }, // Yellow Green
+    { name: "Create-Ship", totalGoal: 10, color: "#DA70D6" }, // Orchid
+    { name: "Share", totalGoal: 10, color: "#F08080" }, // Light Coral
+    { name: "Learn", totalGoal: 5, color: "#20B2AA" }, // Light Sea Green
+    { name: "Surprise", totalGoal: 5, color: "#9ACD32" }, // Yellow Green
 
-//     { name: "What", totalGoal: 1, color: "#40E0D0" }, // Turquoise
-//     { name: "Who", totalGoal: 1, color: "#FFA07A" }, // Light Salmon
-//     { name: "How", totalGoal: 1, color: "#BA55D3" }, // Medium Orchid
-//     { name: "Why", totalGoal: 1, color: "#FF8C00" }  // Dark Orange
-// ];
+    { name: "What", totalGoal: 1, color: "#40E0D0" }, // Turquoise
+    { name: "Who", totalGoal: 1, color: "#FFA07A" }, // Light Salmon
+    { name: "How", totalGoal: 1, color: "#BA55D3" }, // Medium Orchid
+    { name: "Why", totalGoal: 1, color: "#FF8C00" }  // Dark Orange
+];
 
 
 
@@ -368,10 +368,10 @@ function createPreElements(count, category) {
     trunk.appendChild(progressBar);
 }
 
-async function initializeCategoryDocuments(categories) {
+async function initializeCategoryDocuments(categoriesForNewRun) {
     const endpointUrl = 'https://j7-magic-tool.vercel.app/api/treeMongoCreate';
     
-    for (const category of categories) {
+    for (const category of categoriesForNewRun) {
         console.log(category.name);
         try {
             const initialNote = []; // Starting with an empty notes array
@@ -405,11 +405,11 @@ async function initializeCategoryDocuments(categories) {
     }
 }
 
-async function storeCategories(categories) {
+async function storeCategories(categoriesForNewRun) {
     const endpointUrl = 'https://j7-magic-tool.vercel.app/api/treeMongoStoreCategories';
     
     try {
-        console.log("Storing categories...");
+        console.log("Storing categories for new run...");
         const response = await fetch(endpointUrl, {
             method: 'POST',
             headers: {
@@ -429,21 +429,10 @@ async function storeCategories(categories) {
     }
 }
 
-document.getElementById("testStoreCategories").addEventListener("click", async () => {
-
-    try {
-        console.log("Testing storeCategories function...");
-        await storeCategories(categories);
-    } catch (error) {
-        console.error("Error testing storeCategories function:", error);
-    }
-});
-
 async function getCategories1() {
+    // this function gets the categories based on the activeTree in mongoDB
     const endpointUrl = 'https://j7-magic-tool.vercel.app/api/treeMongoGetCategories'; // Update with the correct endpoint
-    console.log("hello tony get categories clicked")
     try {
-        console.log("Fetching categories...");
         const response = await fetch(endpointUrl, {
             method: 'GET', // Assuming the serverless function expects a GET request
             headers: {
@@ -456,20 +445,10 @@ async function getCategories1() {
         }
         const data = await response.json();
         categories = data.categories;
-        console.log("Reconstructed Categories:", data.categories);
     } catch (error) {
         console.error("Error fetching categories:", error);
     }
 }
-
-// Add event listener for the new button
-document.getElementById("getCategories1").addEventListener("click", async () => {
-    try {
-        await getCategories1();
-    } catch (error) {
-        console.error("Error testing getCategories function:", error);
-    }
-});
 
 async function treeMongoAdd(category, add, note, photoUrl) {
     try {
