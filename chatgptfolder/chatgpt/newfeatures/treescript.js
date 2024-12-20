@@ -428,13 +428,42 @@ document.getElementById("testStoreCategories").addEventListener("click", async (
     try {
         console.log("Testing storeCategories function...");
         await storeCategories(categories);
-        console.log("storeCategories function executed successfully!");
     } catch (error) {
         console.error("Error testing storeCategories function:", error);
     }
 });
 
+async function getCategories() {
+    const endpointUrl = 'https://j7-magic-tool.vercel.app/api/treeReconstructCategories'; // Update with the correct endpoint
 
+    try {
+        console.log("Fetching categories...");
+        const response = await fetch(endpointUrl, {
+            method: 'GET', // Assuming the serverless function expects a GET request
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Reconstructed Categories:", data.categories);
+    } catch (error) {
+        console.error("Error fetching categories:", error);
+    }
+}
+
+// Add event listener for the new button
+document.getElementById("getCategories").addEventListener("click", async () => {
+    try {
+        await getCategories();
+    } catch (error) {
+        console.error("Error testing getCategories function:", error);
+    }
+});
 
 async function treeMongoAdd(category, add, note, photoUrl) {
     try {
