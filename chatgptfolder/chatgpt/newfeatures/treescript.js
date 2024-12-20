@@ -433,7 +433,7 @@ document.getElementById("testStoreCategories").addEventListener("click", async (
     }
 });
 
-async function getCategories() {
+async function getCategories1() {
     const endpointUrl = 'https://j7-magic-tool.vercel.app/api/treeMongoGetCategories'; // Update with the correct endpoint
     console.log("hello tony get categories clicked")
     try {
@@ -459,7 +459,7 @@ async function getCategories() {
 // Add event listener for the new button
 document.getElementById("getCategories1").addEventListener("click", async () => {
     try {
-        await getCategories();
+        await getCategories1();
     } catch (error) {
         console.error("Error testing getCategories function:", error);
     }
