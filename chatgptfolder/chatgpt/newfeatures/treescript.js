@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
-const categoriesForNewRun = [
+let categoriesForNewRun = [
     { name: "Dance", totalGoal: 19, color: "#FF7F50" }, // Coral
     { name: "Sing", totalGoal: 23, color: "#FFD700" }, // Gold
     { name: "Social", totalGoal: 10, color: "#6A5ACD" }, // Slate Blue
