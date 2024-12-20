@@ -1,10 +1,10 @@
 let addPointsContainerState = 0; 
 let categories = [];
 
-document.addEventListener("DOMContentLoaded", async () => {
+
+document.addEventListener('DOMContentLoaded', async () => {
     await getCategories1(); // Fetch and set categories globally
-});
-document.addEventListener('DOMContentLoaded', async (event) => {
+    console.log(categories); 
     populateCategoryDropdowns();
     createCategoryElements();
     incrementCategory();
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
 //     { name: "Why", totalGoal: 1, color: "#FF8C00" }  // Dark Orange
 // ];
 
-console.log(categories); 
+
 
 function createCategoryElements() {
     const treeContainer = document.querySelector('.treeContainer');
