@@ -1,6 +1,7 @@
 let addPointsContainerState = 0; 
-
+let categories = [];
 document.addEventListener('DOMContentLoaded', async (event) => {
+    await getCategories1();
     populateCategoryDropdowns();
     createCategoryElements();
     incrementCategory();
@@ -20,27 +21,29 @@ document.addEventListener('DOMContentLoaded', async (event) => {
     });
 });
 
-const categories = [
-    { name: "Cooking", totalGoal: 50, color: "#FF7F50" }, // Coral
-    { name: "Work", totalGoal: 20, color: "#FFD700" }, // Gold
-    { name: "Social", totalGoal: 10, color: "#6A5ACD" }, // Slate Blue
-    { name: "Give Back", totalGoal: 5, color: "#98FB98" }, // Pale Green
+// const categories = [
+//     { name: "Cooking", totalGoal: 50, color: "#FF7F50" }, // Coral
+//     { name: "Work", totalGoal: 20, color: "#FFD700" }, // Gold
+//     { name: "Social", totalGoal: 10, color: "#6A5ACD" }, // Slate Blue
+//     { name: "Give Back", totalGoal: 5, color: "#98FB98" }, // Pale Green
 
-    { name: "Husband Duty", totalGoal: 5, color: "#FF69B4" }, // Hot Pink
-    { name: "Fatherhood", totalGoal: 30, color: "#00FA9A" }, // Medium Spring Green
-    { name: "Body Health", totalGoal: 50, color: "#4682B4" }, // Steel Blue
-    { name: "Home Ownership", totalGoal: 20, color: "#DAA520" }, // Goldenrod
+//     { name: "Husband Duty", totalGoal: 5, color: "#FF69B4" }, // Hot Pink
+//     { name: "Fatherhood", totalGoal: 30, color: "#00FA9A" }, // Medium Spring Green
+//     { name: "Body Health", totalGoal: 50, color: "#4682B4" }, // Steel Blue
+//     { name: "Home Ownership", totalGoal: 20, color: "#DAA520" }, // Goldenrod
 
-    { name: "Create-Ship", totalGoal: 10, color: "#DA70D6" }, // Orchid
-    { name: "Share", totalGoal: 10, color: "#F08080" }, // Light Coral
-    { name: "Learn", totalGoal: 5, color: "#20B2AA" }, // Light Sea Green
-    { name: "Surprise", totalGoal: 5, color: "#9ACD32" }, // Yellow Green
+//     { name: "Create-Ship", totalGoal: 10, color: "#DA70D6" }, // Orchid
+//     { name: "Share", totalGoal: 10, color: "#F08080" }, // Light Coral
+//     { name: "Learn", totalGoal: 5, color: "#20B2AA" }, // Light Sea Green
+//     { name: "Surprise", totalGoal: 5, color: "#9ACD32" }, // Yellow Green
 
-    { name: "What", totalGoal: 1, color: "#40E0D0" }, // Turquoise
-    { name: "Who", totalGoal: 1, color: "#FFA07A" }, // Light Salmon
-    { name: "How", totalGoal: 1, color: "#BA55D3" }, // Medium Orchid
-    { name: "Why", totalGoal: 1, color: "#FF8C00" }  // Dark Orange
-];
+//     { name: "What", totalGoal: 1, color: "#40E0D0" }, // Turquoise
+//     { name: "Who", totalGoal: 1, color: "#FFA07A" }, // Light Salmon
+//     { name: "How", totalGoal: 1, color: "#BA55D3" }, // Medium Orchid
+//     { name: "Why", totalGoal: 1, color: "#FF8C00" }  // Dark Orange
+// ];
+
+console.log(categories); 
 
 function createCategoryElements() {
     const treeContainer = document.querySelector('.treeContainer');
