@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Fetch updated categories after initialization
             console.log("Fetching updated categories...");
-            await getCategories1();
+            await storeCategories(categoriesForNewRun);
             console.log("Updated categories fetched:", categoriesForNewRun);
         } catch (error) {
             console.error("An error occurred during initialization:", error);
