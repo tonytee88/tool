@@ -399,6 +399,43 @@ async function initializeCategoryDocuments(categories) {
     }
 }
 
+async function storeCategories(categories) {
+    const endpointUrl = 'https://j7-magic-tool.vercel.app/api/treeMongoStoreCategories';
+    
+    try {
+        console.log("Storing categories...");
+        const response = await fetch(endpointUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ categories }), // Pass the categories array
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Categories stored successfully:", data.message);
+    } catch (error) {
+        console.error("Error storing categories:", error);
+    }
+}
+
+document.getElementById("testStoreCategories").addEventListener("click", async () => {
+
+    try {
+        console.log("Testing storeCategories function...");
+        await storeCategories(categories);
+        console.log("storeCategories function executed successfully!");
+    } catch (error) {
+        console.error("Error testing storeCategories function:", error);
+    }
+});
+
+
+
 async function treeMongoAdd(category, add, note, photoUrl) {
     try {
         const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoAdd', {
