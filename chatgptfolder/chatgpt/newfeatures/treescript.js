@@ -435,7 +435,7 @@ document.getElementById("testStoreCategories").addEventListener("click", async (
 
 async function getCategories() {
     const endpointUrl = 'https://j7-magic-tool.vercel.app/api/treeMongoGetCategories'; // Update with the correct endpoint
-
+    console.log("hello tony get categories clicked")
     try {
         console.log("Fetching categories...");
         const response = await fetch(endpointUrl, {
