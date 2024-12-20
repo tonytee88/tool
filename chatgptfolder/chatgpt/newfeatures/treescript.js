@@ -457,7 +457,7 @@ async function getCategories() {
 }
 
 // Add event listener for the new button
-document.getElementById("getCategories").addEventListener("click", async () => {
+document.getElementById("getCategories1").addEventListener("click", async () => {
     try {
         await getCategories();
     } catch (error) {
