@@ -16,13 +16,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             // Call the initialize function
-            await initializeCategoryDocuments(categories);
+            await initializeCategoryDocuments(categoriesForNewRun);
             console.log("Initialization complete!");
 
             // Fetch updated categories after initialization
             console.log("Fetching updated categories...");
             await getCategories1();
-            console.log("Updated categories fetched:", categories);
+            console.log("Updated categories fetched:", categoriesForNewRun);
         } catch (error) {
             console.error("An error occurred during initialization:", error);
         }
