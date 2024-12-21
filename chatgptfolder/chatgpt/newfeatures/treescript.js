@@ -428,7 +428,7 @@ async function storeCategories(categoriesForNewRun) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ categories }), // Pass the categories array
+            body: JSON.stringify({ categoriesForNewRun }), // Pass the categories array
         });
 
         if (!response.ok) {
