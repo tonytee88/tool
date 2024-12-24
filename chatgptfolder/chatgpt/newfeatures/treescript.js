@@ -4,6 +4,7 @@ let categories = [];
 document.addEventListener('DOMContentLoaded', async () => {
     await getCategories1(); // Fetch and set categories globally
     console.log(categories); 
+    console.log("updated 10.06")
     populateCategoryDropdowns();
     createCategoryElements();
     incrementCategory();
