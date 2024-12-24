@@ -29,35 +29,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
-let categoriesForNewRun = [
-    { name: "Dance", totalGoal: 19, color: "#FF7F50" }, // Coral
-    { name: "Sing", totalGoal: 23, color: "#FFD700" }, // Gold
-    { name: "Social", totalGoal: 10, color: "#6A5ACD" }, // Slate Blue
-    { name: "Give Back", totalGoal: 5, color: "#98FB98" }, // Pale Green
+const categoriesForNewRun = [
+    { name: "Cooking", totalGoal: 6, color: "#FF7F50" }, // Coral - Trouver 10 recettes qui vont s'ajouter à ma rotation
+    { name: "Work", totalGoal: 5, color: "#FFD700" }, // Gold - Embarquer sur 5 projets extra-work qui vont m'amener plus loin
+    { name: "Social", totalGoal: 5, color: "#6A5ACD" }, // Slate Blue - Trouver 5 thématiques de discussion et partager avec des humains
+    { name: "Give Back", totalGoal: 2, color: "#98FB98" }, // Pale Green
 
+    { name: "Husband Duty", totalGoal: 3, color: "#FF69B4" }, // Hot Pink - Trouver 3 manières d'être un meilleur mari
+    { name: "Fatherhood", totalGoal: 5, color: "#00FA9A" }, // Medium Spring Green - Intentionnellement avoir une expérience avec les enfants
+    { name: "Body Health", totalGoal: 65, color: "#4682B4" }, // Steel Blue
+    { name: "Home Ownership", totalGoal: 12, color: "#DAA520" }, // Goldenrod - Faire une liste des choses à faire weekly et exécuter, +1 si réussi
+
+    { name: "Learn", totalGoal: 5, color: "#20B2AA" }, // Light Sea Green - Apprendre 5 nouvelles choses intentionnellement et écrire mes apprentissages
+
+    { name: "What-Who-How-Why", totalGoal: 1, color: "#40E0D0" }, // Turquoise
 ];
-
-// const categoriesForNewRun = [
-//     { name: "Cooking", totalGoal: 50, color: "#FF7F50" }, // Coral
-//     { name: "Work", totalGoal: 20, color: "#FFD700" }, // Gold
-//     { name: "Social", totalGoal: 10, color: "#6A5ACD" }, // Slate Blue
-//     { name: "Give Back", totalGoal: 5, color: "#98FB98" }, // Pale Green
-
-//     { name: "Husband Duty", totalGoal: 5, color: "#FF69B4" }, // Hot Pink
-//     { name: "Fatherhood", totalGoal: 30, color: "#00FA9A" }, // Medium Spring Green
-//     { name: "Body Health", totalGoal: 50, color: "#4682B4" }, // Steel Blue
-//     { name: "Home Ownership", totalGoal: 20, color: "#DAA520" }, // Goldenrod
-
-//     { name: "Create-Ship", totalGoal: 10, color: "#DA70D6" }, // Orchid
-//     { name: "Share", totalGoal: 10, color: "#F08080" }, // Light Coral
-//     { name: "Learn", totalGoal: 5, color: "#20B2AA" }, // Light Sea Green
-//     { name: "Surprise", totalGoal: 5, color: "#9ACD32" }, // Yellow Green
-
-//     { name: "What", totalGoal: 1, color: "#40E0D0" }, // Turquoise
-//     { name: "Who", totalGoal: 1, color: "#FFA07A" }, // Light Salmon
-//     { name: "How", totalGoal: 1, color: "#BA55D3" }, // Medium Orchid
-//     { name: "Why", totalGoal: 1, color: "#FF8C00" }  // Dark Orange
-// ];
 
 
 
