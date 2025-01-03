@@ -1,6 +1,6 @@
 let addPointsContainerState = 0; 
 let categories = [];
-console.log("updated 3-jan2")
+console.log("updated 3-jan3")
 document.addEventListener('DOMContentLoaded', async () => {
     await getCategories1(); // Fetch and set categories globally
     console.log(categories); 
@@ -16,11 +16,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log("Initializing categories...");
 
         try {
-            // Call the initialize function
             await initializeCategoryDocuments(categoriesForNewRun);
             console.log("Initialization complete!");
 
-            // Fetch updated categories after initialization
             console.log("Fetching updated categories...");
             await storeCategories(categoriesForNewRun);
             console.log("Updated categories fetched:", categoriesForNewRun);
@@ -33,54 +31,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     const autocompleteList = document.getElementById("autocompleteList");
     const STATIC_NOTE = "Combo 7W+"; // Static note always shown first
 
-    // Function to get last 5 notes from localStorage
     function getRecentNotes() {
         return JSON.parse(localStorage.getItem("recentNotes")) || [];
     }
 
-    // Function to save a new note to history
     function saveNoteHistory(note) {
         let notes = getRecentNotes();
-
-        // Avoid duplicates (except static note)
         if (!notes.includes(note) && note !== STATIC_NOTE) {
             notes.unshift(note);
         }
         if (notes.length > 5) {
             notes = notes.slice(0, 5);
         }
-
         localStorage.setItem("recentNotes", JSON.stringify(notes));
     }
 
-    // Show autocomplete list (with static note first)
     function showAutocomplete() {
         let notes = getRecentNotes();
         autocompleteList.innerHTML = ""; // Clear existing list
 
-        if (notes.length === 0) {
-            autocompleteList.style.display = "none";
-            return;
-        }
-
-        // Add static note first
+        // Always add static note first
         const staticItem = document.createElement("div");
         staticItem.classList.add("autocomplete-item");
         staticItem.textContent = STATIC_NOTE;
-        staticItem.addEventListener("touchstart", (e) => {
-            e.preventDefault();
+        staticItem.addEventListener("click", () => {
             noteInput.value = STATIC_NOTE;
             autocompleteList.style.display = "none";
         });
         autocompleteList.appendChild(staticItem);
 
-        // Add user-submitted notes
+        if (notes.length === 0) {
+            autocompleteList.style.display = "block"; // Show even if there are no stored notes
+            return;
+        }
+
         notes.forEach(note => {
             const item = document.createElement("div");
             item.classList.add("autocomplete-item");
             item.textContent = note;
-            item.addEventListener("touchstart", (e) => {
-                e.preventDefault();
+            item.addEventListener("click", () => {
                 noteInput.value = note;
                 autocompleteList.style.display = "none";
             });
@@ -90,26 +79,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         autocompleteList.style.display = "block";
     }
 
-    // Hide autocomplete on tapping anywhere else
-    document.addEventListener("touchstart", (e) => {
+    // Show autocomplete when input is focused
+    noteInput.addEventListener("focus", showAutocomplete);
+
+    // Hide autocomplete when tapping outside
+    document.addEventListener("click", (e) => {
         if (!noteInput.contains(e.target) && !autocompleteList.contains(e.target)) {
             autocompleteList.style.display = "none";
         }
     });
 
-    // Show autocomplete when input is focused (triggered on tap)
-    noteInput.addEventListener("focus", showAutocomplete);
-    
-    // Handle adding a note when the user submits
-    document.getElementById("addOne").addEventListener("touchstart", (e) => {
-        e.preventDefault();
+    document.getElementById("addOne").addEventListener("click", () => {
         const note = noteInput.value.trim();
         if (note) {
             saveNoteHistory(note);
             noteInput.value = ""; // Clear input
         }
     });
-
 
 });
 
