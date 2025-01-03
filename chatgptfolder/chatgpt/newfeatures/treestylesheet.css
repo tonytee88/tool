@@ -421,23 +421,22 @@ button:hover {
     position: absolute;
     background: white;
     border: 1px solid #ccc;
+    width: 100%;
     max-height: 150px;
     overflow-y: auto;
-    width: 100%;
     z-index: 1000;
-    display: none;
-    border-radius: 8px;
+    display: none; /* Hide by default */
+    border-radius: 5px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    touch-action: manipulation; /* Prevents zooming on tap */
 }
 
 .autocomplete-item {
-    padding: 15px; /* Larger tap area */
-    font-size: 16px; /* Bigger font for better readability */
+    padding: 12px;
+    font-size: 16px;
     cursor: pointer;
-    user-select: none; /* Prevents accidental text selection */
+    user-select: none;
 }
 
-.autocomplete-item:active {
+.autocomplete-item:hover {
     background-color: #f0f0f0;
 }
