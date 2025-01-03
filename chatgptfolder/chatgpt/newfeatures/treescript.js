@@ -1,10 +1,10 @@
 let addPointsContainerState = 0; 
 let categories = [];
-console.log("updated 10.06")
+console.log("updated 3-jan")
 document.addEventListener('DOMContentLoaded', async () => {
     await getCategories1(); // Fetch and set categories globally
     console.log(categories); 
-    console.log("updated 10.06")
+
     populateCategoryDropdowns();
     createCategoryElements();
     incrementCategory();
@@ -28,6 +28,77 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error("An error occurred during initialization:", error);
         }
     });
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        const noteInput = document.getElementById("noteInput");
+        const autocompleteList = document.getElementById("autocompleteList");
+    
+        // Function to get last 5 notes from localStorage
+        function getRecentNotes() {
+            return JSON.parse(localStorage.getItem("recentNotes")) || [];
+        }
+    
+        // Function to save a new note to history
+        function saveNoteHistory(note) {
+            let notes = getRecentNotes();
+    
+            // Avoid duplicates and store only the latest 5
+            if (!notes.includes(note)) {
+                notes.unshift(note);
+            }
+            if (notes.length > 5) {
+                notes = notes.slice(0, 5);
+            }
+    
+            localStorage.setItem("recentNotes", JSON.stringify(notes));
+        }
+    
+        // Show autocomplete list (mobile optimized)
+        function showAutocomplete() {
+            const notes = getRecentNotes();
+            autocompleteList.innerHTML = ""; // Clear existing list
+            if (notes.length === 0) {
+                autocompleteList.style.display = "none";
+                return;
+            }
+    
+            notes.forEach(note => {
+                const item = document.createElement("div");
+                item.classList.add("autocomplete-item");
+                item.textContent = note;
+                item.addEventListener("touchstart", (e) => {
+                    e.preventDefault(); // Prevent click delay on mobile
+                    noteInput.value = note; // Fill input with selected note
+                    autocompleteList.style.display = "none"; // Hide list
+                });
+    
+                autocompleteList.appendChild(item);
+            });
+    
+            autocompleteList.style.display = "block";
+        }
+    
+        // Hide autocomplete on tapping anywhere else
+        document.addEventListener("touchstart", (e) => {
+            if (!noteInput.contains(e.target) && !autocompleteList.contains(e.target)) {
+                autocompleteList.style.display = "none";
+            }
+        });
+    
+        // Show autocomplete when input is focused (triggered on tap)
+        noteInput.addEventListener("focus", showAutocomplete);
+        
+        // Handle adding a note when the user submits
+        document.getElementById("addOne").addEventListener("touchstart", (e) => {
+            e.preventDefault(); // Prevent double tap delay
+            const note = noteInput.value.trim();
+            if (note) {
+                saveNoteHistory(note); // Save note to history
+                noteInput.value = ""; // Clear input
+            }
+        });
+    });
+
 });
 
 const categoriesForNewRun = [
@@ -85,26 +156,6 @@ async function fetchCategoryNotes(categoryName) {
     }
     return await response.json();
 }
-
-// async function fetchAndDisplayNotes(categoryName) {
-//     try {
-//         const response = await fetch(`https://j7-magic-tool.vercel.app/api/treeMongoGetNotes?category=${encodeURIComponent(categoryName)}`, {
-//             method: 'GET',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//             },
-//         });
-
-//         if (!response.ok) {
-//             throw new Error(`HTTP error! Status: ${response.status}`);
-//         }
-
-//         const notes = await response.json();
-//         displayNotes(notes, categoryName.toLowerCase());
-//     } catch (error) {
-//         console.error('Error fetching notes:', error);
-//     }
-// }
 
 function displayNotes(notes) {
     const historyContainer = document.getElementById('history');

@@ -415,3 +415,29 @@ button:hover {
     margin: 5px 0;     /* Adds vertical spacing between entries */
 
 }
+
+
+.autocomplete-list {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    max-height: 150px;
+    overflow-y: auto;
+    width: 100%;
+    z-index: 1000;
+    display: none;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    touch-action: manipulation; /* Prevents zooming on tap */
+}
+
+.autocomplete-item {
+    padding: 15px; /* Larger tap area */
+    font-size: 16px; /* Bigger font for better readability */
+    cursor: pointer;
+    user-select: none; /* Prevents accidental text selection */
+}
+
+.autocomplete-item:active {
+    background-color: #f0f0f0;
+}

@@ -33,7 +33,10 @@
     
     <div id="addPointsContainer">
         <div id="addPointsTopContainer"></div>
-            <div id="noteInputContainer"><input id="noteInput" type="text"></div>
+            <div id="noteInputContainer">
+                <input id="noteInput" type="text" autocomplete="off">
+                <div id="autocompleteList" class="autocomplete-list"></div> <!-- Autocomplete Container -->
+        </div>
         </div>
         <div id="addPointsBottomContainer">
             <select id="categoryDropdown">
