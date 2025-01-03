@@ -1,9 +1,9 @@
 let addPointsContainerState = 0; 
 let categories = [];
-console.log("updated 3-jan4")
-document.addEventListener('DOMContentLoaded', async () => {
+console.log("updated 3-jan5")
+document.addEventListener("DOMContentLoaded", async () => {
     await getCategories1(); // Fetch and set categories globally
-    console.log(categories); 
+    console.log(categories);
 
     populateCategoryDropdowns();
     createCategoryElements();
@@ -11,25 +11,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     await initTrees();
     getAndLoadIdeas();
 
-    const initButton = document.getElementById('initializeCategories');
-    initButton.addEventListener('click', async function() {
-        console.log("Initializing categories...");
-
-        try {
-            await initializeCategoryDocuments(categoriesForNewRun);
-            console.log("Initialization complete!");
-
-            console.log("Fetching updated categories...");
-            await storeCategories(categoriesForNewRun);
-            console.log("Updated categories fetched:", categoriesForNewRun);
-        } catch (error) {
-            console.error("An error occurred during initialization:", error);
-        }
-    });
-
     const noteInput = document.getElementById("noteInput");
     const autocompleteList = document.getElementById("autocompleteList");
     const STATIC_NOTE = "Combo 7W+"; // Static note always shown first
+
+    if (!noteInput || !autocompleteList) {
+        console.error("Error: Input or autocomplete list not found!");
+        return;
+    }
 
     function getRecentNotes() {
         return JSON.parse(localStorage.getItem("recentNotes")) || [];
@@ -50,7 +39,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         let notes = getRecentNotes();
         autocompleteList.innerHTML = ""; // Clear existing list
 
-        // Always add static note first
+        // Add static note first
         const staticItem = document.createElement("div");
         staticItem.classList.add("autocomplete-item");
         staticItem.textContent = STATIC_NOTE;
@@ -60,11 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         autocompleteList.appendChild(staticItem);
 
-        if (notes.length === 0) {
-            autocompleteList.style.display = "block"; // Show even if there are no stored notes
-            return;
-        }
-
+        // Show stored notes
         notes.forEach(note => {
             const item = document.createElement("div");
             item.classList.add("autocomplete-item");
@@ -76,13 +61,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             autocompleteList.appendChild(item);
         });
 
-        autocompleteList.style.display = "block";
+        if (autocompleteList.children.length > 0) {
+            autocompleteList.style.display = "block"; // Show dropdown
+        }
     }
 
-    // Show autocomplete when input is focused
     noteInput.addEventListener("focus", showAutocomplete);
 
-    // Hide autocomplete when tapping outside
     document.addEventListener("click", (e) => {
         if (!noteInput.contains(e.target) && !autocompleteList.contains(e.target)) {
             autocompleteList.style.display = "none";
@@ -93,7 +78,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const note = noteInput.value.trim();
         if (note) {
             saveNoteHistory(note);
-            noteInput.value = ""; // Clear input
+            noteInput.value = "";
         }
     });
 
