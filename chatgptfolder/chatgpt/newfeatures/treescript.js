@@ -1,6 +1,6 @@
 let addPointsContainerState = 0; 
 let categories = [];
-console.log("updated 3-jan5")
+console.log("updated 3-jan6")
 document.addEventListener("DOMContentLoaded", async () => {
     await getCategories1(); // Fetch and set categories globally
     console.log(categories);
@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function showAutocomplete() {
         let notes = getRecentNotes();
-        autocompleteList.innerHTML = ""; // Clear existing list
+        //autocompleteList.innerHTML = ""; // Clear existing list
 
         // Add static note first
         const staticItem = document.createElement("div");
