@@ -1,6 +1,6 @@
 let addPointsContainerState = 0; 
 let categories = [];
-console.log("updated 3-jan1")
+console.log("updated 3-jan2")
 document.addEventListener('DOMContentLoaded', async () => {
     await getCategories1(); // Fetch and set categories globally
     console.log(categories); 
@@ -29,73 +29,86 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-        const noteInput = document.getElementById("noteInput");
-        const autocompleteList = document.getElementById("autocompleteList");
-    
-        // Function to get last 5 notes from localStorage
-        function getRecentNotes() {
-            return JSON.parse(localStorage.getItem("recentNotes")) || [];
+    const noteInput = document.getElementById("noteInput");
+    const autocompleteList = document.getElementById("autocompleteList");
+    const STATIC_NOTE = "Combo 7W+"; // Static note always shown first
+
+    // Function to get last 5 notes from localStorage
+    function getRecentNotes() {
+        return JSON.parse(localStorage.getItem("recentNotes")) || [];
+    }
+
+    // Function to save a new note to history
+    function saveNoteHistory(note) {
+        let notes = getRecentNotes();
+
+        // Avoid duplicates (except static note)
+        if (!notes.includes(note) && note !== STATIC_NOTE) {
+            notes.unshift(note);
         }
-    
-        // Function to save a new note to history
-        function saveNoteHistory(note) {
-            let notes = getRecentNotes();
-    
-            // Avoid duplicates and store only the latest 5
-            if (!notes.includes(note)) {
-                notes.unshift(note);
-            }
-            if (notes.length > 5) {
-                notes = notes.slice(0, 5);
-            }
-    
-            localStorage.setItem("recentNotes", JSON.stringify(notes));
+        if (notes.length > 5) {
+            notes = notes.slice(0, 5);
         }
-    
-        // Show autocomplete list (mobile optimized)
-        function showAutocomplete() {
-            const notes = getRecentNotes();
-            autocompleteList.innerHTML = ""; // Clear existing list
-            if (notes.length === 0) {
+
+        localStorage.setItem("recentNotes", JSON.stringify(notes));
+    }
+
+    // Show autocomplete list (with static note first)
+    function showAutocomplete() {
+        let notes = getRecentNotes();
+        autocompleteList.innerHTML = ""; // Clear existing list
+
+        if (notes.length === 0) {
+            autocompleteList.style.display = "none";
+            return;
+        }
+
+        // Add static note first
+        const staticItem = document.createElement("div");
+        staticItem.classList.add("autocomplete-item");
+        staticItem.textContent = STATIC_NOTE;
+        staticItem.addEventListener("touchstart", (e) => {
+            e.preventDefault();
+            noteInput.value = STATIC_NOTE;
+            autocompleteList.style.display = "none";
+        });
+        autocompleteList.appendChild(staticItem);
+
+        // Add user-submitted notes
+        notes.forEach(note => {
+            const item = document.createElement("div");
+            item.classList.add("autocomplete-item");
+            item.textContent = note;
+            item.addEventListener("touchstart", (e) => {
+                e.preventDefault();
+                noteInput.value = note;
                 autocompleteList.style.display = "none";
-                return;
-            }
-    
-            notes.forEach(note => {
-                const item = document.createElement("div");
-                item.classList.add("autocomplete-item");
-                item.textContent = note;
-                item.addEventListener("touchstart", (e) => {
-                    e.preventDefault(); // Prevent click delay on mobile
-                    noteInput.value = note; // Fill input with selected note
-                    autocompleteList.style.display = "none"; // Hide list
-                });
-    
-                autocompleteList.appendChild(item);
             });
-    
-            autocompleteList.style.display = "block";
+            autocompleteList.appendChild(item);
+        });
+
+        autocompleteList.style.display = "block";
+    }
+
+    // Hide autocomplete on tapping anywhere else
+    document.addEventListener("touchstart", (e) => {
+        if (!noteInput.contains(e.target) && !autocompleteList.contains(e.target)) {
+            autocompleteList.style.display = "none";
         }
+    });
+
+    // Show autocomplete when input is focused (triggered on tap)
+    noteInput.addEventListener("focus", showAutocomplete);
     
-        // Hide autocomplete on tapping anywhere else
-        document.addEventListener("touchstart", (e) => {
-            if (!noteInput.contains(e.target) && !autocompleteList.contains(e.target)) {
-                autocompleteList.style.display = "none";
-            }
-        });
-    
-        // Show autocomplete when input is focused (triggered on tap)
-        noteInput.addEventListener("focus", showAutocomplete);
-        
-        // Handle adding a note when the user submits
-        document.getElementById("addOne").addEventListener("touchstart", (e) => {
-            e.preventDefault(); // Prevent double tap delay
-            const note = noteInput.value.trim();
-            if (note) {
-                saveNoteHistory(note); // Save note to history
-                noteInput.value = ""; // Clear input
-            }
-        });
+    // Handle adding a note when the user submits
+    document.getElementById("addOne").addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        const note = noteInput.value.trim();
+        if (note) {
+            saveNoteHistory(note);
+            noteInput.value = ""; // Clear input
+        }
+    });
 
 
 });
