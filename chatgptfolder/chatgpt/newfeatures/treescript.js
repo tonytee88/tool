@@ -1,16 +1,7 @@
 let addPointsContainerState = 0; 
 let categories = [];
-console.log("updated 6-jan1")
+console.log("updated 6-jan2")
 document.addEventListener("DOMContentLoaded", async () => {
-    await getCategories1(); // Fetch and set categories globally
-    console.log(categories);
-
-    populateCategoryDropdowns();
-    createCategoryElements();
-    incrementCategory();
-    await initTrees();
-    getAndLoadIdeas();
-
     const noteInput = document.getElementById("noteInput");
     const autocompleteList = document.getElementById("autocompleteList");
     const STATIC_NOTE = "Combo 7W+"; // Static note always shown first
@@ -81,6 +72,15 @@ document.addEventListener("DOMContentLoaded", async () => {
             noteInput.value = "";
         }
     });
+    
+    await getCategories1(); // Fetch and set categories globally
+    console.log(categories);
+
+    populateCategoryDropdowns();
+    createCategoryElements();
+    incrementCategory();
+    await initTrees();
+    getAndLoadIdeas();
 
 });
 
