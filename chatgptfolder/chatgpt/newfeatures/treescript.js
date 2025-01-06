@@ -1,6 +1,6 @@
 let addPointsContainerState = 0; 
 let categories = [];
-console.log("updated 6-jan2")
+console.log("updated 6-jan3")
 document.addEventListener("DOMContentLoaded", async () => {
     const noteInput = document.getElementById("noteInput");
     const autocompleteList = document.getElementById("autocompleteList");

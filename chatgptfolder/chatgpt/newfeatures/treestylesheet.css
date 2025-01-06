@@ -419,13 +419,13 @@ button:hover {
 
 .autocomplete-list {
     position: absolute;
-    background: white;
-    border: 1px solid #ccc;
+    background: #2a2a2a;
+    border: 1px solid #000000;
     width: 100%;
     max-height: 150px;
     overflow-y: auto;
     z-index: 1000;
-    /*display: none; /* Hide by default */
+    display: none; /* Hide by default */
     border-radius: 5px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
