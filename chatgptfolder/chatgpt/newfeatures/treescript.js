@@ -1,6 +1,6 @@
 let addPointsContainerState = 0; 
 let categories = [];
-console.log("updated 6-jan3")
+console.log("updated 6-jan4")
 document.addEventListener("DOMContentLoaded", async () => {
     const noteInput = document.getElementById("noteInput");
     const autocompleteList = document.getElementById("autocompleteList");
@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function showAutocomplete() {
         let notes = getRecentNotes();
-        //autocompleteList.innerHTML = ""; // Clear existing list
+        autocompleteList.innerHTML = ""; // Clear existing list
 
         // Add static note first
         const staticItem = document.createElement("div");
