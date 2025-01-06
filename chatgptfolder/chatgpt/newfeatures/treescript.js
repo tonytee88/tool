@@ -1,6 +1,6 @@
 let addPointsContainerState = 0; 
 let categories = [];
-console.log("updated 3-jan6")
+console.log("updated 6-jan1")
 document.addEventListener("DOMContentLoaded", async () => {
     await getCategories1(); // Fetch and set categories globally
     console.log(categories);
