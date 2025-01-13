@@ -1,6 +1,6 @@
 let addPointsContainerState = 0; 
 let categories = [];
-console.log("updated 6-jan4")
+console.log("updated13-jan")
 document.addEventListener("DOMContentLoaded", async () => {
     const noteInput = document.getElementById("noteInput");
     const autocompleteList = document.getElementById("autocompleteList");
@@ -317,6 +317,7 @@ function incrementCategory() {
         const selectedCategory = dropdown.value;
         const noteInput = document.getElementById("noteInput");
         const noteValue = noteInput.value;
+        console.log("noteValue:" + noteValue)
         const add = 1;
 
         let photoUrl = "";
