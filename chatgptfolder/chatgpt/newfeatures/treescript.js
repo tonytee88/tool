@@ -1,77 +1,77 @@
 let addPointsContainerState = 0; 
 let categories = [];
-console.log("updated13-jan")
+console.log("updated13-jan1")
 document.addEventListener("DOMContentLoaded", async () => {
-    const noteInput = document.getElementById("noteInput");
-    const autocompleteList = document.getElementById("autocompleteList");
-    const STATIC_NOTE = "Combo 7W+"; // Static note always shown first
+    // const noteInput = document.getElementById("noteInput");
+    // const autocompleteList = document.getElementById("autocompleteList");
+    // const STATIC_NOTE = "Combo 7W+"; // Static note always shown first
 
-    if (!noteInput || !autocompleteList) {
-        console.error("Error: Input or autocomplete list not found!");
-        return;
-    }
+    // if (!noteInput || !autocompleteList) {
+    //     console.error("Error: Input or autocomplete list not found!");
+    //     return;
+    // }
 
-    function getRecentNotes() {
-        return JSON.parse(localStorage.getItem("recentNotes")) || [];
-    }
+    // function getRecentNotes() {
+    //     return JSON.parse(localStorage.getItem("recentNotes")) || [];
+    // }
 
-    function saveNoteHistory(note) {
-        let notes = getRecentNotes();
-        if (!notes.includes(note) && note !== STATIC_NOTE) {
-            notes.unshift(note);
-        }
-        if (notes.length > 5) {
-            notes = notes.slice(0, 5);
-        }
-        localStorage.setItem("recentNotes", JSON.stringify(notes));
-    }
+    // function saveNoteHistory(note) {
+    //     let notes = getRecentNotes();
+    //     if (!notes.includes(note) && note !== STATIC_NOTE) {
+    //         notes.unshift(note);
+    //     }
+    //     if (notes.length > 5) {
+    //         notes = notes.slice(0, 5);
+    //     }
+    //     localStorage.setItem("recentNotes", JSON.stringify(notes));
+    // }
 
-    function showAutocomplete() {
-        let notes = getRecentNotes();
-        autocompleteList.innerHTML = ""; // Clear existing list
+    // function showAutocomplete() {
+    //     let notes = getRecentNotes();
+    //     autocompleteList.innerHTML = ""; // Clear existing list
 
-        // Add static note first
-        const staticItem = document.createElement("div");
-        staticItem.classList.add("autocomplete-item");
-        staticItem.textContent = STATIC_NOTE;
-        staticItem.addEventListener("click", () => {
-            noteInput.value = STATIC_NOTE;
-            autocompleteList.style.display = "none";
-        });
-        autocompleteList.appendChild(staticItem);
+    //     // Add static note first
+    //     const staticItem = document.createElement("div");
+    //     staticItem.classList.add("autocomplete-item");
+    //     staticItem.textContent = STATIC_NOTE;
+    //     staticItem.addEventListener("click", () => {
+    //         noteInput.value = STATIC_NOTE;
+    //         autocompleteList.style.display = "none";
+    //     });
+    //     autocompleteList.appendChild(staticItem);
 
-        // Show stored notes
-        notes.forEach(note => {
-            const item = document.createElement("div");
-            item.classList.add("autocomplete-item");
-            item.textContent = note;
-            item.addEventListener("click", () => {
-                noteInput.value = note;
-                autocompleteList.style.display = "none";
-            });
-            autocompleteList.appendChild(item);
-        });
+    //     // Show stored notes
+    //     notes.forEach(note => {
+    //         const item = document.createElement("div");
+    //         item.classList.add("autocomplete-item");
+    //         item.textContent = note;
+    //         item.addEventListener("click", () => {
+    //             noteInput.value = note;
+    //             autocompleteList.style.display = "none";
+    //         });
+    //         autocompleteList.appendChild(item);
+    //     });
 
-        if (autocompleteList.children.length > 0) {
-            autocompleteList.style.display = "block"; // Show dropdown
-        }
-    }
+    //     if (autocompleteList.children.length > 0) {
+    //         autocompleteList.style.display = "block"; // Show dropdown
+    //     }
+    // }
 
-    noteInput.addEventListener("focus", showAutocomplete);
+    // noteInput.addEventListener("focus", showAutocomplete);
 
-    document.addEventListener("click", (e) => {
-        if (!noteInput.contains(e.target) && !autocompleteList.contains(e.target)) {
-            autocompleteList.style.display = "none";
-        }
-    });
+    // document.addEventListener("click", (e) => {
+    //     if (!noteInput.contains(e.target) && !autocompleteList.contains(e.target)) {
+    //         autocompleteList.style.display = "none";
+    //     }
+    // });
 
-    document.getElementById("addOne").addEventListener("click", () => {
-        const note = noteInput.value.trim();
-        if (note) {
-            saveNoteHistory(note);
-            noteInput.value = "";
-        }
-    });
+    // document.getElementById("addOne").addEventListener("click", () => {
+    //     const note = noteInput.value.trim();
+    //     if (note) {
+    //         saveNoteHistory(note);
+    //         noteInput.value = "";
+    //     }
+    // });
     
     await getCategories1(); // Fetch and set categories globally
     console.log(categories);
