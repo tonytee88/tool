@@ -1,8 +1,12 @@
 {
   "name": "chatgpt-folder",
   "version": "1.0.0",
-  "description": "",
+  "description": "hello world",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/your-repo.git"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,6 +14,9 @@
   "license": "ISC",
   "dependencies": {
     "@types/google-apps-script": "^1.0.63",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "reactflow": "^11.11.4"
   }
 }

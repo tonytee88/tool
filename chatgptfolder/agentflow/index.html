@@ -1,2 +1,68 @@
-<!DOCTYPE html> 
-hello world..
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Simple LLM Flow Editor</title>
+
+  <!-- Drawflow CSS (via CDN) -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/drawflow/dist/drawflow.min.css"
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+    <!-- New Flow Name Section -->
+    <div class="flow-name-container">
+        <label for="flow-name">Flow Name:</label>
+        <input type="text" id="flow-name" value="New Flow 01">
+      </div>
+
+    <!-- ------------------------------------------------
+         TOOLBAR
+    ------------------------------------------------- -->
+    <div class="toolbar">
+        <button id="btn-add-start">+ Start</button>
+        <button id="btn-add-prompt">+ Prompt</button>
+        <button id="btn-add-llm">+ LLM Call</button>
+        <button id="btn-add-output">+ Output</button>
+        <button id="btn-save">Save Flow</button>
+        <button id="btn-load">Load Flow</button>
+      </div>
+    
+      <!-- Load Flow Modal -->
+      <div id="load-modal" class="modal">
+        <h3>Load Existing Flow</h3>
+        <select id="flow-list"></select>
+        <div class="modal-buttons">
+          <button id="load-confirm">Load</button>
+          <button id="load-cancel">Cancel</button>
+        </div>
+      </div>
+  
+    <!-- ------------------------------------------------
+         DRAWFLOW CONTAINER
+    ------------------------------------------------- -->
+    <div id="drawflow"></div>
+  
+    <!-- ------------------------------------------------
+         MODAL OVERLAY & POPUP
+    ------------------------------------------------- -->
+    <div id="modal-overlay" class="modal-overlay"></div>
+  
+    <div id="prompt-modal" class="modal">
+      <h3>Edit Prompt Text</h3>
+      <textarea id="prompt-modal-textarea" rows="6"></textarea>
+      <div class="modal-buttons">
+        <button id="modal-save">Save</button>
+        <button id="modal-cancel">Cancel</button>
+      </div>
+    </div>
+  
+    <!-- Drawflow JS (via CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/drawflow/dist/drawflow.min.js"></script>
+  <!-- Your custom script -->
+  <script src="script.js"></script>
+</body>
+</html>
