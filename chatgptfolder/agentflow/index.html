@@ -12,7 +12,6 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-
     <!-- New Flow Name Section -->
     <div class="flow-name-container">
         <label for="flow-name">Flow Name:</label>
@@ -29,6 +28,7 @@
         <button id="btn-add-output">+ Output</button>
         <button id="btn-save">Save Flow</button>
         <button id="btn-load">Load Flow</button>
+        <button id="btn-test-update">Test Update Prompt</button>
       </div>
     
       <!-- Load Flow Modal -->
@@ -40,7 +40,6 @@
           <button id="load-cancel">Cancel</button>
         </div>
       </div>
-  
     <!-- ------------------------------------------------
          DRAWFLOW CONTAINER
     ------------------------------------------------- -->
@@ -49,16 +48,31 @@
     <!-- ------------------------------------------------
          MODAL OVERLAY & POPUP
     ------------------------------------------------- -->
-    <div id="modal-overlay" class="modal-overlay"></div>
-  
-    <div id="prompt-modal" class="modal">
-      <h3>Edit Prompt Text</h3>
-      <textarea id="prompt-modal-textarea" rows="6"></textarea>
+    <div id="modal-overlay"></div>
+    <div id="prompt-modal">
+      <h2>Edit Prompt</h2>
+      <label for="prompt-modal-name" style="display: block; margin-bottom: 5px;">Prompt Name</label>
+      <input
+        type="text"
+        id="prompt-modal-name"
+        class="prompt-modal-name"
+        placeholder="Enter Prompt Name"
+      />
+      <label for="prompt-modal-textarea" style="display: block; margin: 15px 0 5px;">Prompt Text</label>
+      <textarea
+        id="prompt-modal-textarea"
+        class="prompt-modal-textarea"
+        placeholder="Enter Prompt Text"
+      ></textarea>
       <div class="modal-buttons">
-        <button id="modal-save">Save</button>
-        <button id="modal-cancel">Cancel</button>
+        <button class="save-button" onclick="closePromptModal(true)">Save</button>
+        <button class="cancel-button" onclick="closePromptModal(false)">Cancel</button>
       </div>
+    </div>  
     </div>
+    
+    
+    
   
     <!-- Drawflow JS (via CDN) -->
     <script src="https://cdn.jsdelivr.net/npm/drawflow/dist/drawflow.min.js"></script>
