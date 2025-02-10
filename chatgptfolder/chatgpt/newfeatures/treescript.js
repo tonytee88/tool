@@ -133,11 +133,27 @@ function createCategoryElements() {
 }
 
 async function fetchCategoryNotes(categoryName) {
-    const response = await fetch(`https://j7-magic-tool.vercel.app/api/treeMongoNotes?operation=getNotes&category=${categoryName}`);
-    if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+    try {
+        const response = await fetch(
+            `https://j7-magic-tool.vercel.app/api/treeMongoNotes?operation=getNotes&category=${encodeURIComponent(categoryName)}`,
+            {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching category notes:', error);
+        throw error;
     }
-    return await response.json();
 }
 
 function displayNotes(notes) {
