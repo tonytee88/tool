@@ -133,7 +133,7 @@ function createCategoryElements() {
 }
 
 async function fetchCategoryNotes(categoryName) {
-    const response = await fetch(`https://j7-magic-tool.vercel.app/api/treeMongoGetNotes?category=${categoryName}`);
+    const response = await fetch(`https://j7-magic-tool.vercel.app/api/treeMongoNotes?operation=getNotes&category=${categoryName}`);
     if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
     }
@@ -404,7 +404,7 @@ function createPreElements(count, category) {
 }
 
 async function initializeCategoryDocuments(categoriesForNewRun) {
-    const endpointUrl = 'https://j7-magic-tool.vercel.app/api/treeMongoCreate';
+    const endpointUrl = 'https://j7-magic-tool.vercel.app/api/treeMongoNotes?operation=create';
     
     for (const category of categoriesForNewRun) {
         console.log(category.name);
@@ -441,7 +441,7 @@ async function initializeCategoryDocuments(categoriesForNewRun) {
 }
 
 async function storeCategories(categoriesForNewRun) {
-    const endpointUrl = 'https://j7-magic-tool.vercel.app/api/treeMongoStoreCategories';
+    const endpointUrl = 'https://j7-magic-tool.vercel.app/api/treeMongoNotes?operation=storeCategories';
     
     try {
         console.log("Storing categories for new run...");
@@ -466,7 +466,7 @@ async function storeCategories(categoriesForNewRun) {
 
 async function getCategories1() {
     // this function gets the categories based on the activeTree in mongoDB
-    const endpointUrl = 'https://j7-magic-tool.vercel.app/api/treeMongoGetCategories'; // Update with the correct endpoint
+    const endpointUrl = 'https://j7-magic-tool.vercel.app/api/treeMongoNotes?operation=getCategories'; // Update with the correct endpoint
     try {
         const response = await fetch(endpointUrl, {
             method: 'GET', // Assuming the serverless function expects a GET request
@@ -487,7 +487,7 @@ async function getCategories1() {
 
 async function treeMongoAdd(category, add, note, photoUrl) {
     try {
-        const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoAdd', {
+        const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoNotes?operation=addNote', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -517,7 +517,7 @@ async function treeMongoAdd(category, add, note, photoUrl) {
 async function treeMongoGetCount(category) {
 
     try {
-        const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoGetCount', {
+        const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoNotes?operation=getCategoryCount', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -900,7 +900,7 @@ async function callApi(currentDate, keywords) {
 //find active tree + fetchNotesFromActiveTree : return object with activity note, photourl, date, category
 async function treeMongoGetNotes() {
     try {
-        const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoGetNotes', {
+        const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoNotes?operation=getNotes', {
             method: 'GET', // Should likely be a GET request if fetching data
             headers: {
                 'Content-Type': 'application/json',
