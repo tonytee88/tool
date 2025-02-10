@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // });
     
     await getCategories1(); // Fetch and set categories globally
-    console.log(categories);
+    //console.log(categories);
 
     populateCategoryDropdowns();
     createCategoryElements();
@@ -1086,3 +1086,28 @@ function submitData() {
         console.error(`Error creating idea:`, error);
     }
 }
+
+document.getElementById('initializeCategories').addEventListener('click', async () => {
+
+    try {
+        // First, store the categories
+        console.log("Starting category initialization test...");
+        await storeCategories(categoriesForNewRun);
+        
+        // Then initialize the documents for each category
+        console.log("Creating individual category documents...");
+        await initializeCategoryDocuments(categoriesForNewRun);
+        
+        console.log("Test initialization completed successfully!");
+        
+        // Optional: Fetch and display the categories to verify
+        const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoNotes?operation=getCategories');
+        if (response.ok) {
+            const data = await response.json();
+            console.log("Verified categories in database:", data);
+        }
+
+    } catch (error) {
+        console.error("Error during test initialization:", error);
+    }
+});
