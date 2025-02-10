@@ -85,7 +85,27 @@
   padding: 10px;
   border-radius: 5px;
   font-size: 14px;
+  line-height: 1.6; /* Improve readability */
+  white-space: normal; /* Ensure text wraps properly */
 }
+
+/* Make headings stand out */
+.output-response h3 {
+  font-size: 16px;
+  font-weight: bold;
+  color: #ff9800;
+  margin-top: 12px;
+  margin-bottom: 6px;
+}
+
+/* Style horizontal separators */
+.output-response hr {
+  border: none;
+  height: 1px;
+  background: #555;
+  margin: 10px 0;
+}
+
 
     /* ------------------------------------------------
        MODAL STYLES
@@ -355,4 +375,75 @@
 
 .cancel-button:hover {
   background: #e53935;
+}
+
+/* ------------------------------------------------
+    ZOOM CONTROLS (FLOATING ON MOBILE)
+------------------------------------------------- */
+.zoom-controls {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.zoom-controls button {
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 50%;
+  border: none;
+  background: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.zoom-controls button:hover {
+  background: #0056b3;
+}
+
+@media (max-width: 600px) {
+  .zoom-controls {
+    bottom: 20px;
+    right: 20px;
+  }
+}
+
+/* ------------------------------------------------
+    RESPONSIVE TOOLBAR
+------------------------------------------------- */
+.toolbar {
+  background: #444;
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap; /* Wraps buttons on small screens */
+  justify-content: center;
+  gap: 8px;
+}
+
+.toolbar button {
+  padding: 12px 16px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  background: #000000;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.toolbar button:hover {
+  background: #0056b3;
+}
+
+@media (max-width: 600px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: center;
+  }
+  .toolbar button {
+    width: 90%; /* Full width on mobile */
+  }
 }

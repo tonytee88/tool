@@ -5,7 +5,7 @@ editor.editor_mode = "edit";
 
 // Track which node is being edited in the modal
 let currentEditNodeId = null;
-let currentZoom = 1; 
+let currentZoom = .2; 
 
 // Get the modal elements
 const modalOverlay = document.getElementById('modal-overlay');
@@ -361,20 +361,20 @@ function closePromptModal(doSave) {
 
 // --- LLM NODE ---
 function createLLMNode(x, y) {
-  editor.addNode(
+  const nodeId = editor.addNode(
     'LLM Call',
-    1, // One input (for connecting prompt block)
-    1, // One output (for connecting output block)
+    1,
+    1,
     x,
     y,
     'llm',
-    { selectedModel: "openai/gpt-4o-mini" }, // Default selected model
+    { selectedModel: 'openai/gpt-4o-mini' }, // ✅ Default model
     `
       <div class="df-node-content block-llm">
         <strong>LLM Call</strong>
         <div>
-          <label for="model-dropdown" style="display: block; margin-bottom: 5px;">Select Model</label>
-          <select class="model-dropdown">
+          <label for="model-dropdown-${nodeId}" style="display: block; margin-bottom: 5px;">Select Model</label>
+          <select class="model-dropdown" id="model-dropdown-${nodeId}">
             <option value="openai/gpt-4o-mini">GPT-4o-mini</option>
             <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
             <option value="perplexity/llama-3.1-sonar-large-128k-online">Perplexity</option>
@@ -384,19 +384,19 @@ function createLLMNode(x, y) {
     `
   );
 
-  // Attach event listeners to the dropdown and button
-  setTimeout(() => attachLLMListeners(editor.drawflow.drawflow.Home.data), 0);
+  // ✅ Attach event listener AFTER rendering
+  setTimeout(() => {
+    const dropdown = document.getElementById(`model-dropdown-${nodeId}`);
+    if (dropdown) {
+      dropdown.addEventListener('change', (event) => {
+        const selectedModel = event.target.value;
+        editor.drawflow.drawflow.Home.data[nodeId].data.selectedModel = selectedModel;
+        console.log(`🔄 Model updated for Node ${nodeId}: ${selectedModel}`);
+      });
+    }
+  }, 100);
 }
 
-function attachLLMListeners() {
-  document.querySelectorAll('.model-dropdown').forEach((dropdown) => {
-    dropdown.addEventListener('change', (event) => {
-      const nodeId = event.target.closest('.drawflow-node').id.split('-')[1];
-      const node = editor.getNodeFromId(nodeId);
-      node.data.selectedModel = event.target.value; // Update selected model in the node data
-    });
-  });
-}
 
 // --- OUTPUT NODE ---
 function createOutputNode(x, y) {
@@ -435,24 +435,23 @@ function createOutputNode(x, y) {
 
 function attachOutputListeners(nodeId) {
   setTimeout(() => { // Add slight delay to ensure elements exist
-    const nodeElement = document.getElementById(`node-${nodeId}`);
-    if (!nodeElement) {
-      console.error(`Output node ${nodeId} not found for event listener.`);
-      return;
-    }
-
-    const copyButton = nodeElement.querySelector('.copy-output-btn');
-    const outputDiv = nodeElement.querySelector('.output-response');
-
-    if (copyButton && outputDiv) {
-      copyButton.addEventListener('click', () => {
+    document.addEventListener("click", function (event) {
+      if (event.target.classList.contains("copy-output-btn")) {
+        const nodeElement = event.target.closest(".df-node-content"); // Find the parent node
+        if (!nodeElement) return;
+    
+        const outputDiv = nodeElement.querySelector(".output-response");
+        if (!outputDiv) {
+          console.error("Output div not found!");
+          return;
+        }
+    
         navigator.clipboard.writeText(outputDiv.innerText)
-          .then(() => alert('Output copied to clipboard!'))
-          .catch(err => console.error('Failed to copy text: ', err));
-      });
-    }
-  }, 200); // Ensure it's executed slightly after rendering
-}
+          .then(() => console.log("✅ Output copied to clipboard!"))
+          .catch(err => console.error("❌ Failed to copy text: ", err));
+      }
+    })
+})};
 
 // Optional: Add a method to list available flows
 async function listFlows() {
@@ -650,7 +649,15 @@ async function executeLLMFlow(flowData) {
       } else {
         const combinedInputs = getSortedInputs(nodeId, flowData);
         console.log("📝 combinedInputs: " + combinedInputs);
-        const selectedModel = currentNode.data.selectedModel || 'gpt-3.5-turbo';
+
+        // ✅ Get latest model selection from UI
+        const nodeElement = document.getElementById(`node-${nodeId}`);
+        const modelDropdown = nodeElement?.querySelector('.model-dropdown');
+        const selectedModel = modelDropdown?.value || currentNode.data.selectedModel || 'openai/gpt-4o-mini';
+
+        // ✅ Ensure the model selection is stored correctly in node data
+        currentNode.data.selectedModel = selectedModel;
+        console.log(`📝 Model selected for Node ${nodeId}: ${selectedModel}`);
 
         try {
           const response = await callLLMAPI(combinedInputs, selectedModel);
@@ -677,11 +684,26 @@ async function executeLLMFlow(flowData) {
       const linkedLLMNode = inputConnections.find(id => storedResponses[id]);
 
       if (linkedLLMNode) {
-        currentNode.data.output = storedResponses[linkedLLMNode];
-        console.log(`✅ Output Node (${nodeId}) Displaying: ${storedResponses[linkedLLMNode]}`);
+        const formattedResponse = formatTextAsHTML(storedResponses[linkedLLMNode]);
+        currentNode.data.output = formattedResponse;
 
-        // ✅ Immediately update the UI
-        updateOutputNodes(flowData, nodeId, storedResponses[linkedLLMNode]);
+        console.log(`✅ Output Node (${nodeId}) Displaying:`, formattedResponse);
+
+        // ✅ Immediately update the UI using the formatted response
+        updateOutputNodes(flowData, nodeId, formattedResponse);
+
+        setTimeout(() => {
+          const nodeElement = document.getElementById(`node-${nodeId}`);
+          if (nodeElement) {
+            const outputDiv = nodeElement.querySelector('.output-response');
+            if (outputDiv) {
+              outputDiv.innerHTML = formattedResponse;
+            }
+
+            // ✅ Attach listener here after rendering
+            attachOutputListeners(nodeId);
+          }
+        }, 100);
       } else {
         console.warn(`⚠️ Output Node (${nodeId}) has no valid LLM input.`);
       }
@@ -689,18 +711,37 @@ async function executeLLMFlow(flowData) {
   }
 }
 
+
 function updateOutputNodes(flowData, nodeId, responseText) {
   const nodeElement = document.getElementById(`node-${nodeId}`);
 
   if (nodeElement) {
     const outputDiv = nodeElement.querySelector('.output-response');
     if (outputDiv) {
-      outputDiv.innerHTML = responseText;
+      outputDiv.innerHTML = formatTextAsHTML(responseText); // ✅ Apply structured formatting
     }
   }
 
   // ✅ Also update the stored flow data
   flowData.drawflow.Home.data[nodeId].data.output = responseText;
+}
+
+function formatTextAsHTML(text) {
+  if (!text) return ""; // Prevent errors with empty text
+
+  // ✅ Preserve line breaks
+  let formattedText = text.replace(/\n/g, "<br>");
+
+  // ✅ Convert markdown-like bold text (**bold**) to HTML <strong>
+  formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+  // ✅ Convert markdown-style headings (### Title) into <h3>
+  formattedText = formattedText.replace(/### (.*?)<br>/g, "<h3>$1</h3>");
+
+  // ✅ Convert horizontal separators (---) into <hr>
+  formattedText = formattedText.replace(/---/g, "<hr>");
+
+  return formattedText;
 }
 
 async function waitForInputs(nodeId, flowData) {
@@ -832,6 +873,7 @@ const nodeElement = document.getElementById(`node-${nodeId}`);
 
 // Helper function to call the LLM API
 async function callLLMAPI(prompt, model) {
+  console.log(model);
   try {
     const response = await fetch('https://j7-magic-tool.vercel.app/api/agentFlowStraicoCall', {
       method: 'POST',

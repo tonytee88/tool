@@ -560,7 +560,7 @@ submitButton.addEventListener('click', async () => {
 
 async function treeMongoAddNotebookIdeas(category, idea) {
     try {
-        const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoAddNotebookIdeas', {
+        const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoIdeas?operation=add', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -656,7 +656,7 @@ async function getAndLoadIdeas() {
 
 async function treeMongoFetchIdeas(category) {
     try {
-        const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoFetchIdeas', {
+        const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoIdeas?operation=get', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -684,7 +684,7 @@ async function treeMongoFetchIdeas(category) {
 
 async function treeMongoFetchSavedIdeas(saveName) {
     try {
-        const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoFetchSavedIdeas', {
+        const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoIdeas?operation=get', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -713,7 +713,7 @@ async function treeMongoFetchSavedIdeas(saveName) {
 
 async function treeMongoDeleteIdea(category, idea) {
     try {
-        const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoDeleteIdea', {
+        const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoIdeas?operation=delete', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -741,7 +741,7 @@ async function treeMongoDeleteIdea(category, idea) {
 
 async function treeMongoSaveIdeas(saveName, ideas) {
     try {
-        const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoSaveIdeas', {
+        const response = await fetch('https://j7-magic-tool.vercel.app/api/treeMongoIdeas?operation=save', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
