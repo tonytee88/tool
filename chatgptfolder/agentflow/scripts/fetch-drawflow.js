@@ -9,7 +9,7 @@ async function main() {
   try {
     // ✅ Get flowId & channelId from GitHub Action request
     const flowId = process.env.FLOW_ID || "New Flow 01";
-    const channelId = process.env.SLACK_CHANNEL_ID; // 🔹 Capture dynamically
+    const channelId = process.env.SLACK_CHANNEL_ID || "hihi" ; // 🔹 Capture dynamically
     console.log(channelId);
     if (!flowId || !channelId) {
       console.error('❌ Missing flowId or channelId');
