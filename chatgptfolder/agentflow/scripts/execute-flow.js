@@ -147,4 +147,5 @@ async function waitForInputs(nodeId, flowData) {
       console.error("❌ Error sending output to Slack:", error);
     }
   }
-  
+
+  executeLLMFlow(flowData, slackResponseUrl);

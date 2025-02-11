@@ -3,6 +3,7 @@ const path = require('path');
 const axios = require('axios');
 
 const handler = async (req, res) => {
+    console.log("hello fetch js is working")
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
