@@ -1,0 +1,28 @@
+name: Execute Drawflow
+
+on:
+  repository_dispatch:
+    types: [run_drawflow]
+
+jobs:
+  execute-flow:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install axios
+
+      - name: Fetch Drawflow Data
+        env:
+          VERCEL_API_URL: "https://j7-magic-tool.vercel.app/api/agentFlowCRUD"
+        run: |
+          echo "Fetching drawflow data for ${{ github.event.client_payload.flowName }}"
+          node scripts/fetch-drawflow.js "${{ github.event.client_payload.flowName }}"
