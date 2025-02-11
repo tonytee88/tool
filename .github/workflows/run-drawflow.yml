@@ -26,6 +26,7 @@ jobs:
       - name: Fetch Drawflow Data & Execute Flow
         env:
           VERCEL_API_URL: "https://j7-magic-tool.vercel.app/api/agentFlowCRUD"
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         run: |
           echo "📡 Fetching drawflow data for flow ID: $FLOW_ID and sending updates to Slack channel: $SLACK_CHANNEL_ID"
           node chatgptfolder/agentflow/scripts/fetch-drawflow.js
