@@ -96,7 +96,7 @@ async function sendSlackMessage(message, filePath = null) {
     console.log(`📩 Sending message to Slack: "${message}"`);
 
     const slackToken = process.env.SLACK_BOT_TOKEN;
-    const slackChannel = C07FXMA353Q ;
+    const slackChannel = "C07FXMA353Q" ;
 
     const payload = {
       channel: slackChannel,
