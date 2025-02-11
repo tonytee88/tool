@@ -17,7 +17,7 @@ async function main() {
     });
 
     const flowData = response.data;
-
+    console.log("here's the drawflow data: " + json.stringify(flowData))
     if (!flowData || flowData.length === 0) {
       console.warn(`⚠️ No flow found for flowId: ${flowId}`);
       await sendSlackMessage(`⚠️ No flow found for *${flowId}*. Please check and try again.`);
@@ -63,7 +63,7 @@ async function uploadFileToSlack(filePath, flowId) {
     console.log(`📤 Uploading drawflow.txt to Slack for flow: ${flowId}`);
 
     const slackToken = process.env.SLACK_BOT_TOKEN; // Ensure this is stored in GitHub Secrets
-    const slackChannel = process.env.SLACK_CHANNEL_ID || "YOUR_SLACK_CHANNEL_ID";
+    const slackChannel = "C07FXMA353Q";
 
     const formData = new FormData();
     formData.append('file', fs.createReadStream(filePath));
