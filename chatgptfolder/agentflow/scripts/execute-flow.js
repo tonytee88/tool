@@ -75,9 +75,8 @@ async function executeLLMFlow(flowData) {
     const filePath = generateOutputFile(finalOutputText);
     await sendSlackMessage(channelId, "here's the output", filePath);
   }
-}
 
-async function waitForInputs(nodeId, flowData) {
+  async function waitForInputs(nodeId, flowData) {
     return new Promise(resolve => {
       const checkInputs = () => {
         if (areInputsReady(nodeId, flowData)) {
@@ -122,6 +121,58 @@ async function waitForInputs(nodeId, flowData) {
     return finalOutputText.trim();
   }
   
+  function determineExecutionOrder(flowData) {
+    const allNodes = flowData.drawflow.Home.data;
+    const executionOrder = [];
+    const processedNodes = new Set();
+  
+    function traverseNode(nodeId) {
+      const nodeIdStr = String(nodeId); // Ensure consistent ID format
+  
+      if (processedNodes.has(nodeIdStr)) {
+        console.log("detected node was already processed: " + nodeIdStr)
+      return; // ✅ Prevent duplicate visits
+      }
+  
+      const node = allNodes[nodeIdStr];
+      if (!node) return;
+  
+      console.log(`🔍 Analyzing Node: ${nodeIdStr} (${node.name})`);
+  
+      // Step 1: Process dependencies first (make sure inputs are processed before this node)
+      const inputConnections = Object.values(node.inputs)
+        .flatMap(input => input.connections)
+        .map(conn => String(conn.node)) // Ensure consistency
+        .filter(inputNodeId => !processedNodes.has(inputNodeId));
+  
+      inputConnections.forEach(traverseNode);
+  
+      // ✅ Only add the node once all inputs have been processed
+      if (!processedNodes.has(nodeIdStr)) {
+        executionOrder.push(nodeIdStr);
+        processedNodes.add(nodeIdStr);
+      }
+  
+      // Step 2: Process connected outputs (ensuring unique visits)
+      const outputConnections = Object.values(node.outputs)
+        .flatMap(output => output.connections)
+        .map(conn => String(conn.node)) // Ensure consistency
+        .filter(outputNodeId => !processedNodes.has(outputNodeId));
+  
+      outputConnections.forEach(traverseNode);
+    }
+  
+    // Get all LLM Call nodes, sort by position, and process them **before** outputs
+    const llmNodes = Object.values(allNodes)
+      .filter(node => node.name === 'LLM Call')
+      .sort((a, b) => a.pos_y === b.pos_y ? a.pos_x - b.pos_x : a.pos_y - b.pos_y);
+  
+    llmNodes.forEach(llmNode => traverseNode(llmNode.id));
+  
+    console.log("✅ Final executionOrder:", executionOrder);
+    return executionOrder;
+  }
+
   function generateOutputFile(outputText) {
     const filePath = path.join('/tmp', 'final_output.txt');
     fs.writeFileSync(filePath, outputText, 'utf8');
@@ -158,5 +209,120 @@ async function sendSlackMessage(channelId, message, filePath = null) {
     console.error('❌ Error sending message to Slack:', error);
   }
 }
+
+function getSortedInputs(nodeId, flowData) {
+    const node = flowData.drawflow.Home.data[nodeId];
+    console.log("Processing Node ID:", nodeId);
+  
+    const inputConnections = node.inputs.input_1.connections || [];
+  
+    if (inputConnections.length === 0) {
+      const currentNodeElement = document.getElementById(`node-${nodeId}`);
+      const currentPromptTextElement = currentNodeElement?.querySelector('.prompt-text-display');
+      return currentPromptTextElement ? currentPromptTextElement.textContent.trim() : '';
+    }
+  
+    // Gather all connected input nodes
+    const connectedNodes = inputConnections.map(conn => {
+      const connectedNodeId = conn.node;
+      const connectedNode = flowData.drawflow.Home.data[connectedNodeId];
+  
+      if (!connectedNode) return null;
+  
+      const connectedNodeElement = document.getElementById(`node-${connectedNodeId}`);
+      let connectedText = '';
+  
+      if (connectedNode.name === 'Prompt' || connectedNode.name === 'Output') {
+        const promptTextElement = connectedNodeElement?.querySelector('.prompt-text-display') ||
+                                  connectedNodeElement?.querySelector('.output-response');
+        connectedText = promptTextElement ? promptTextElement.textContent.trim() : '';
+      } else if (connectedNode.name === 'LLM Call') {
+        connectedText = connectedNode.data.output || ''; // Use stored LLM response if available
+        updateFlowData();
+      }
+  
+      return {
+        id: connectedNodeId,
+        x: connectedNode.pos_x,
+        y: connectedNode.pos_y,
+        text: connectedText,
+      };
+    }).filter(Boolean);
+  
+    // Sort inputs left to right, top to bottom
+    connectedNodes.sort((a, b) => a.y === b.y ? a.x - b.x : a.y - b.y);
+  
+    // Combine all inputs into one string
+    return connectedNodes.map(node => node.text).join(' and ');
+  }
+
+  function updateOutputNodes(flowData, nodeId, responseText) {
+    const nodeElement = document.getElementById(`node-${nodeId}`);
+  
+    if (nodeElement) {
+      const outputDiv = nodeElement.querySelector('.output-response');
+      if (outputDiv) {
+        outputDiv.innerHTML = formatTextAsHTML(responseText); // ✅ Apply structured formatting
+      }
+    }
+  
+    // ✅ Also update the stored flow data
+    flowData.drawflow.Home.data[nodeId].data.output = responseText;
+  }
+
+  function formatTextAsHTML(text) {
+    if (!text) return ""; // Prevent errors with empty text
+  
+    // ✅ Preserve line breaks
+    let formattedText = text.replace(/\n/g, "<br>");
+  
+    // ✅ Convert markdown-like bold text (**bold**) to HTML <strong>
+    formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+  
+    // ✅ Convert markdown-style headings (### Title) into <h3>
+    formattedText = formattedText.replace(/### (.*?)<br>/g, "<h3>$1</h3>");
+  
+    // ✅ Convert horizontal separators (---) into <hr>
+    formattedText = formattedText.replace(/---/g, "<hr>");
+  
+    return formattedText;
+  }
+
+  function markNodeAsError(nodeId, errorMessage) {
+    const nodeElement = document.getElementById(`node-${nodeId}`);
+      if (!nodeElement) return;
+    
+      // Add error indicator
+      const errorIndicator = document.createElement('div');
+      errorIndicator.className = 'error-indicator';
+      errorIndicator.title = errorMessage; // Tooltip with the error message
+      errorIndicator.innerHTML = '⚠️'; // Warning icon
+      nodeElement.appendChild(errorIndicator);
+    }
+
+    async function callLLMAPI(prompt, model) {
+        console.log(model);
+        try {
+          const response = await fetch('https://j7-magic-tool.vercel.app/api/agentFlowStraicoCall', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: prompt, models: model }),
+          });
+      
+          if (!response.ok) {
+            throw new Error(`Failed to call LLM API: ${response.statusText}`);
+          }
+      
+          return await response.json();
+        } catch (error) {
+          throw new Error(`Error calling LLM API: ${error.message}`);
+        }
+      }
+
+}
+
+
 
   executeLLMFlow(flowData);
