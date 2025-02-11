@@ -40,7 +40,7 @@ async function main() {
     try {
       console.log(`🚀 Triggering execute-flow.js for flowId: ${flowId}...`);
       const executeFlow = require("./execute-flow");
-      await executeFlow(flowData);
+      //await executeFlow(flowData);
       console.log('✅ execute-flow.js completed successfully.');
     } catch (execError) {
       console.error('❌ Error executing execute-flow.js:', execError);
