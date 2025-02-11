@@ -3,15 +3,15 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 
+const flowId = process.env.FLOW_ID || "x";
+const channelId = process.env.SLACK_CHANNEL_ID || "x" ; // 🔹 Capture dynamically
+
 async function main() {
   console.log('🔍 Starting fetch-drawflow.js execution...');
 
   try {
     // ✅ Get flowId & channelId from GitHub Action request
-    const flowId = process.env.FLOW_ID || "x";
-    const channelId = process.env.SLACK_CHANNEL_ID || "x" ; // 🔹 Capture dynamically
-    console.log(channelId);
-    console.log("flowid loaded from env : "+ flowId)
+
     if (!flowId || !channelId) {
       console.error('❌ Missing flowId or channelId');
       process.exit(1); // 🔴 Fail GH Action
