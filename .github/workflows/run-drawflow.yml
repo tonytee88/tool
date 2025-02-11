@@ -7,6 +7,9 @@ on:
 jobs:
   execute-flow:
     runs-on: ubuntu-latest
+    env:
+      FLOW_ID: ${{ github.event.inputs.flowId }}
+      SLACK_CHANNEL_ID: ${{ github.event.inputs.channelId }}
 
     steps:
       - name: Checkout repository
@@ -19,9 +22,6 @@ jobs:
 
       - name: Install dependencies
         run: npm install axios
-
-      - name: Ensure Scripts Exist
-        run: ls -la chatgptfolder/agentflow/scripts/
 
       - name: Fetch Drawflow Data & Execute Flow
         env:
