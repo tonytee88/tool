@@ -2,20 +2,15 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 
-const handler = async (req, res) => {
-    console.log("hello fetch js is working")
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+async function main() {
+  console.log('🔍 Starting fetch-drawflow.js execution...');
 
   try {
-    // ✅ Get flowId from query params (e.g., ?flowId=New Flow 01)
-    const { flowId } = req.query;
-    if (!flowId) {
-      return res.status(400).json({ error: 'flowId query parameter is required' });
-    }
+    // ✅ Get flowId from GitHub Actions environment variable (or default)
+    const flowId = process.env.FLOW_ID || "New Flow 01"; 
+    console.log(`📡 Fetching drawflow for flowId: ${flowId} from agentFlowCRUD...`);
 
-    // ✅ Fetch the correct flow from MongoDB (via agentFlowCRUD)
+    // ✅ Fetch flow from MongoDB
     const response = await axios.get(`https://j7-magic-tool.vercel.app/api/agentFlowCRUD`, {
       params: { flowId }
     });
@@ -23,36 +18,35 @@ const handler = async (req, res) => {
     const flowData = response.data;
 
     if (!flowData || flowData.length === 0) {
-      return res.status(404).json({ error: `No flow found for flowId: ${flowId}` });
+      console.warn(`⚠️ No flow found for flowId: ${flowId}`);
+      process.exit(1); // 🔴 Fail GH Action
     }
 
-    // ✅ Convert JSON response to a readable .txt format
-    const filePath = path.join('/tmp', 'drawflow.txt');
-    const formattedFlowData = JSON.stringify(flowData, null, 2); // Pretty-print JSON
-    fs.writeFileSync(filePath, formattedFlowData);
+    console.log(`✅ Successfully retrieved drawflow data for: ${flowId}`);
+    
+    // ✅ Save JSON response to a .txt file
+    const filePath = path.join(__dirname, 'drawflow.txt');
+    fs.writeFileSync(filePath, JSON.stringify(flowData, null, 2)); // Pretty-print JSON
 
-    console.log(`✅ Drawflow file created: ${filePath}`);
+    console.log(`📄 Drawflow file created at: ${filePath}`);
 
-    // ✅ Call the execution script (pass the fetched flowData)
-    require("./execute-flow")(flowData);
+    // ✅ Call execution script **asynchronously**
+    try {
+      console.log(`🚀 Triggering execute-flow.js for flowId: ${flowId}...`);
+      const executeFlow = require("./execute-flow");
+      await executeFlow(flowData);  // ✅ Ensures execution completes
+      console.log('✅ execute-flow.js completed successfully.');
+    } catch (execError) {
+      console.error('❌ Error executing execute-flow.js:', execError);
+      process.exit(1); // 🔴 Fail GH Action if execution fails
+    }
 
-    // ✅ Send a message with the file to Slack
-    return res.status(200).json({
-      response_type: 'in_channel',
-      text: `📄 Here is your Drawflow file for *${flowId}*:`,
-      attachments: [
-        {
-          title: 'drawflow.txt',
-          filetype: 'text/plain',
-          url_private: filePath
-        }
-      ]
-    });
-
+    console.log(`✅ Fetch & Execute Flow completed successfully!`);
   } catch (error) {
     console.error('❌ Error fetching drawflow:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    process.exit(1); // 🔴 Fail GH Action
   }
-};
+}
 
-module.exports = handler;
+// ✅ Automatically run the script when executed
+main();
