@@ -8,27 +8,37 @@ const handler = async (req, res) => {
   }
 
   try {
-    // ✅ Fetch Drawflow JSON from the correct MongoDB endpoint
-    const response = await axios.get('https://j7-magic-tool.vercel.app/api/agentFlowCRUD');
-    const flowData = response.data;
-
-    if (!flowData) {
-      return res.status(404).json({ error: 'No flow data found' });
+    // ✅ Get flowId from query params (e.g., ?flowId=New Flow 01)
+    const { flowId } = req.query;
+    if (!flowId) {
+      return res.status(400).json({ error: 'flowId query parameter is required' });
     }
 
-    // ✅ Convert JSON to a .txt file
+    // ✅ Fetch the correct flow from MongoDB (via agentFlowCRUD)
+    const response = await axios.get(`https://j7-magic-tool.vercel.app/api/agentFlowCRUD`, {
+      params: { flowId }
+    });
+
+    const flowData = response.data;
+
+    if (!flowData || flowData.length === 0) {
+      return res.status(404).json({ error: `No flow found for flowId: ${flowId}` });
+    }
+
+    // ✅ Convert JSON response to a readable .txt format
     const filePath = path.join('/tmp', 'drawflow.txt');
-    fs.writeFileSync(filePath, JSON.stringify(flowData, null, 2));
+    const formattedFlowData = JSON.stringify(flowData, null, 2); // Pretty-print JSON
+    fs.writeFileSync(filePath, formattedFlowData);
 
-    console.log('✅ Drawflow file created:', filePath);
+    console.log(`✅ Drawflow file created: ${filePath}`);
 
-    // ✅ Call the execution script
+    // ✅ Call the execution script (pass the fetched flowData)
     require("./execute-flow")(flowData);
 
-    // ✅ Send a message with the file in Slack
+    // ✅ Send a message with the file to Slack
     return res.status(200).json({
       response_type: 'in_channel',
-      text: '📄 Here is your Drawflow file:',
+      text: `📄 Here is your Drawflow file for *${flowId}*:`,
       attachments: [
         {
           title: 'drawflow.txt',
