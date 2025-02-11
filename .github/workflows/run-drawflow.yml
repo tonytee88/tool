@@ -20,9 +20,12 @@ jobs:
       - name: Install dependencies
         run: npm install axios
 
-      - name: Fetch Drawflow Data
+      - name: Ensure Scripts Exist
+        run: ls -la tool/chatgptfolder/agentflow/scripts/
+
+      - name: Fetch Drawflow Data & Execute Flow
         env:
           VERCEL_API_URL: "https://j7-magic-tool.vercel.app/api/agentFlowCRUD"
         run: |
-          echo "Fetching drawflow data for ${{ github.event.client_payload.flowName }}"
-          node scripts/fetch-drawflow.js "${{ github.event.client_payload.flowName }}"
+          echo "📡 Fetching drawflow data for ${{ github.event.client_payload.flowName }} and executing it"
+          node tool/chatgptfolder/agentflow/scripts/fetch-drawflow.js "${{ github.event.client_payload.flowName }}"
