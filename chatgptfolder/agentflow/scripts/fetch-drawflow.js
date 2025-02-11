@@ -1,73 +1,76 @@
+require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
-require('dotenv').config(); // Load Slack credentials from .env
 
 async function main() {
   console.log('🔍 Starting fetch-drawflow.js execution...');
 
   try {
-    // ✅ Get flowId from GitHub Actions environment variable (or default)
-    const flowId = process.env.FLOW_ID || "New Flow 01"; 
-    console.log(`📡 Fetching drawflow for flowId: ${flowId} from agentFlowCRUD...`);
+    // ✅ Get flowId & channelId from GitHub Action request
+    const flowId = process.env.FLOW_ID || "New Flow 01";
+    const channelId = process.env.SLACK_CHANNEL_ID; // 🔹 Capture dynamically
+    console.log(channelId);
+    if (!flowId || !channelId) {
+      console.error('❌ Missing flowId or channelId');
+      process.exit(1); // 🔴 Fail GH Action
+    }
 
-    // ✅ Fetch flow from MongoDB
+    console.log(`📡 Fetching drawflow for flowId: ${flowId}...`);
     const response = await axios.get(`https://j7-magic-tool.vercel.app/api/agentFlowCRUD`, {
       params: { flowId }
     });
 
     const flowData = response.data;
-    console.log("here's the drawflow data: " + json.stringify(flowData))
     if (!flowData || flowData.length === 0) {
       console.warn(`⚠️ No flow found for flowId: ${flowId}`);
-      await sendSlackMessage(`⚠️ No flow found for *${flowId}*. Please check and try again.`);
-      process.exit(1); // 🔴 Fail GH Action
+      await sendSlackMessage(channelId, `⚠️ No flow found for *${flowId}*. Please check and try again.`);
+      process.exit(1);
     }
 
     console.log(`✅ Successfully retrieved drawflow data for: ${flowId}`);
-    
-    // ✅ Save JSON response to a .txt file
+
+    // ✅ Save JSON response to .txt file
     const filePath = path.join(__dirname, 'drawflow.txt');
-    fs.writeFileSync(filePath, JSON.stringify(flowData, null, 2)); // Pretty-print JSON
+    fs.writeFileSync(filePath, JSON.stringify(flowData, null, 2));
 
     console.log(`📄 Drawflow file created at: ${filePath}`);
 
-    // ✅ Call execution script **asynchronously**
+    // ✅ Call execution script
     try {
       console.log(`🚀 Triggering execute-flow.js for flowId: ${flowId}...`);
       const executeFlow = require("./execute-flow");
-      await executeFlow(flowData);  // ✅ Ensures execution completes
+      await executeFlow(flowData);
       console.log('✅ execute-flow.js completed successfully.');
     } catch (execError) {
       console.error('❌ Error executing execute-flow.js:', execError);
-      await sendSlackMessage(`❌ Error executing flow *${flowId}*. Check logs for details.`);
-      process.exit(1); // 🔴 Fail GH Action if execution fails
+      await sendSlackMessage(channelId, `❌ Error executing flow *${flowId}*. Check logs.`);
+      process.exit(1);
     }
 
-    // ✅ Upload file to Slack
-    await uploadFileToSlack(filePath, flowId);
+    // ✅ Upload file to Slack (to correct channel)
+    await uploadFileToSlack(filePath, flowId, channelId);
+    await sendSlackMessage(channelId, `✅ Flow *${flowId}* executed successfully!`, filePath);
 
     console.log(`✅ Fetch & Execute Flow completed successfully!`);
-    await sendSlackMessage(`✅ Flow *${flowId}* executed successfully! Check the attached drawflow.txt file.`, filePath);
 
   } catch (error) {
     console.error('❌ Error fetching drawflow:', error);
-    await sendSlackMessage(`❌ Error fetching drawflow for *${flowId}*. Check logs for details.`);
-    process.exit(1); // 🔴 Fail GH Action
+    await sendSlackMessage(channelId, `❌ Error fetching drawflow for *${flowId}*. Check logs.`);
+    process.exit(1);
   }
 }
 
 // ✅ Uploads a file to Slack
-async function uploadFileToSlack(filePath, flowId) {
+async function uploadFileToSlack(filePath, flowId, channelId) {
   try {
-    console.log(`📤 Uploading drawflow.txt to Slack for flow: ${flowId}`);
+    console.log(`📤 Uploading drawflow.txt to Slack in channel: ${channelId}`);
 
-    const slackToken = process.env.SLACK_BOT_TOKEN; // Ensure this is stored in GitHub Secrets
-    const slackChannel = "C07FXMA353Q";
+    const slackToken = process.env.SLACK_BOT_TOKEN;
 
     const formData = new FormData();
     formData.append('file', fs.createReadStream(filePath));
-    formData.append('channels', slackChannel);
+    formData.append('channels', channelId);
     formData.append('title', `Drawflow for ${flowId}`);
     formData.append('filename', 'drawflow.txt');
     formData.append('filetype', 'text/plain');
@@ -90,16 +93,15 @@ async function uploadFileToSlack(filePath, flowId) {
   }
 }
 
-// ✅ Sends a message to Slack
-async function sendSlackMessage(message, filePath = null) {
+// ✅ Sends a message to Slack (to correct channel)
+async function sendSlackMessage(channelId, message, filePath = null) {
   try {
-    console.log(`📩 Sending message to Slack: "${message}"`);
+    console.log(`📩 Sending message to Slack Channel (${channelId}): "${message}"`);
 
     const slackToken = process.env.SLACK_BOT_TOKEN;
-    const slackChannel = "C07FXMA353Q" ;
 
     const payload = {
-      channel: slackChannel,
+      channel: channelId,
       text: message,
     };
 
