@@ -1,37 +1,48 @@
-const axios = require('axios');
 const fs = require('fs');
+const path = require('path');
+const axios = require('axios');
 
-const flowName = process.argv[2];
+const handler = async (req, res) => {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
-if (!flowName) {
-  console.error("❌ Missing flow name argument");
-  process.exit(1);
-}
-
-(async () => {
   try {
-    console.log(`📡 Fetching flow data for: ${flowName}`);
-
-    const response = await axios.get(`https://j7-magic-tool.vercel.app/api/agentFlowCRUD?flowId=${flowName}`);
-
-    if (response.status !== 200) {
-      throw new Error(`Failed to retrieve flow data (HTTP ${response.status})`);
-    }
-
+    // Fetch Drawflow JSON from MongoDB
+    const response = await axios.get('https://j7-magic-tool.vercel.app/api/agentFlowStraicoCall');
     const flowData = response.data;
-    
-    if (!flowData || flowData.length === 0) {
-      throw new Error("Empty flow data received");
+
+    if (!flowData) {
+      return res.status(404).json({ error: 'No flow data found' });
     }
 
-    fs.writeFileSync('flow-data.json', JSON.stringify(flowData, null, 2));
-    console.log("✅ Flow data saved as flow-data.json");
+    // Convert JSON to a .txt file
+    const filePath = path.join('/tmp', 'drawflow.txt');
+    fs.writeFileSync(filePath, JSON.stringify(flowData, null, 2));
 
+    console.log('✅ Drawflow file created:', filePath);
     // Call the execution script
     require("./execute-flow")(flowData);
+    // Send a message with the file in Slack
+    return res.status(200).json({
+      response_type: 'in_channel',
+      text: '📄 Here is your Drawflow file:',
+      attachments: [
+        {
+          title: 'drawflow.txt',
+          filetype: 'text/plain',
+          url_private: filePath
+        }
+      ]
+    });
 
   } catch (error) {
-    console.error("❌ Error fetching flow data:", error.message);
-    process.exit(1);
+    console.error('❌ Error fetching drawflow:', error);
+    return res.status(500).json({ error: 'Internal server error' });
   }
-})();
+};
+
+module.exports = handler;
+
+
+
