@@ -8,9 +8,10 @@ async function main() {
 
   try {
     // ✅ Get flowId & channelId from GitHub Action request
-    const flowId = process.env.FLOW_ID || "New Flow 01";
-    const channelId = process.env.SLACK_CHANNEL_ID || "C07FXMA353Q" ; // 🔹 Capture dynamically
+    const flowId = process.env.FLOW_ID || "x";
+    const channelId = process.env.SLACK_CHANNEL_ID || "x" ; // 🔹 Capture dynamically
     console.log(channelId);
+    console.log("flowid loaded from env : "+ flowId)
     if (!flowId || !channelId) {
       console.error('❌ Missing flowId or channelId');
       process.exit(1); // 🔴 Fail GH Action
@@ -19,7 +20,7 @@ async function main() {
     console.log(`📡 Fetching drawflow for flowId: ${flowId}...`);
     const response = await axios.get(`https://j7-magic-tool.vercel.app/api/agentFlowCRUD?flowId=${encodeURIComponent(flowId)}`);
     console.log("drawflow data: " + JSON.stringify(response));
-    
+
     const flowData = response.data;
     if (!flowData || flowData.length === 0) {
       console.warn(`⚠️ No flow found for flowId: ${flowId}`);
