@@ -17,9 +17,7 @@ async function main() {
     }
 
     console.log(`📡 Fetching drawflow for flowId: ${flowId}...`);
-    const response = await axios.get(`https://j7-magic-tool.vercel.app/api/agentFlowCRUD`, {
-      params: { flowId }
-    });
+    const response = await axios.get(`https://j7-magic-tool.vercel.app/api/agentFlowCRUD?flowId=${encodeURIComponent(flowId)}`);
 
     const flowData = response.data;
     if (!flowData || flowData.length === 0) {
