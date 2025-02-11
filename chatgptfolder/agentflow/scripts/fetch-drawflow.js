@@ -8,22 +8,24 @@ const handler = async (req, res) => {
   }
 
   try {
-    // Fetch Drawflow JSON from MongoDB
-    const response = await axios.get('https://j7-magic-tool.vercel.app/api/agentFlowStraicoCall');
+    // ✅ Fetch Drawflow JSON from the correct MongoDB endpoint
+    const response = await axios.get('https://j7-magic-tool.vercel.app/api/agentFlowCRUD');
     const flowData = response.data;
 
     if (!flowData) {
       return res.status(404).json({ error: 'No flow data found' });
     }
 
-    // Convert JSON to a .txt file
+    // ✅ Convert JSON to a .txt file
     const filePath = path.join('/tmp', 'drawflow.txt');
     fs.writeFileSync(filePath, JSON.stringify(flowData, null, 2));
 
     console.log('✅ Drawflow file created:', filePath);
-    // Call the execution script
+
+    // ✅ Call the execution script
     require("./execute-flow")(flowData);
-    // Send a message with the file in Slack
+
+    // ✅ Send a message with the file in Slack
     return res.status(200).json({
       response_type: 'in_channel',
       text: '📄 Here is your Drawflow file:',
@@ -43,6 +45,3 @@ const handler = async (req, res) => {
 };
 
 module.exports = handler;
-
-
-
