@@ -21,7 +21,7 @@ jobs:
         run: npm install axios
 
       - name: Ensure Scripts Exist
-        run: ls -la tool/chatgptfolder/agentflow/scripts/
+        run: ls -la chatgptfolder/agentflow/scripts/
 
       - name: Fetch Drawflow Data & Execute Flow
         env:
