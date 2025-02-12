@@ -175,109 +175,120 @@ async function callLLMAPI(prompt, model) {
 }
 
 function determineExecutionOrder(flowData) {
-    const allNodes = flowData.Home.data;
+    // ✅ Extract correct data structure
+    const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data;
+    
+    if (!structuredFlow) {
+        console.error("❌ Invalid flowData format!");
+        return [];
+    }
+
     const executionOrder = [];
     const processedNodes = new Set();
-  
+
     function traverseNode(nodeId) {
-      const nodeIdStr = String(nodeId); // Ensure consistent ID format
-  
-      if (processedNodes.has(nodeIdStr)) {
-        console.log("detected node was already processed: " + nodeIdStr)
-      return; // ✅ Prevent duplicate visits
-      }
-  
-      const node = allNodes[nodeIdStr];
-      if (!node) return;
-  
-      console.log(`🔍 Analyzing Node: ${nodeIdStr} (${node.name})`);
-  
-      // Step 1: Process dependencies first (make sure inputs are processed before this node)
-      const inputConnections = Object.values(node.inputs)
-        .flatMap(input => input.connections)
-        .map(conn => String(conn.node)) // Ensure consistency
-        .filter(inputNodeId => !processedNodes.has(inputNodeId));
-  
-      inputConnections.forEach(traverseNode);
-  
-      // ✅ Only add the node once all inputs have been processed
-      if (!processedNodes.has(nodeIdStr)) {
-        executionOrder.push(nodeIdStr);
-        processedNodes.add(nodeIdStr);
-      }
-  
-      // Step 2: Process connected outputs (ensuring unique visits)
-      const outputConnections = Object.values(node.outputs)
-        .flatMap(output => output.connections)
-        .map(conn => String(conn.node)) // Ensure consistency
-        .filter(outputNodeId => !processedNodes.has(outputNodeId));
-  
-      outputConnections.forEach(traverseNode);
+        const nodeIdStr = String(nodeId); // Ensure consistent ID format
+
+        if (processedNodes.has(nodeIdStr)) {
+            console.log(`⏭️ Node ${nodeIdStr} already processed.`);
+            return; // ✅ Prevent duplicate visits
+        }
+
+        const node = structuredFlow[nodeIdStr];
+        if (!node) return;
+
+        console.log(`🔍 Analyzing Node: ${nodeIdStr} (${node.name})`);
+
+        // Step 1: Process dependencies first (ensure inputs are processed before this node)
+        const inputConnections = Object.values(node.inputs || {})
+            .flatMap(input => input.connections || [])
+            .map(conn => String(conn.node)) // Ensure consistency
+            .filter(inputNodeId => !processedNodes.has(inputNodeId));
+
+        inputConnections.forEach(traverseNode);
+
+        // ✅ Only add the node once all inputs have been processed
+        if (!processedNodes.has(nodeIdStr)) {
+            executionOrder.push(nodeIdStr);
+            processedNodes.add(nodeIdStr);
+        }
+
+        // Step 2: Process connected outputs (ensuring unique visits)
+        const outputConnections = Object.values(node.outputs || {})
+            .flatMap(output => output.connections || [])
+            .map(conn => String(conn.node)) // Ensure consistency
+            .filter(outputNodeId => !processedNodes.has(outputNodeId));
+
+        outputConnections.forEach(traverseNode);
     }
-  
+
     // Get all LLM Call nodes, sort by position, and process them **before** outputs
-    const llmNodes = Object.values(allNodes)
-      .filter(node => node.name === 'LLM Call')
-      .sort((a, b) => a.pos_y === b.pos_y ? a.pos_x - b.pos_x : a.pos_y - b.pos_y);
-  
+    const llmNodes = Object.values(structuredFlow)
+        .filter(node => node.name === 'LLM Call')
+        .sort((a, b) => (a.pos_y === b.pos_y ? a.pos_x - b.pos_x : a.pos_y - b.pos_y));
+
     llmNodes.forEach(llmNode => traverseNode(llmNode.id));
-  
+
     console.log("✅ Final executionOrder:", executionOrder);
     return executionOrder;
-  }
+}
+
   
 function getSortedInputs(nodeId, flowData) {
-const node = flowData.Home.data[nodeId];
+    // ✅ Extract correct data structure
+    const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data;
 
-if (!node) {
-    console.error(`❌ Node ${nodeId} not found in flowData!`);
-    return "";
-}
-
-console.log("Processing Node ID:", nodeId);
-
-const inputConnections = node.inputs?.input_1?.connections || [];
-
-if (inputConnections.length === 0) {
-    // ✅ Read from stored flowData instead of the browser DOM
-    return node.data?.promptText?.trim() || "";
-}
-
-// ✅ Gather all connected input nodes and read from `flowData`
-const connectedNodes = inputConnections.map(conn => {
-    const connectedNodeId = conn.node;
-    const connectedNode = flowData.Home.data[connectedNodeId];
-
-    if (!connectedNode) {
-    console.warn(`⚠️ Connected Node ${connectedNodeId} is missing!`);
-    return null;
+    if (!structuredFlow || !structuredFlow[nodeId]) {
+        console.error(`❌ Node ${nodeId} not found in flowData!`);
+        return "";
     }
 
-    let connectedText = "";
+    const node = structuredFlow[nodeId];
+    console.log("Processing Node ID:", nodeId);
 
-    // ✅ Read directly from the saved flowData instead of querying the DOM
-    if (connectedNode.name === "Prompt") {
-    connectedText = connectedNode.data?.promptText?.trim() || "";
-    } else if (connectedNode.name === "Output") {
-    connectedText = connectedNode.data?.output?.trim() || "";
-    } else if (connectedNode.name === "LLM Call") {
-    connectedText = connectedNode.data?.output?.trim() || "";
+    const inputConnections = node.inputs?.input_1?.connections || [];
+
+    if (inputConnections.length === 0) {
+        // ✅ Read from stored flowData instead of the browser DOM
+        return node.data?.promptText?.trim() || "";
     }
 
-    return {
-    id: connectedNodeId,
-    x: connectedNode.pos_x,
-    y: connectedNode.pos_y,
-    text: connectedText,
-    };
-}).filter(Boolean);
+    // ✅ Gather all connected input nodes and read from `flowData`
+    const connectedNodes = inputConnections.map(conn => {
+        const connectedNodeId = conn.node;
+        const connectedNode = structuredFlow[connectedNodeId];
 
-// ✅ Sort inputs left to right, top to bottom
-connectedNodes.sort((a, b) => (a.y === b.y ? a.x - b.x : a.y - b.y));
+        if (!connectedNode) {
+            console.warn(`⚠️ Connected Node ${connectedNodeId} is missing!`);
+            return null;
+        }
 
-// ✅ Combine all inputs into one string
-return connectedNodes.map(node => node.text).join(" and ");
+        let connectedText = "";
+
+        // ✅ Read directly from the saved flowData instead of querying the DOM
+        if (connectedNode.name === "Prompt") {
+            connectedText = connectedNode.data?.promptText?.trim() || "";
+        } else if (connectedNode.name === "Output") {
+            connectedText = connectedNode.data?.output?.trim() || "";
+        } else if (connectedNode.name === "LLM Call") {
+            connectedText = connectedNode.data?.output?.trim() || "";
+        }
+
+        return {
+            id: connectedNodeId,
+            x: connectedNode.pos_x,
+            y: connectedNode.pos_y,
+            text: connectedText,
+        };
+    }).filter(Boolean);
+
+    // ✅ Sort inputs left to right, top to bottom
+    connectedNodes.sort((a, b) => (a.y === b.y ? a.x - b.x : a.y - b.y));
+
+    // ✅ Combine all inputs into one string
+    return connectedNodes.map(node => node.text).join(" and ");
 }
+
 
 function formatTextAsHTML(text) {
 if (!text) return ""; // Prevent errors with empty text
@@ -298,16 +309,20 @@ return formattedText;
 }
 
 function updateOutputNodes(flowData, nodeId, responseText) {
-    if (!flowData.drawflow.Home.data[nodeId]) {
+    // ✅ Extract the actual flowData from the array
+    const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data;
+  
+    if (!structuredFlow || !structuredFlow[nodeId]) {
       console.error(`❌ Node ${nodeId} not found in flowData`);
       return;
     }
   
     // ✅ Update output in the object-based flowData
-    flowData.drawflow.Home.data[nodeId].data.output = responseText;
+    structuredFlow[nodeId].data.output = responseText;
   
     console.log(`✅ Updated output for Node ${nodeId}:`, responseText);
   }
+  
   
   function markNodeAsError(flowData, nodeId, errorMessage) {
     if (!flowData.drawflow.Home.data[nodeId]) {
