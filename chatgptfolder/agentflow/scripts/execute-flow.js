@@ -81,10 +81,10 @@ async function executeLLMFlow(flowData) {
     const finalOutputText = compileFinalOutputs(structuredFlow);
   
     if (finalOutputText) {
-      console.log("llm response output combined: " + finalOutputText)
+      //console.log("llm response output combined: " + finalOutputText)
       const filePath = generateOutputFile(finalOutputText);
       await sendSlackMessage(channelId, "✅ Here's the final output:" + finalOutputText, filePath);
-      await sendSlackMessage(channelId, "✅ Here's the final output:", filePath);
+      //await sendSlackMessage(channelId, "✅ Here's the final output:", filePath);
     }
   }
   
@@ -353,21 +353,21 @@ console.warn(`⚠️ Marked Node ${nodeId} as error: ${errorMessage}`);
 }
   
 function compileFinalOutputs(flowData) {
-    console.log("🔍 Now running the final outputs compiler function...");
+    //console.log("🔍 Now running the final outputs compiler function...");
     
     const allNodes = flowData;
     let finalOutputText = "";
   
     Object.values(allNodes).forEach(node => {
       if (node.name === "Output") {
-        console.log(`🛠 Found Output Node: ${node.id}, checking connections...`);
-        console.log(`🔗 Output connections:`, node.outputs);
+        //console.log(`🛠 Found Output Node: ${node.id}, checking connections...`);
+        //console.log(`🔗 Output connections:`, node.outputs);
   
         // ✅ Check if there are NO output connections at all
         const hasConnections = node.outputs && Object.keys(node.outputs).some(key => node.outputs[key].connections.length > 0);
   
         if (!hasConnections) {
-          console.log(`📌 Final Output Node Detected: ${node.id}`);
+          //console.log(`📌 Final Output Node Detected: ${node.id}`);
           finalOutputText += `${node.data.output || "No output generated"}\n\n`;
         }
       }
