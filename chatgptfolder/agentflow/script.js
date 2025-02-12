@@ -228,35 +228,34 @@ async function loadSelectedFlow() {
 
     const drawflowData = toDrawflowFormat(apiResponse);
 
-    // Clear existing nodes before importing
+    // ✅ Clear existing nodes before importing
     editor.clear();
 
-    // Import the flow
+    // ✅ Import the flow
     editor.import(drawflowData);
 
-    // ✅ Restore the selected model for each LLM Call node
-    setTimeout(() => {
-      Object.values(drawflowData.drawflow.Home.data).forEach(node => {
-        if (node.name === "LLM Call") {
-          const dropdown = document.getElementById(`model-dropdown-${node.id}`);
-          if (dropdown) {
-            dropdown.value = node.data.selectedModel || 'openai/gpt-4o-mini'; // Default if missing
-            console.log(`📥 Restored model selection for Node ${node.id}:`, dropdown.value);
-          }
+    // ✅ After import, update each LLM node's dropdown to reflect the saved model
+    Object.values(drawflowData.drawflow.Home.data).forEach(node => {
+      if (node.name === "LLM Call") {
+        const dropdown = document.getElementById(`model-dropdown-${node.id}`);
+        if (dropdown) {
+          dropdown.value = node.data.selectedModel || 'openai/gpt-4o-mini'; // ✅ Set saved model or default
+          console.log(`🎯 Set model for Node ${node.id}:`, dropdown.value);
         }
-      });
-    }, 100);
+      }
+    });
 
-    // Reattach listeners for all nodes
+    // ✅ Reattach event listeners for nodes
     reattachAllListeners();
 
-    // Close the modal
+    // ✅ Close the modal
     closeLoadFlowModal();
   } catch (error) {
-    console.error('Error loading flow:', error);
+    console.error('❌ Error loading flow:', error);
     alert(`Failed to load flow: ${error.message}`);
   }
 }
+
 
 
 
