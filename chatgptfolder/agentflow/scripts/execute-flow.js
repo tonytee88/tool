@@ -353,19 +353,30 @@ console.warn(`⚠️ Marked Node ${nodeId} as error: ${errorMessage}`);
 }
   
 function compileFinalOutputs(flowData) {
-console.log("Now going for the final outputs compiler function")
-const allNodes = flowData;
-let finalOutputText = "";
-
-Object.values(allNodes).forEach(node => {
-    if (node.name === "Output" && (!node.outputs || Object.keys(node.outputs).length === 0)) {
-    console.log(`📌 Final Output Node Detected: ${node.id}`);
-    finalOutputText += `${node.data.output || "No output generated"}\n\n`;
-    }
-});
-
-return finalOutputText.trim();
-}
+    console.log("🔍 Now running the final outputs compiler function...");
+    
+    const allNodes = flowData;
+    let finalOutputText = "";
+  
+    Object.values(allNodes).forEach(node => {
+      if (node.name === "Output") {
+        console.log(`🛠 Found Output Node: ${node.id}, checking connections...`);
+        console.log(`🔗 Output connections:`, node.outputs);
+  
+        // ✅ Check if there are NO output connections at all
+        const hasConnections = node.outputs && Object.keys(node.outputs).some(key => node.outputs[key].connections.length > 0);
+  
+        if (!hasConnections) {
+          console.log(`📌 Final Output Node Detected: ${node.id}`);
+          finalOutputText += `${node.data.output || "No output generated"}\n\n`;
+        }
+      }
+    });
+  
+    console.log("✅ Final Output Compilation Complete:", finalOutputText.trim());
+    return finalOutputText.trim();
+  }
+  
 
 function generateOutputFile(outputText) {
   const filePath = path.join('/tmp', 'final_output.txt');
