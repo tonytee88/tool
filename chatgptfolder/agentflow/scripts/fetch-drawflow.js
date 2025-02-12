@@ -65,7 +65,6 @@ async function main() {
 // ✅ Uploads a file to Slack
 async function uploadFileToSlack(filePath, channels) {
     const token = process.env.SLACK_BOT_TOKEN;
-    const channels = channelId;
 
     try {
       // Step 1: Request an upload URL
