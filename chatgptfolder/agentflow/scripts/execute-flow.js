@@ -140,7 +140,7 @@ async function callLLMAPI(prompt, model) {
 }
 
 function determineExecutionOrder(flowData) {
-    const allNodes = flowData.drawflow.Home.data;
+    const allNodes = flowData.Home.data;
     const executionOrder = [];
     const processedNodes = new Set();
   
