@@ -573,28 +573,56 @@ function closePromptModal(doSave) {
 // =========================================================================================================
 
 async function startFlowExecution() {
-  await saveFlow(); // ✅ Ensure the flow is saved before execution
-  storedResponses = {}; // ✅ Clear previous responses
-  clearOutputNodes(); // ✅ Reset UI for outputs
+  // Ensure the flow is saved and UI outputs are cleared.
+  await saveFlow();
+  storedResponses = {}; // Clear previous responses
+  clearOutputNodes();
 
-  // ✅ Get latest flowData from the editor
-  const flowData = editor.export();
+  // Get the latest flowData from your editor.
+  //const flowData = editor.export();
+  //console.log("flowdata: ", JSON.stringify(flowData, null, 2));
+  const flowName = document.getElementById('flow-name').value.trim() || 'New Flow 01z';
+  //console.log("Flowname is :", flowName)
+  // Extract the flowName from the export.
+  // Adjust this extraction logic based on how your editor's export structure stores the flow name.
+  //const flowName = flowData.flowName || (flowData.drawflow && flowData.drawflow.name ? flowData.drawflow.name : "Unnamed Flow");
 
-  // ✅ Ensure flowData structure is correct (for both browser & server execution)
-  const structuredFlowData = {
-    drawflow: flowData.drawflow // Extract only necessary data
-  };
+  console.log("🚀 Executing flow:", flowName);
 
-  console.log('🚀 Executing flow with:', structuredFlowData);
+  // Define a channelId for browser-triggered flows.
+  // This can be a fixed value or obtained from your UI if needed.
+  const channelId = "nochan"; // Replace or update as needed
 
-  // ✅ Import & Run `execute-flow.js`
-  import('./scripts/execute-flow.js').then(({ executeLLMFlow }) => {
-    executeLLMFlow(structuredFlowData); // Run the unified execution
-  }).catch(error => {
-    console.error('❌ Failed to execute flow:', error);
-  });
+  // Call the server endpoint with the extracted flowName and channelId.
+  await callBrowserFlow(flowName, channelId);
 }
 
+async function callBrowserFlow(flowName, channelId) {
+  const endpointUrl = "https://j7-magic-tool.vercel.app/api/slack?operation=browser";
+
+  try {
+    const response = await fetch(endpointUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ flowName, channelId })
+    });
+
+    if (!response.ok) {
+      // Optionally, read the error message from the response body
+      const errorText = await response.text();
+      throw new Error(`Server error: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log("Flow executed successfully:", data);
+    return data;
+  } catch (error) {
+    console.error("Error executing flow:", error);
+    throw error;
+  }
+}
 
 function clearOutputNodes() {
   const flowData = editor.export();
