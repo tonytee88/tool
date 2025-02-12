@@ -5,78 +5,85 @@ const axios = require('axios');
 const channelId = process.env.SLACK_CHANNEL_ID || "x"; // Capture dynamically
 
 async function executeLLMFlow(flowData) {
-  console.log("🚀 Starting Flow Execution...");
-
-  if (!flowData || !flowData.length) {
-    console.error("❌ No valid flowData received.");
-    return;
-  }
-
-  // ✅ Extract proper flow data structure
-  flowData = flowData[0].flowData.drawflow;
-  const executionOrder = determineExecutionOrder(flowData);
-  const storedResponses = {}; // ✅ Cache responses to avoid redundant API calls
-
-  for (const nodeId of executionOrder) {
-    const currentNode = flowData.Home.data[nodeId];
-
-    if (!currentNode) continue;
-
-    if (currentNode.name === 'LLM Call') {
-      console.log(`🚀 Processing LLM Call Node: ${nodeId}`);
-
-      if (storedResponses[nodeId]) {
-        console.log(`✅ Using cached response for Node ${nodeId}`);
-        currentNode.data.output = storedResponses[nodeId];
-      } else {
-        await waitForInputs(nodeId, flowData);
-
-        const combinedInputs = getSortedInputs(nodeId, flowData);
-        console.log("📝 Combined Inputs:", combinedInputs);
-
-        const selectedModel = currentNode.data.selectedModel || 'openai/gpt-4o-mini';
-        console.log(`📝 Model selected for Node ${nodeId}: ${selectedModel}`);
-
-        try {
-          const response = await callLLMAPI(combinedInputs, selectedModel);
-          const messageResponse = response.data?.completions?.[selectedModel]?.completion?.choices?.[0]?.message?.content || "⚠️ No valid response";
-
-          console.log(`✅ LLM Call Node (${nodeId}) Response:`, messageResponse);
-
-          currentNode.data.output = messageResponse;
-          storedResponses[nodeId] = messageResponse;
-          updateOutputNodes(flowData, nodeId, messageResponse);
-        } catch (error) {
-          console.error(`❌ LLM Call Node (${nodeId}) Error:`, error);
-          markNodeAsError(nodeId, error.message);
+    console.log("🚀 Starting Flow Execution...");
+  
+    if (!flowData || !flowData.length) {
+      console.error("❌ No valid flowData received.");
+      return;
+    }
+  
+    // ✅ Extract proper flow data structure
+    const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data;
+  
+    if (!structuredFlow) {
+      console.error("❌ Invalid flowData format!");
+      return;
+    }
+  
+    const executionOrder = determineExecutionOrder(structuredFlow);
+    const storedResponses = {}; // ✅ Cache responses to avoid redundant API calls
+  
+    for (const nodeId of executionOrder) {
+      const currentNode = structuredFlow[nodeId];
+  
+      if (!currentNode) continue;
+  
+      if (currentNode.name === 'LLM Call') {
+        console.log(`🚀 Processing LLM Call Node: ${nodeId}`);
+  
+        if (storedResponses[nodeId]) {
+          console.log(`✅ Using cached response for Node ${nodeId}`);
+          currentNode.data.output = storedResponses[nodeId];
+        } else {
+          await waitForInputs(nodeId, structuredFlow);
+  
+          const combinedInputs = getSortedInputs(nodeId, structuredFlow);
+          console.log("📝 Combined Inputs:", combinedInputs);
+  
+          const selectedModel = currentNode.data.selectedModel || 'openai/gpt-4o-mini';
+          console.log(`📝 Model selected for Node ${nodeId}: ${selectedModel}`);
+  
+          try {
+            const response = await callLLMAPI(combinedInputs, selectedModel);
+            const messageResponse = response.data?.completions?.[selectedModel]?.completion?.choices?.[0]?.message?.content || "⚠️ No valid response";
+  
+            console.log(`✅ LLM Call Node (${nodeId}) Response:`, messageResponse);
+  
+            currentNode.data.output = messageResponse;
+            storedResponses[nodeId] = messageResponse;
+            updateOutputNodes(structuredFlow, nodeId, messageResponse);
+          } catch (error) {
+            console.error(`❌ LLM Call Node (${nodeId}) Error:`, error);
+            markNodeAsError(nodeId, error.message);
+          }
+        }
+      } else if (currentNode.name === 'Output') {
+        console.log(`📤 Processing Output Node: ${nodeId}`);
+  
+        const inputConnections = currentNode.inputs.input_1?.connections?.map(conn => conn.node) || [];
+        const linkedLLMNode = inputConnections.find(id => storedResponses[id]);
+  
+        if (linkedLLMNode) {
+          const formattedResponse = formatTextAsHTML(storedResponses[linkedLLMNode]);
+          currentNode.data.output = formattedResponse;
+  
+          console.log(`✅ Output Node (${nodeId}) Displaying:`, formattedResponse);
+          updateOutputNodes(structuredFlow, nodeId, formattedResponse);
+        } else {
+          console.warn(`⚠️ Output Node (${nodeId}) has no valid LLM input.`);
         }
       }
-    } else if (currentNode.name === 'Output') {
-      console.log(`📤 Processing Output Node: ${nodeId}`);
-
-      const inputConnections = currentNode.inputs.input_1.connections.map(conn => conn.node);
-      const linkedLLMNode = inputConnections.find(id => storedResponses[id]);
-
-      if (linkedLLMNode) {
-        const formattedResponse = formatTextAsHTML(storedResponses[linkedLLMNode]);
-        currentNode.data.output = formattedResponse;
-
-        console.log(`✅ Output Node (${nodeId}) Displaying:`, formattedResponse);
-        updateOutputNodes(flowData, nodeId, formattedResponse);
-      } else {
-        console.warn(`⚠️ Output Node (${nodeId}) has no valid LLM input.`);
-      }
+    }
+  
+    // ✅ Compile final output from all terminal nodes
+    const finalOutputText = compileFinalOutputs(structuredFlow);
+  
+    if (finalOutputText) {
+      const filePath = generateOutputFile(finalOutputText);
+      await sendSlackMessage(channelId, "✅ Here's the final output:", filePath);
     }
   }
-
-  // ✅ Compile final output from all terminal nodes
-  const finalOutputText = compileFinalOutputs(flowData);
-
-  if (finalOutputText) {
-    const filePath = generateOutputFile(finalOutputText);
-    await sendSlackMessage(channelId, "✅ Here's the final output:", filePath);
-  }
-}
+  
 
 // ✅ Wait for valid input before proceeding
 async function waitForInputs(nodeId, flowData) {
@@ -96,19 +103,22 @@ async function waitForInputs(nodeId, flowData) {
 
 // ✅ Ensure inputs are ready before processing
 function areInputsReady(nodeId, flowData) {
-    const node = flowData.Home.data[nodeId];
+    // ✅ Extract correct structure
+    const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data;
   
-    if (!node) {
+    if (!structuredFlow || !structuredFlow[nodeId]) {
       console.error(`❌ Node ${nodeId} is missing in flowData!`);
       return false;
     }
   
-    const inputConnections = Object.values(node.inputs)
-      .flatMap(input => input.connections)
+    const node = structuredFlow[nodeId];
+  
+    const inputConnections = Object.values(node.inputs || {})
+      .flatMap(input => input.connections || [])
       .map(conn => conn.node);
   
     for (const inputNodeId of inputConnections) {
-      const inputNode = flowData.Home.data[inputNodeId];
+      const inputNode = structuredFlow[inputNodeId];
   
       if (!inputNode) {
         console.error(`❌ Node ${inputNodeId} is missing in flowData!`);
@@ -144,6 +154,7 @@ function areInputsReady(nodeId, flowData) {
     console.log(`✅ Node ${nodeId} is ready for execution.`);
     return true;
   }
+  
   
 
 // ✅ Send final output to Slack
@@ -322,20 +333,40 @@ function updateOutputNodes(flowData, nodeId, responseText) {
   
     console.log(`✅ Updated output for Node ${nodeId}:`, responseText);
   }
+    
+function markNodeAsError(flowData, nodeId, errorMessage) {
+if (!flowData[nodeId]) {
+    console.error(`❌ Node ${nodeId} not found in flowData`);
+    return;
+}
+
+// ✅ Store the error message in `flowData`
+flowData[nodeId].data.error = errorMessage;
+
+console.warn(`⚠️ Marked Node ${nodeId} as error: ${errorMessage}`);
+}
   
-  
-  function markNodeAsError(flowData, nodeId, errorMessage) {
-    if (!flowData.drawflow.Home.data[nodeId]) {
-      console.error(`❌ Node ${nodeId} not found in flowData`);
-      return;
+function compileFinalOutputs(flowData) {
+const allNodes = flowData;
+let finalOutputText = "";
+
+Object.values(allNodes).forEach(node => {
+    if (node.name === "Output" && (!node.outputs || Object.keys(node.outputs).length === 0)) {
+    console.log(`📌 Final Output Node Detected: ${node.id}`);
+    finalOutputText += `${node.data.output || "No output generated"}\n\n`;
     }
-  
-    // ✅ Store the error message in `flowData`
-    flowData.drawflow.Home.data[nodeId].data.error = errorMessage;
-  
-    console.warn(`⚠️ Marked Node ${nodeId} as error: ${errorMessage}`);
-  }
-  
+});
+
+return finalOutputText.trim();
+}
+
+function generateOutputFile(outputText) {
+  const filePath = path.join('/tmp', 'final_output.txt');
+  fs.writeFileSync(filePath, outputText, 'utf8');
+  console.log('✅ Final Output File Created:', filePath);
+  return filePath;
+}
+
 
 // ✅ Export function
 module.exports = executeLLMFlow;
