@@ -106,9 +106,9 @@ async function waitForInputs(nodeId, flowData) {
 }
 
 // ✅ Ensure inputs are ready before processing
-function areInputsReady(nodeId, flowData) {
+function areInputsReady(nodeId, structuredFlow) {
     // ✅ Extract correct structure
-    const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data;
+    //const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data;
   
     if (!structuredFlow || !structuredFlow[nodeId]) {
       console.error(`❌ Node ${nodeId} is missing in flowData!`);
@@ -249,9 +249,9 @@ function determineExecutionOrder(structuredFlow) {
 }
 
   
-function getSortedInputs(nodeId, flowData) {
+function getSortedInputs(nodeId, structuredFlow) {
     // ✅ Extract correct data structure
-    const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data;
+    //const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data;
 
     if (!structuredFlow || !structuredFlow[nodeId]) {
         console.error(`❌ Node ${nodeId} not found in flowData!`);
@@ -323,9 +323,9 @@ formattedText = formattedText.replace(/---/g, "<hr>");
 return formattedText;
 }
 
-function updateOutputNodes(flowData, nodeId, responseText) {
+function updateOutputNodes(structuredFlow, nodeId, responseText) {
     // ✅ Extract the actual flowData from the array
-    const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data;
+    //const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data;
   
     if (!structuredFlow || !structuredFlow[nodeId]) {
       console.error(`❌ Node ${nodeId} not found in flowData`);
