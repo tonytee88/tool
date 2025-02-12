@@ -278,11 +278,13 @@ function getSortedInputs(nodeId, structuredFlow) {
             return null;
         }
 
+        console.log(`🔍 Inspecting Node ${connectedNodeId}:`, connectedNode.data); // Debugging
         let connectedText = "";
 
         // ✅ Read directly from the saved flowData instead of querying the DOM
         if (connectedNode.name === "Prompt") {
             connectedText = connectedNode.data?.promptText?.trim() || "";
+            console.log(`✅ Extracted Prompt Text: "${connectedText}" from Node ${connectedNodeId}`);
         } else if (connectedNode.name === "Output") {
             connectedText = connectedNode.data?.output?.trim() || "";
         } else if (connectedNode.name === "LLM Call") {
