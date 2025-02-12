@@ -383,6 +383,7 @@ function closePromptModal(doSave) {
 
 // --- LLM NODE ---
 function createLLMNode(x, y) {
+  // ✅ Add node first and get its ID
   const nodeId = editor.addNode(
     'LLM Call',
     1,
@@ -395,8 +396,8 @@ function createLLMNode(x, y) {
       <div class="df-node-content block-llm">
         <strong>LLM Call</strong>
         <div>
-          <label for="model-dropdown-${nodeId}" style="display: block; margin-bottom: 5px;">Select Model</label>
-          <select class="model-dropdown" id="model-dropdown-${nodeId}">
+          <label for="model-dropdown" style="display: block; margin-bottom: 5px;">Select Model</label>
+          <select class="model-dropdown">
             <option value="openai/gpt-4o-mini">GPT-4o-mini</option>
             <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
             <option value="perplexity/llama-3.1-sonar-large-128k-online">Perplexity</option>
@@ -406,18 +407,15 @@ function createLLMNode(x, y) {
     `
   );
 
-  // ✅ Attach event listener AFTER rendering
+  // ✅ After node is created, set correct ID for dropdown
   setTimeout(() => {
-    const dropdown = document.getElementById(`model-dropdown-${nodeId}`);
+    const dropdown = document.querySelector(`#node-${nodeId} .model-dropdown`);
     if (dropdown) {
-      dropdown.addEventListener('change', (event) => {
-        const selectedModel = event.target.value;
-        editor.drawflow.drawflow.Home.data[nodeId].data.selectedModel = selectedModel;
-        console.log(`🔄 Model updated for Node ${nodeId}: ${selectedModel}`);
-      });
+      dropdown.id = `model-dropdown-${nodeId}`; // ✅ Set correct ID
     }
   }, 100);
 }
+
 
 
 // --- OUTPUT NODE ---
