@@ -12,14 +12,15 @@ async function executeLLMFlow(flowData) {
     return;
   }
 
-  flowData = flowData[0]; // Ensure we're working with the actual flow object
+  // ✅ Extract proper flow data structure
+  flowData = flowData[0].flowData; 
   const executionOrder = determineExecutionOrder(flowData);
   const storedResponses = {}; // ✅ Cache responses to avoid redundant API calls
   const executionQueue = [...executionOrder]; // ✅ Queue-based execution
 
   while (executionQueue.length > 0) {
     const nodeId = executionQueue.shift();
-    const currentNode = flowData.flowData.drawflow.Home.data[nodeId];
+    const currentNode = flowData.drawflow.Home.data[nodeId];
 
     if (!currentNode) continue;
 
@@ -96,38 +97,42 @@ async function waitForInputs(nodeId, flowData) {
   });
 }
 
-// ✅ Find nodes that should execute next
-function enqueueConnectedNodes(nodeId, flowData, queue) {
-  const currentNode = flowData.flowData.drawflow.Home.data[nodeId];
-  if (!currentNode) return;
+// ✅ Check if a node's inputs are ready
+function areInputsReady(nodeId, flowData) {
+  const node = flowData.drawflow.Home.data[nodeId];
 
-  const outputConnections = Object.values(currentNode.outputs)
-    .flatMap(output => output.connections)
+  const inputConnections = Object.values(node.inputs)
+    .flatMap(input => input.connections)
     .map(conn => conn.node);
 
-  outputConnections.forEach(nextNodeId => {
-    if (!queue.includes(nextNodeId)) queue.push(nextNodeId);
-  });
-}
+  for (const inputNodeId of inputConnections) {
+    const inputNode = flowData.drawflow.Home.data[inputNodeId];
 
-// ✅ Extract final outputs
-function compileFinalOutputs(flowData) {
-  const allNodes = flowData.flowData.drawflow.Home.data;
-  let finalOutputText = "";
+    let outputData = inputNode?.data?.output?.trim() || "";
 
-  Object.values(allNodes).forEach(node => {
-    if (node.name === "Output" && node.outputs.output_1.connections.length === 0) {
-      console.log(`📌 Final Output Node Detected: ${node.id}`);
-      finalOutputText += `${node.data.output || "No output generated"}\n\n`;
+    if (!outputData || outputData === "Waiting for response...") {
+      console.log(`❌ Node ${nodeId} is waiting for input from Node ${inputNodeId}`);
+      return false;
     }
-  });
-
-  return finalOutputText.trim();
+  }
+  return true;
 }
 
-// ✅ Sort execution order
+// ✅ Generates output file
+function generateOutputFile(outputText) {
+  const filePath = path.join('/tmp', 'final_output.txt');
+  fs.writeFileSync(filePath, outputText, 'utf8');
+  return filePath;
+}
+
+// ✅ Updates output node data
+function updateOutputNodes(flowData, nodeId, responseText) {
+  flowData.drawflow.Home.data[nodeId].data.output = responseText;
+}
+
+// ✅ Sorts execution order
 function determineExecutionOrder(flowData) {
-  const allNodes = flowData.flowData.drawflow.Home.data;
+  const allNodes = flowData.drawflow.Home.data;
   const executionOrder = [];
   const processedNodes = new Set();
 
@@ -170,38 +175,32 @@ function determineExecutionOrder(flowData) {
 
 // ✅ Call LLM API
 async function callLLMAPI(prompt, model) {
-  console.log("🔍 Calling LLM API with model:", model);
   try {
     const response = await axios.post('https://j7-magic-tool.vercel.app/api/agentFlowStraicoCall', {
       message: prompt,
       models: model
     });
 
-    if (!response.data) throw new Error("Empty response from API.");
     return response.data;
   } catch (error) {
     throw new Error(`Error calling LLM API: ${error.message}`);
   }
 }
 
-// ✅ Generates output file
-function generateOutputFile(outputText) {
-  const filePath = path.join('/tmp', 'final_output.txt');
-  fs.writeFileSync(filePath, outputText, 'utf8');
-  return filePath;
-}
-
-// ✅ Sends a message to Slack
+// ✅ Send Slack Message
 async function sendSlackMessage(channelId, message, filePath) {
   console.log(`📩 Sending message to Slack (${channelId})`);
   const slackToken = process.env.SLACK_BOT_TOKEN;
 
-  const payload = { channel: channelId, text: message };
-  await axios.post('https://slack.com/api/chat.postMessage', payload, {
+  await axios.post('https://slack.com/api/chat.postMessage', {
+    channel: channelId,
+    text: message
+  }, {
     headers: { 'Authorization': `Bearer ${slackToken}`, 'Content-Type': 'application/json' }
   });
 
   console.log("✅ Message sent to Slack.");
 }
 
+// ✅ Export function
 module.exports = executeLLMFlow;
