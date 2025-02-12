@@ -50,7 +50,7 @@ async function main() {
     }
 
     // ✅ Upload file to Slack (to correct channel)
-    await uploadFileToSlack(filePath, flowId, channelId);
+    await uploadFileToSlack(filePath, channelId);
     await sendSlackMessage(channelId, `✅ Flow *${flowId}* executed successfully!`, filePath);
 
     console.log(`✅ Fetch & Execute Flow completed successfully!`);
@@ -63,47 +63,72 @@ async function main() {
 }
 
 // ✅ Uploads a file to Slack
-async function uploadFileToSlack(filePath, flowId, channelId) {
+async function uploadFileToSlack(filePath, channels) {
+    const token = process.env.SLACK_BOT_TOKEN;
+    const channels = channelId;
+
     try {
-        console.log(`📤 Uploading file to Slack in channel: ${channelId}`);
-
-        const slackToken = process.env.SLACK_BOT_TOKEN;
-        if (!slackToken) throw new Error("❌ Missing Slack bot token!");
-
-        // ✅ Ensure file exists before uploading
-        if (!fs.existsSync(filePath)) {
-            throw new Error(`❌ File not found: ${filePath}`);
+      // Step 1: Request an upload URL
+      const uploadUrlResponse = await axios.post(
+        'https://slack.com/api/files.getUploadURLExternal',
+        {
+          length: fs.statSync(filePath).size,
+          filename: 'your_filename.ext', // Replace with your file's name
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-
-        // ✅ Create form data
-        const formData = new FormData();
-        formData.append('file', fs.createReadStream(filePath));
-        formData.append('channels', channelId);
-        formData.append('filename', 'drawflow.txt');
-        formData.append('title', `Drawflow for ${flowId}`);
-
-        // ✅ Upload using `files.uploadV2`
-        const response = await axios.post('https://slack.com/api/files.uploadV2', formData, {
-            headers: {
-                'Authorization': `Bearer ${slackToken}`,
-                ...formData.getHeaders(), // Ensure correct headers
+      );
+  
+      if (!uploadUrlResponse.data.ok) {
+        throw new Error(`Error getting upload URL: ${uploadUrlResponse.data.error}`);
+      }
+  
+      const uploadUrl = uploadUrlResponse.data.upload_url;
+      const fileId = uploadUrlResponse.data.file_id;
+  
+      // Step 2: Upload the file
+      const form = new FormData();
+      form.append('file', fs.createReadStream(filePath));
+  
+      const uploadResponse = await axios.post(uploadUrl, form, {
+        headers: form.getHeaders(),
+      });
+  
+      if (uploadResponse.status !== 200) {
+        throw new Error('Error uploading file to the provided URL');
+      }
+  
+      // Step 3: Complete the upload
+      const completeResponse = await axios.post(
+        'https://slack.com/api/files.completeUploadExternal',
+        {
+          files: [
+            {
+              id: fileId,
+              title: 'Your File Title', // Replace with your file's title
             },
-        });
-
-        console.log("📩 Slack API response:", response.data);
-
-        if (!response.data.ok) {
-            console.error(`❌ Slack upload failed: ${response.data.error}`);
-            throw new Error(`Slack upload failed: ${response.data.error}`);
+          ],
+          channels: channels, // Array of channel IDs where the file will be shared
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-
-        console.log(`✅ File successfully uploaded to Slack! URL: ${response.data.file?.permalink}`);
-        return response.data.file?.permalink; // ✅ Return uploaded file link
-
+      );
+  
+      if (!completeResponse.data.ok) {
+        throw new Error(`Error completing upload: ${completeResponse.data.error}`);
+      }
+  
+      console.log('File uploaded successfully:', completeResponse.data.file);
     } catch (error) {
-        console.error('❌ Error uploading file to Slack:', error.message);
+      console.error('Error uploading file to Slack:', error);
     }
-}
+  }
 
 // ✅ Sends a message to Slack (to correct channel)
 async function sendSlackMessage(channelId, message, filePath = null) {
