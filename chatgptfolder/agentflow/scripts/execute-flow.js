@@ -14,7 +14,7 @@ async function executeLLMFlow(flowData) {
   
     // ✅ Extract proper flow data structure
     const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data || flowData[0]?.flowData?.drawflow?.data;
-    console.log("structuredflow data: ", JSON.stringify(structuredFlow, null, 2));
+    //console.log("structuredflow data: ", JSON.stringify(structuredFlow, null, 2));
     if (!structuredFlow || typeof structuredFlow !== "object") {
         console.error("❌ Invalid flowData format! Expected an object but got:", structuredFlow);
         return;
@@ -189,9 +189,9 @@ async function callLLMAPI(prompt, model) {
   }
 }
 
-function determineExecutionOrder(flowData) {
+function determineExecutionOrder(structuredFlow) {
     // ✅ Extract correct data structure
-    const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data || flowData[0]?.flowData?.drawflow?.data;
+    //const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data || flowData[0]?.flowData?.drawflow?.data;
     
     if (!structuredFlow) {
         console.error("❌ Invalid flowData format from determineExecutionOrder function!");
