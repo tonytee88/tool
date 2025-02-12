@@ -84,10 +84,22 @@ function updateFlowData() {
 async function saveFlow() {
   const flowName = document.getElementById('flow-name').value.trim() || 'New Flow 01';
   updateFlowData();
-  // Re-export the flow to include the updated HTML
+
+  // ✅ Get the current flow data
   const updatedFlowData = editor.export();
 
-  // Call the MongoDB API to save the updated flow
+  // ✅ Ensure all LLM Call nodes have the latest selected model
+  Object.values(updatedFlowData.drawflow.Home.data).forEach(node => {
+    if (node.name === "LLM Call") {
+      const dropdown = document.getElementById(`model-dropdown-${node.id}`);
+      if (dropdown) {
+        node.data.selectedModel = dropdown.value; // ✅ Store selected model
+        console.log(`📥 Saved model selection for Node ${node.id}:`, dropdown.value);
+      }
+    }
+  });
+
+  // ✅ Call the MongoDB API to save the updated flow
   try {
     const response = await fetch('https://j7-magic-tool.vercel.app/api/agentFlowCRUD', {
       method: 'PUT',
@@ -96,7 +108,7 @@ async function saveFlow() {
       },
       body: JSON.stringify({
         flowId: flowName,
-        flowData: updatedFlowData,
+        flowData: updatedFlowData, // ✅ Now includes selectedModel
         metadata: {
           name: flowName,
           updatedAt: new Date().toISOString(),
@@ -108,13 +120,13 @@ async function saveFlow() {
       throw new Error('Failed to save flow');
     }
 
-    const result = await response.json();
-    console.log("Flow saved")
+    console.log("✅ Flow saved successfully!");
   } catch (error) {
-    console.error('Error saving flow:', error);
+    console.error('❌ Error saving flow:', error);
     alert('Failed to save flow');
   }
 }
+
 
 function extractContentNodeHtml(nodeElement) {
   // Clone the node to avoid modifying the original
@@ -222,8 +234,18 @@ async function loadSelectedFlow() {
     // Import the flow
     editor.import(drawflowData);
 
-    // Re-import the export to ensure everything is synchronized
-    //editor.import(editor.export());
+    // ✅ Restore the selected model for each LLM Call node
+    setTimeout(() => {
+      Object.values(drawflowData.drawflow.Home.data).forEach(node => {
+        if (node.name === "LLM Call") {
+          const dropdown = document.getElementById(`model-dropdown-${node.id}`);
+          if (dropdown) {
+            dropdown.value = node.data.selectedModel || 'openai/gpt-4o-mini'; // Default if missing
+            console.log(`📥 Restored model selection for Node ${node.id}:`, dropdown.value);
+          }
+        }
+      });
+    }, 100);
 
     // Reattach listeners for all nodes
     reattachAllListeners();
@@ -235,6 +257,7 @@ async function loadSelectedFlow() {
     alert(`Failed to load flow: ${error.message}`);
   }
 }
+
 
 
 // --- START NODE ---
