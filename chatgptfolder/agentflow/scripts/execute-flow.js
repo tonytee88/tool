@@ -191,7 +191,7 @@ async function callLLMAPI(prompt, model) {
 
 function determineExecutionOrder(flowData) {
     // ✅ Extract correct data structure
-    const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data;
+    const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data || flowData[0]?.flowData?.drawflow?.data;
     
     if (!structuredFlow) {
         console.error("❌ Invalid flowData format from determineExecutionOrder function!");
