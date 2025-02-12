@@ -97,9 +97,21 @@ async function saveFlow() {
         console.log(`📥 Saved model selection for Node ${node.id}:`, dropdown.value);
       }
     }
+
+    // ✅ Ensure all Prompt nodes save the latest prompt text
+    if (node.name === "Prompt") {
+      const nodeElement = document.getElementById(`node-${node.id}`);
+      if (nodeElement) {
+        const promptTextElement = nodeElement.querySelector('.prompt-text-display');
+        if (promptTextElement) {
+          node.data.promptText = promptTextElement.textContent.trim(); // ✅ Store updated prompt text
+          console.log(`📥 Saved prompt text for Node ${node.id}:`, node.data.promptText);
+        }
+      }
+    }
   });
 
-  // ✅ Call the MongoDB API to save the updated flow
+  // ✅ Call the API to save the updated flow
   try {
     const response = await fetch('https://j7-magic-tool.vercel.app/api/agentFlowCRUD', {
       method: 'PUT',
@@ -108,7 +120,7 @@ async function saveFlow() {
       },
       body: JSON.stringify({
         flowId: flowName,
-        flowData: updatedFlowData, // ✅ Now includes selectedModel
+        flowData: updatedFlowData,
         metadata: {
           name: flowName,
           updatedAt: new Date().toISOString(),
@@ -126,7 +138,6 @@ async function saveFlow() {
     alert('Failed to save flow');
   }
 }
-
 
 function extractContentNodeHtml(nodeElement) {
   // Clone the node to avoid modifying the original
