@@ -99,24 +99,55 @@ async function waitForInputs(nodeId, flowData) {
 
 // ✅ Check if a node's inputs are ready
 function areInputsReady(nodeId, flowData) {
-  const node = flowData.drawflow.Home.data[nodeId];
-
-  const inputConnections = Object.values(node.inputs)
-    .flatMap(input => input.connections)
-    .map(conn => conn.node);
-
-  for (const inputNodeId of inputConnections) {
-    const inputNode = flowData.drawflow.Home.data[inputNodeId];
-
-    let outputData = inputNode?.data?.output?.trim() || "";
-
-    if (!outputData || outputData === "Waiting for response...") {
-      console.log(`❌ Node ${nodeId} is waiting for input from Node ${inputNodeId}`);
-      return false;
+    const node = flowData.drawflow.Home.data[nodeId];
+  
+    const inputConnections = Object.values(node.inputs)
+      .flatMap(input => input.connections)
+      .map(conn => conn.node);
+  
+    for (const inputNodeId of inputConnections) {
+      const inputNode = flowData.drawflow.Home.data[inputNodeId];
+  
+      if (!inputNode) {
+        console.error(`❌ Node ${inputNodeId} is missing in flowData!`);
+        return false;
+      }
+  
+      let promptData = "";
+      const nodeElement = document.getElementById(`node-${inputNodeId}`);
+      if (nodeElement) {
+        const promptTextElement = nodeElement.querySelector('.prompt-text-display');
+        promptData = promptTextElement ? promptTextElement.innerText.trim() : "";
+      }
+  
+      // Fallback to stored data if HTML method fails
+      if (!promptData) {
+        promptData = inputNode.data?.promptText?.trim() || "";
+      }
+  
+      let outputData = inputNode.data?.output?.trim() || "";
+  
+      console.log(`🔍 Checking inputs for Node ${inputNodeId}:`);
+      console.log("✅ Output Data:", outputData);
+      console.log("✅ Prompt Data:", promptData);
+  
+      // 🚨 Check each input node type 🚨
+      if (inputNode.name === "Prompt") {
+        // ✅ Prompt nodes are always valid inputs
+        console.log(`✅ Node ${inputNodeId} is a Prompt. Accepting.`);
+        continue;
+      } else if (inputNode.name === "LLM Call" || inputNode.name === "Output") {
+        // ❌ LLM and Output nodes must have a valid output
+        if (!outputData || outputData === "Waiting for response...") {
+          console.log(`❌ Node ${nodeId} is waiting for LLM/Output from Node ${inputNodeId}`);
+          return false;
+        }
+      }
     }
+  
+    console.log(`✅ Node ${nodeId} is ready for execution.`);
+    return true;
   }
-  return true;
-}
 
 // ✅ Generates output file
 function generateOutputFile(outputText) {
