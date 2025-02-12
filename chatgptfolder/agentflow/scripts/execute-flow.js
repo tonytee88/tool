@@ -16,7 +16,7 @@ async function executeLLMFlow(flowData) {
     const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data;
     console.log("structuredflow data : " + JSON.stringify(structuredFlow))
     if (!structuredFlow) {
-      console.error("❌ Invalid flowData format!");
+      console.error("❌ Invalid flowData format from checking if structuredflow exist!");
       return;
     }
   
@@ -192,7 +192,7 @@ function determineExecutionOrder(flowData) {
     const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data;
     
     if (!structuredFlow) {
-        console.error("❌ Invalid flowData format!");
+        console.error("❌ Invalid flowData format from determineExecutionOrder function!");
         return [];
     }
 
