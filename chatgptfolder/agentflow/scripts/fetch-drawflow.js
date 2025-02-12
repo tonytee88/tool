@@ -40,6 +40,9 @@ async function main() {
     // ✅ Call execution script
     try {
       console.log(`🚀 Triggering execute-flow.js for flowId: ${flowId}...`);
+      if (slackInput) {
+        injectSlackInput(flowData, slackInput);
+      }
       const executeFlow = require("./execute-flow");
       await executeFlow(flowData);
       console.log('✅ execute-flow.js completed successfully.');
