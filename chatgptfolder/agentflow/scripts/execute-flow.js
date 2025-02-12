@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 
-const channelId = process.env.SLACK_CHANNEL_ID || "x"; // 🔹 Capture dynamically
+const channelId = process.env.SLACK_CHANNEL_ID || "x"; // Capture dynamically
 
 async function executeLLMFlow(flowData) {
   console.log("🚀 Starting Flow Execution...");
@@ -13,14 +13,12 @@ async function executeLLMFlow(flowData) {
   }
 
   // ✅ Extract proper flow data structure
-  flowData = flowData[0].flowData; 
+  flowData = flowData[0].flowData.drawflow;
   const executionOrder = determineExecutionOrder(flowData);
   const storedResponses = {}; // ✅ Cache responses to avoid redundant API calls
-  const executionQueue = [...executionOrder]; // ✅ Queue-based execution
 
-  while (executionQueue.length > 0) {
-    const nodeId = executionQueue.shift();
-    const currentNode = flowData.drawflow.Home.data[nodeId];
+  for (const nodeId of executionOrder) {
+    const currentNode = flowData.Home.data[nodeId];
 
     if (!currentNode) continue;
 
@@ -32,6 +30,7 @@ async function executeLLMFlow(flowData) {
         currentNode.data.output = storedResponses[nodeId];
       } else {
         await waitForInputs(nodeId, flowData);
+
         const combinedInputs = getSortedInputs(nodeId, flowData);
         console.log("📝 Combined Inputs:", combinedInputs);
 
@@ -40,15 +39,13 @@ async function executeLLMFlow(flowData) {
 
         try {
           const response = await callLLMAPI(combinedInputs, selectedModel);
-          const messageResponse = response.data?.completion?.choices?.[0]?.message?.content || "⚠️ No valid response";
+          const messageResponse = response.data?.completions?.[selectedModel]?.completion?.choices?.[0]?.message?.content || "⚠️ No valid response";
 
           console.log(`✅ LLM Call Node (${nodeId}) Response:`, messageResponse);
 
           currentNode.data.output = messageResponse;
           storedResponses[nodeId] = messageResponse;
           updateOutputNodes(flowData, nodeId, messageResponse);
-
-          enqueueConnectedNodes(nodeId, flowData, executionQueue);
         } catch (error) {
           console.error(`❌ LLM Call Node (${nodeId}) Error:`, error);
           markNodeAsError(nodeId, error.message);
@@ -97,128 +94,24 @@ async function waitForInputs(nodeId, flowData) {
   });
 }
 
-// ✅ Check if a node's inputs are ready
+// ✅ Ensure inputs are ready before processing
 function areInputsReady(nodeId, flowData) {
-    const node = flowData.drawflow.Home.data[nodeId];
-  
-    const inputConnections = Object.values(node.inputs)
-      .flatMap(input => input.connections)
-      .map(conn => conn.node);
-  
-    for (const inputNodeId of inputConnections) {
-      const inputNode = flowData.drawflow.Home.data[inputNodeId];
-  
-      if (!inputNode) {
-        console.error(`❌ Node ${inputNodeId} is missing in flowData!`);
-        return false;
-      }
-  
-      let promptData = "";
-      const nodeElement = document.getElementById(`node-${inputNodeId}`);
-      if (nodeElement) {
-        const promptTextElement = nodeElement.querySelector('.prompt-text-display');
-        promptData = promptTextElement ? promptTextElement.innerText.trim() : "";
-      }
-  
-      // Fallback to stored data if HTML method fails
-      if (!promptData) {
-        promptData = inputNode.data?.promptText?.trim() || "";
-      }
-  
-      let outputData = inputNode.data?.output?.trim() || "";
-  
-      console.log(`🔍 Checking inputs for Node ${inputNodeId}:`);
-      console.log("✅ Output Data:", outputData);
-      console.log("✅ Prompt Data:", promptData);
-  
-      // 🚨 Check each input node type 🚨
-      if (inputNode.name === "Prompt") {
-        // ✅ Prompt nodes are always valid inputs
-        console.log(`✅ Node ${inputNodeId} is a Prompt. Accepting.`);
-        continue;
-      } else if (inputNode.name === "LLM Call" || inputNode.name === "Output") {
-        // ❌ LLM and Output nodes must have a valid output
-        if (!outputData || outputData === "Waiting for response...") {
-          console.log(`❌ Node ${nodeId} is waiting for LLM/Output from Node ${inputNodeId}`);
-          return false;
-        }
-      }
+  const node = flowData.Home.data[nodeId];
+  const inputConnections = Object.values(node.inputs).flatMap(input => input.connections).map(conn => conn.node);
+
+  for (const inputNodeId of inputConnections) {
+    const inputNode = flowData.Home.data[inputNodeId];
+    let outputData = inputNode?.data?.output?.trim() || "";
+
+    if (!outputData || outputData === "Waiting for response...") {
+      console.log(`❌ Node ${nodeId} is waiting for input from Node ${inputNodeId}`);
+      return false;
     }
-  
-    console.log(`✅ Node ${nodeId} is ready for execution.`);
-    return true;
   }
-
-// ✅ Generates output file
-function generateOutputFile(outputText) {
-  const filePath = path.join('/tmp', 'final_output.txt');
-  fs.writeFileSync(filePath, outputText, 'utf8');
-  return filePath;
+  return true;
 }
 
-// ✅ Updates output node data
-function updateOutputNodes(flowData, nodeId, responseText) {
-  flowData.drawflow.Home.data[nodeId].data.output = responseText;
-}
-
-// ✅ Sorts execution order
-function determineExecutionOrder(flowData) {
-  const allNodes = flowData.drawflow.Home.data;
-  const executionOrder = [];
-  const processedNodes = new Set();
-
-  function traverseNode(nodeId) {
-    const nodeIdStr = String(nodeId);
-
-    if (processedNodes.has(nodeIdStr)) return;
-
-    const node = allNodes[nodeIdStr];
-    if (!node) return;
-
-    const inputConnections = Object.values(node.inputs)
-      .flatMap(input => input.connections)
-      .map(conn => String(conn.node))
-      .filter(inputNodeId => !processedNodes.has(inputNodeId));
-
-    inputConnections.forEach(traverseNode);
-
-    if (!processedNodes.has(nodeIdStr)) {
-      executionOrder.push(nodeIdStr);
-      processedNodes.add(nodeIdStr);
-    }
-
-    const outputConnections = Object.values(node.outputs)
-      .flatMap(output => output.connections)
-      .map(conn => String(conn.node))
-      .filter(outputNodeId => !processedNodes.has(outputNodeId));
-
-    outputConnections.forEach(traverseNode);
-  }
-
-  const llmNodes = Object.values(allNodes)
-    .filter(node => node.name === 'LLM Call')
-    .sort((a, b) => a.pos_y === b.pos_y ? a.pos_x - b.pos_x : a.pos_y - b.pos_y);
-
-  llmNodes.forEach(llmNode => traverseNode(llmNode.id));
-
-  return executionOrder;
-}
-
-// ✅ Call LLM API
-async function callLLMAPI(prompt, model) {
-  try {
-    const response = await axios.post('https://j7-magic-tool.vercel.app/api/agentFlowStraicoCall', {
-      message: prompt,
-      models: model
-    });
-
-    return response.data;
-  } catch (error) {
-    throw new Error(`Error calling LLM API: ${error.message}`);
-  }
-}
-
-// ✅ Send Slack Message
+// ✅ Send final output to Slack
 async function sendSlackMessage(channelId, message, filePath) {
   console.log(`📩 Sending message to Slack (${channelId})`);
   const slackToken = process.env.SLACK_BOT_TOKEN;
@@ -231,6 +124,19 @@ async function sendSlackMessage(channelId, message, filePath) {
   });
 
   console.log("✅ Message sent to Slack.");
+}
+
+// ✅ Call LLM API
+async function callLLMAPI(prompt, model) {
+  try {
+    const response = await axios.post('https://j7-magic-tool.vercel.app/api/agentFlowStraicoCall', {
+      message: prompt,
+      models: model
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(`Error calling LLM API: ${error.message}`);
+  }
 }
 
 // ✅ Export function
