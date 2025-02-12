@@ -79,6 +79,7 @@ async function executeLLMFlow(flowData) {
     const finalOutputText = compileFinalOutputs(structuredFlow);
   
     if (finalOutputText) {
+      console.log("llm response output combined: " + finalOutputText)
       const filePath = generateOutputFile(finalOutputText);
       await sendSlackMessage(channelId, "✅ Here's the final output:", filePath);
     }
