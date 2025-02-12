@@ -321,22 +321,22 @@ function attachPromptListeners(nodeId) {
   }
 }
 
-function updatePromptContent(value, nodeId, previewDiv) {
-  const node = editor.getNodeFromId(nodeId);
-  if (node) {
-    node.data.promptText = value;
-    previewDiv.textContent = value.length > 50 
-      ? value.substring(0, 50) + '...'
-      : value;
-  }
-}
+// function updatePromptContent(value, nodeId, previewDiv) {
+//   const node = editor.getNodeFromId(nodeId);
+//   if (node) {
+//     node.data.promptText = value;
+//     previewDiv.textContent = value.length > 50 
+//       ? value.substring(0, 50) + '...'
+//       : value;
+//   }
+// }
 
-function updatePromptName(value, nodeId) {
-  const node = editor.getNodeFromId(nodeId);
-  if (node) {
-    node.data.name = value;
-  }
-}
+// function updatePromptName(value, nodeId) {
+//   const node = editor.getNodeFromId(nodeId);
+//   if (node) {
+//     node.data.name = value;
+//   }
+// }
 
 // Open the modal for the prompt's big text
 
@@ -362,35 +362,35 @@ function openPromptModal(nodeId) {
   document.getElementById('prompt-modal').style.display = 'block';
 }
 
-function closePromptModal(doSave) {
-  if (currentEditNodeId !== null && doSave) {
-    const node = editor.getNodeFromId(currentEditNodeId);
-    if (node) {
-      const promptModalNameInput = document.getElementById('prompt-modal-name');
-      const promptModalTextarea = document.getElementById('prompt-modal-textarea');
+// function closePromptModal(doSave) {
+//   if (currentEditNodeId !== null && doSave) {
+//     const node = editor.getNodeFromId(currentEditNodeId);
+//     if (node) {
+//       const promptModalNameInput = document.getElementById('prompt-modal-name');
+//       const promptModalTextarea = document.getElementById('prompt-modal-textarea');
 
-      // Save full input and name to the node
-      node.data.name = promptModalNameInput.value;
-      node.data.promptText = promptModalTextarea.value;
+//       // Save full input and name to the node
+//       node.data.name = promptModalNameInput.value;
+//       node.data.promptText = promptModalTextarea.value;
 
-      // Update the node display with capped text
-      const nodeElement = document.querySelector(`#node-${currentEditNodeId} .df-node-content.block-prompt`);
-      const nameDisplay = nodeElement.querySelector('.prompt-name-display');
-      const textDisplay = nodeElement.querySelector('.prompt-text-display');
+//       // Update the node display with capped text
+//       const nodeElement = document.querySelector(`#node-${currentEditNodeId} .df-node-content.block-prompt`);
+//       const nameDisplay = nodeElement.querySelector('.prompt-name-display');
+//       const textDisplay = nodeElement.querySelector('.prompt-text-display');
 
-      nameDisplay.textContent = node.data.name;
-      textDisplay.textContent =
-        node.data.promptText.length > 100
-          ? node.data.promptText.substring(0, 100) + "..."
-          : node.data.promptText;
-    }
-  }
+//       nameDisplay.textContent = node.data.name;
+//       textDisplay.textContent =
+//         node.data.promptText.length > 100
+//           ? node.data.promptText.substring(0, 100) + "..."
+//           : node.data.promptText;
+//     }
+//   }
 
-  // Hide the modal and overlay
-  document.getElementById('modal-overlay').style.display = 'none';
-  document.getElementById('prompt-modal').style.display = 'none';
-  currentEditNodeId = null;
-}
+//   // Hide the modal and overlay
+//   document.getElementById('modal-overlay').style.display = 'none';
+//   document.getElementById('prompt-modal').style.display = 'none';
+//   currentEditNodeId = null;
+// }
 
 // --- LLM NODE ---
 function createLLMNode(x, y) {
@@ -573,14 +573,28 @@ function closePromptModal(doSave) {
 // =========================================================================================================
 
 async function startFlowExecution() {
-  await saveFlow(); // Save the flow before execution
-  storedResponses = {}; // ✅ Clear stored responses before starting
-  clearOutputNodes(); // ✅ Reset the UI for output nodes
+  await saveFlow(); // ✅ Ensure the flow is saved before execution
+  storedResponses = {}; // ✅ Clear previous responses
+  clearOutputNodes(); // ✅ Reset UI for outputs
 
+  // ✅ Get latest flowData from the editor
   const flowData = editor.export();
-  console.log('Starting optimized LLM execution...');
-  await executeLLMFlow(flowData);
+
+  // ✅ Ensure flowData structure is correct (for both browser & server execution)
+  const structuredFlowData = {
+    drawflow: flowData.drawflow // Extract only necessary data
+  };
+
+  console.log('🚀 Executing flow with:', structuredFlowData);
+
+  // ✅ Import & Run `execute-flow.js`
+  import('./execute-flow.js').then(({ executeLLMFlow }) => {
+    executeLLMFlow(structuredFlowData); // Run the unified execution
+  }).catch(error => {
+    console.error('❌ Failed to execute flow:', error);
+  });
 }
+
 
 function clearOutputNodes() {
   const flowData = editor.export();

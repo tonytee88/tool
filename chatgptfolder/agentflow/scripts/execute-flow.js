@@ -4,7 +4,7 @@ const axios = require('axios');
 
 const channelId = process.env.SLACK_CHANNEL_ID || "x"; // Capture dynamically
 
-async function executeLLMFlow(flowData) {
+export async function executeLLMFlow(flowData) {
     console.log("🚀 Starting Flow Execution...");
   
     if (!flowData || !flowData.length) {
