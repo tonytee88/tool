@@ -226,6 +226,58 @@ function determineExecutionOrder(flowData) {
     return executionOrder;
   }
   
-
+  function getSortedInputs(nodeId, flowData) {
+    const node = flowData.Home.data[nodeId];
+  
+    if (!node) {
+      console.error(`❌ Node ${nodeId} not found in flowData!`);
+      return "";
+    }
+  
+    console.log("Processing Node ID:", nodeId);
+  
+    const inputConnections = node.inputs?.input_1?.connections || [];
+  
+    if (inputConnections.length === 0) {
+      // ✅ Read from stored flowData instead of the browser DOM
+      return node.data?.promptText?.trim() || "";
+    }
+  
+    // ✅ Gather all connected input nodes and read from `flowData`
+    const connectedNodes = inputConnections.map(conn => {
+      const connectedNodeId = conn.node;
+      const connectedNode = flowData.Home.data[connectedNodeId];
+  
+      if (!connectedNode) {
+        console.warn(`⚠️ Connected Node ${connectedNodeId} is missing!`);
+        return null;
+      }
+  
+      let connectedText = "";
+  
+      // ✅ Read directly from the saved flowData instead of querying the DOM
+      if (connectedNode.name === "Prompt") {
+        connectedText = connectedNode.data?.promptText?.trim() || "";
+      } else if (connectedNode.name === "Output") {
+        connectedText = connectedNode.data?.output?.trim() || "";
+      } else if (connectedNode.name === "LLM Call") {
+        connectedText = connectedNode.data?.output?.trim() || "";
+      }
+  
+      return {
+        id: connectedNodeId,
+        x: connectedNode.pos_x,
+        y: connectedNode.pos_y,
+        text: connectedText,
+      };
+    }).filter(Boolean);
+  
+    // ✅ Sort inputs left to right, top to bottom
+    connectedNodes.sort((a, b) => (a.y === b.y ? a.x - b.x : a.y - b.y));
+  
+    // ✅ Combine all inputs into one string
+    return connectedNodes.map(node => node.text).join(" and ");
+  }
+  
 // ✅ Export function
 module.exports = executeLLMFlow;
