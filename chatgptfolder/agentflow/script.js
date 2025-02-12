@@ -588,7 +588,7 @@ async function startFlowExecution() {
   console.log('🚀 Executing flow with:', structuredFlowData);
 
   // ✅ Import & Run `execute-flow.js`
-  import('./execute-flow.js').then(({ executeLLMFlow }) => {
+  import('./scripts/execute-flow.js').then(({ executeLLMFlow }) => {
     executeLLMFlow(structuredFlowData); // Run the unified execution
   }).catch(error => {
     console.error('❌ Failed to execute flow:', error);
