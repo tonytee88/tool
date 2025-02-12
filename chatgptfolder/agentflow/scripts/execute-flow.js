@@ -139,5 +139,58 @@ async function callLLMAPI(prompt, model) {
   }
 }
 
+function determineExecutionOrder(flowData) {
+    const allNodes = flowData.drawflow.Home.data;
+    const executionOrder = [];
+    const processedNodes = new Set();
+  
+    function traverseNode(nodeId) {
+      const nodeIdStr = String(nodeId); // Ensure consistent ID format
+  
+      if (processedNodes.has(nodeIdStr)) {
+        console.log("detected node was already processed: " + nodeIdStr)
+      return; // ✅ Prevent duplicate visits
+      }
+  
+      const node = allNodes[nodeIdStr];
+      if (!node) return;
+  
+      console.log(`🔍 Analyzing Node: ${nodeIdStr} (${node.name})`);
+  
+      // Step 1: Process dependencies first (make sure inputs are processed before this node)
+      const inputConnections = Object.values(node.inputs)
+        .flatMap(input => input.connections)
+        .map(conn => String(conn.node)) // Ensure consistency
+        .filter(inputNodeId => !processedNodes.has(inputNodeId));
+  
+      inputConnections.forEach(traverseNode);
+  
+      // ✅ Only add the node once all inputs have been processed
+      if (!processedNodes.has(nodeIdStr)) {
+        executionOrder.push(nodeIdStr);
+        processedNodes.add(nodeIdStr);
+      }
+  
+      // Step 2: Process connected outputs (ensuring unique visits)
+      const outputConnections = Object.values(node.outputs)
+        .flatMap(output => output.connections)
+        .map(conn => String(conn.node)) // Ensure consistency
+        .filter(outputNodeId => !processedNodes.has(outputNodeId));
+  
+      outputConnections.forEach(traverseNode);
+    }
+  
+    // Get all LLM Call nodes, sort by position, and process them **before** outputs
+    const llmNodes = Object.values(allNodes)
+      .filter(node => node.name === 'LLM Call')
+      .sort((a, b) => a.pos_y === b.pos_y ? a.pos_x - b.pos_x : a.pos_y - b.pos_y);
+  
+    llmNodes.forEach(llmNode => traverseNode(llmNode.id));
+  
+    console.log("✅ Final executionOrder:", executionOrder);
+    return executionOrder;
+  }
+  
+
 // ✅ Export function
 module.exports = executeLLMFlow;
