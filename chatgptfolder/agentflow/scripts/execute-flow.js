@@ -14,7 +14,7 @@ async function executeLLMFlow(flowData) {
   
     // ✅ Extract proper flow data structure
     const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data;
-  
+    console.log("structuredflow data : " + JSON.stringify(structuredFlow))
     if (!structuredFlow) {
       console.error("❌ Invalid flowData format!");
       return;
@@ -81,6 +81,7 @@ async function executeLLMFlow(flowData) {
     if (finalOutputText) {
       console.log("llm response output combined: " + finalOutputText)
       const filePath = generateOutputFile(finalOutputText);
+      await sendSlackMessage(channelId, "✅ Here's the final output:" + finalOutputText, filePath);
       await sendSlackMessage(channelId, "✅ Here's the final output:", filePath);
     }
   }
