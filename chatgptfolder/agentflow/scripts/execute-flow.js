@@ -96,20 +96,55 @@ async function waitForInputs(nodeId, flowData) {
 
 // ✅ Ensure inputs are ready before processing
 function areInputsReady(nodeId, flowData) {
-  const node = flowData.Home.data[nodeId];
-  const inputConnections = Object.values(node.inputs).flatMap(input => input.connections).map(conn => conn.node);
-
-  for (const inputNodeId of inputConnections) {
-    const inputNode = flowData.Home.data[inputNodeId];
-    let outputData = inputNode?.data?.output?.trim() || "";
-
-    if (!outputData || outputData === "Waiting for response...") {
-      console.log(`❌ Node ${nodeId} is waiting for input from Node ${inputNodeId}`);
+    const node = flowData.Home.data[nodeId];
+  
+    if (!node) {
+      console.error(`❌ Node ${nodeId} is missing in flowData!`);
       return false;
     }
+  
+    const inputConnections = Object.values(node.inputs)
+      .flatMap(input => input.connections)
+      .map(conn => conn.node);
+  
+    for (const inputNodeId of inputConnections) {
+      const inputNode = flowData.Home.data[inputNodeId];
+  
+      if (!inputNode) {
+        console.error(`❌ Node ${inputNodeId} is missing in flowData!`);
+        return false;
+      }
+  
+      // ✅ Read directly from the saved flowData, not the UI
+      const promptData = inputNode.data?.promptText?.trim() || "";
+      const outputData = inputNode.data?.output?.trim() || "";
+  
+      console.log(`🔍 Checking inputs for Node ${inputNodeId}:`);
+      console.log("✅ Output Data:", outputData);
+      console.log("✅ Prompt Data:", promptData);
+  
+      // 🚨 Check each input node type 🚨
+      if (inputNode.name === "Prompt") {
+        // ✅ Prompt nodes are valid if they have text
+        if (!promptData) {
+          console.log(`❌ Node ${inputNodeId} is a Prompt but has no text.`);
+          return false;
+        }
+        console.log(`✅ Node ${inputNodeId} is a Prompt. Accepting.`);
+        continue;
+      } else if (inputNode.name === "LLM Call" || inputNode.name === "Output") {
+        // ❌ LLM and Output nodes must have a valid output
+        if (!outputData || outputData === "Waiting for response...") {
+          console.log(`❌ Node ${nodeId} is waiting for LLM/Output from Node ${inputNodeId}`);
+          return false;
+        }
+      }
+    }
+  
+    console.log(`✅ Node ${nodeId} is ready for execution.`);
+    return true;
   }
-  return true;
-}
+  
 
 // ✅ Send final output to Slack
 async function sendSlackMessage(channelId, message, filePath) {
