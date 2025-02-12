@@ -75,23 +75,20 @@ async function uploadFileToSlack(filePath, flowId, channelId) {
             throw new Error(`❌ File not found: ${filePath}`);
         }
 
-        // ✅ Correctly create FormData using 'form-data' package
+        // ✅ Create form data
         const formData = new FormData();
         formData.append('file', fs.createReadStream(filePath));
         formData.append('channels', channelId);
-        formData.append('title', `Drawflow for ${flowId}`);
         formData.append('filename', 'drawflow.txt');
+        formData.append('title', `Drawflow for ${flowId}`);
 
-        const headers = {
-            ...formData.getHeaders(),
-            'Authorization': `Bearer ${slackToken}`, // ✅ Correct header format
-        };
-
-        // ✅ Debugging: Log form data details (file check)
-        console.log("🔍 FormData keys:", Array.from(formData));
-
-        // ✅ Upload file to Slack
-        const response = await axios.post('https://slack.com/api/files.upload', formData, { headers });
+        // ✅ Upload using `files.uploadV2`
+        const response = await axios.post('https://slack.com/api/files.uploadV2', formData, {
+            headers: {
+                'Authorization': `Bearer ${slackToken}`,
+                ...formData.getHeaders(), // Ensure correct headers
+            },
+        });
 
         console.log("📩 Slack API response:", response.data);
 
@@ -100,8 +97,8 @@ async function uploadFileToSlack(filePath, flowId, channelId) {
             throw new Error(`Slack upload failed: ${response.data.error}`);
         }
 
-        console.log(`✅ File successfully uploaded to Slack! URL: ${response.data.file.permalink}`);
-        return response.data.file.permalink; // ✅ Return uploaded file link
+        console.log(`✅ File successfully uploaded to Slack! URL: ${response.data.file?.permalink}`);
+        return response.data.file?.permalink; // ✅ Return uploaded file link
 
     } catch (error) {
         console.error('❌ Error uploading file to Slack:', error.message);
