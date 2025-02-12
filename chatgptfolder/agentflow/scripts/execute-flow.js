@@ -13,12 +13,14 @@ async function executeLLMFlow(flowData) {
     }
   
     // ✅ Extract proper flow data structure
-    const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data;
-    console.log("structuredflow data : " + JSON.stringify(structuredFlow))
-    if (!structuredFlow) {
-      console.error("❌ Invalid flowData format from checking if structuredflow exist!");
-      return;
+    const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data || flowData[0]?.flowData?.drawflow?.data;
+    console.log("structuredflow data: ", JSON.stringify(structuredFlow, null, 2));
+    if (!structuredFlow || typeof structuredFlow !== "object") {
+        console.error("❌ Invalid flowData format! Expected an object but got:", structuredFlow);
+        return;
     }
+    
+    console.log("✅ Valid structured flow data loaded!");
   
     const executionOrder = determineExecutionOrder(structuredFlow);
     const storedResponses = {}; // ✅ Cache responses to avoid redundant API calls
