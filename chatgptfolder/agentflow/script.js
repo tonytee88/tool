@@ -578,22 +578,12 @@ async function startFlowExecution() {
   storedResponses = {}; // Clear previous responses
   clearOutputNodes();
 
-  // Get the latest flowData from your editor.
-  //const flowData = editor.export();
-  //console.log("flowdata: ", JSON.stringify(flowData, null, 2));
   const flowName = document.getElementById('flow-name').value.trim() || 'New Flow 01z';
-  //console.log("Flowname is :", flowName)
-  // Extract the flowName from the export.
-  // Adjust this extraction logic based on how your editor's export structure stores the flow name.
-  //const flowName = flowData.flowName || (flowData.drawflow && flowData.drawflow.name ? flowData.drawflow.name : "Unnamed Flow");
 
   console.log("🚀 Executing flow:", flowName);
 
-  // Define a channelId for browser-triggered flows.
-  // This can be a fixed value or obtained from your UI if needed.
-  const channelId = "nochan"; // Replace or update as needed
+  const channelId = "nochan"; 
 
-  // Call the server endpoint with the extracted flowName and channelId.
   await callBrowserFlow(flowName, channelId);
 }
 
