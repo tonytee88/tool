@@ -4,7 +4,7 @@ const path = require('path');
 const axios = require('axios');
 const FormData = require('form-data');
 
-const flowId = process.env.FLOW_ID || "x";
+const flowId = process.env.FLOW_ID || "y";
 const channelId = process.env.SLACK_CHANNEL_ID || "x" ; // 🔹 Capture dynamically
 
 async function main() {

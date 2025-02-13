@@ -598,7 +598,7 @@ async function startFlowExecution() {
 }
 
 async function callBrowserFlow(flowName, channelId) {
-  const endpointUrl = "https://j7-magic-tool.vercel.app/api/slack?operation=browser";
+  const endpointUrl = "https://j7-magic-tool.vercel.app/api/slack?operation=notslack";
 
   try {
     const response = await fetch(endpointUrl, {
