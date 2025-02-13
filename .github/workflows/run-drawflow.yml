@@ -10,6 +10,7 @@ jobs:
     env:
       FLOW_ID: ${{ github.event.client_payload.flowName }}  # ✅ Correctly passing the Flow Name
       SLACK_CHANNEL_ID: ${{ github.event.client_payload.channelId }}  # ✅ Correctly passing the Slack Channel ID
+      CALLBACK_URL: ${{ github.event.client_payload.callbackUrl }}
 
     steps:
       - name: Checkout repository
