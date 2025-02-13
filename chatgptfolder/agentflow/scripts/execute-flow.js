@@ -23,7 +23,7 @@ async function executeLLMFlow(flowData) {
     console.log("✅ Valid structured flow data loaded!");
 
     // ✅ Extract callback URL from flowData
-    const callbackUrl = flowData[0]?.callbackUrl;
+    const callbackUrl = process.env.CALLBACK_URL;
     if (!callbackUrl) {
         console.warn("⚠️ No callback URL provided. Response will not be sent to the browser.");
     }
