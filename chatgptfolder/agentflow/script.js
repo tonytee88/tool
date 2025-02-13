@@ -583,11 +583,12 @@ async function startFlowExecution() {
   console.log("🚀 Executing flow:", flowName);
 
   const channelId = "nochan"; 
+  const callbackUrl = "https://j7-magic-tool.vercel.app/api/slack?operation=receive_response";
 
-  await callBrowserFlow(flowName, channelId);
+  await callBrowserFlow(flowName, channelId, callbackUrl);
 }
 
-async function callBrowserFlow(flowName, channelId) {
+async function callBrowserFlow(flowName, channelId, callbackUrl) {
   const endpointUrl = "https://j7-magic-tool.vercel.app/api/slack?operation=notslack";
 
   try {
@@ -596,7 +597,7 @@ async function callBrowserFlow(flowName, channelId) {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ flowName, channelId })
+      body: JSON.stringify({ flowName, channelId, callbackUrl })
     });
 
     if (!response.ok) {

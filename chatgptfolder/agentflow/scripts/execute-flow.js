@@ -21,6 +21,12 @@ async function executeLLMFlow(flowData) {
     }
     
     console.log("✅ Valid structured flow data loaded!");
+
+    // ✅ Extract callback URL from flowData
+    const callbackUrl = flowData[0]?.callbackUrl;
+    if (!callbackUrl) {
+        console.warn("⚠️ No callback URL provided. Response will not be sent to the browser.");
+    }
   
     const executionOrder = determineExecutionOrder(structuredFlow);
     const storedResponses = {}; // ✅ Cache responses to avoid redundant API calls
@@ -81,10 +87,25 @@ async function executeLLMFlow(flowData) {
     const finalOutputText = compileFinalOutputs(structuredFlow);
   
     if (finalOutputText) {
-      //console.log("llm response output combined: " + finalOutputText)
-      const filePath = generateOutputFile(finalOutputText);
-      await sendSlackMessage(channelId, "✅ Here's the final output:" + finalOutputText, filePath);
-      //await sendSlackMessage(channelId, "✅ Here's the final output:", filePath);
+        console.log("✅ Final Output Ready:", finalOutputText);
+
+        // ✅ Send response to the provided callback URL (if available)
+        if (callbackUrl) {
+            try {
+                await axios.post(callbackUrl, {
+                    flowName: flowData[0].flowName,
+                    response: finalOutputText
+                });
+
+                console.log(`✅ Sent response to callback: ${callbackUrl}`);
+            } catch (error) {
+                console.error("❌ Failed to send response to callback URL:", error);
+            }
+        }
+
+        // ✅ Still send to Slack as before
+        const filePath = generateOutputFile(finalOutputText);
+        await sendSlackMessage(channelId, "✅ Here's the final output:" + finalOutputText, filePath);
     }
   }
   
