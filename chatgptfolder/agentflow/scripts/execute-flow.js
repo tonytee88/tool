@@ -59,7 +59,7 @@ async function executeLLMFlow(flowData, requestType) {
 
             // 🌟 Only store response in MongoDB if request is from browser
             if (requestType === "browser") {
-                await saveExecutionResponse(flowId, nodeId, messageResponse);
+                await saveExecutionResponse(executionId, nodeId, messageResponse);
                 //console.log("stored with executionId, nodeId, messageResponse : ",executionId, nodeId, messageResponse)
             }
 
@@ -424,21 +424,21 @@ function generateOutputFile(outputText) {
   return filePath;
 }
 
-async function saveExecutionResponse(flowId, nodeId, messageResponse) {
+async function saveExecutionResponse(executionId, nodeId, messageResponse) {
     try {
       await fetch('https://j7-magic-tool.vercel.app/api/agentFlowCRUD', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           operation: "save_response",
-          flowId,
+          executionId,
           nodeId,
           content: messageResponse,
           timestamp: new Date().toISOString(),
         }),
       });
   
-      console.log(`📤 Stored response for Execution ID: ${flowId}, Output ID: ${nodeId}`);
+      console.log(`📤 Stored response for Execution ID: ${executionId}, Output ID: ${nodeId}`);
     } catch (error) {
       console.error("❌ Error saving execution response:", error);
     }

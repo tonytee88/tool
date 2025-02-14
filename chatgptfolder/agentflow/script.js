@@ -247,6 +247,18 @@ async function loadSelectedFlow() {
     const drawflowData = toDrawflowFormat(apiResponse);
     editor.clear();
     editor.import(drawflowData);
+    // ✅ Restore the selected model for each LLM Call node
+    setTimeout(() => {
+      Object.values(drawflowData.drawflow.Home.data).forEach(node => {
+        if (node.name === "LLM Call") {
+          const dropdown = document.getElementById(`model-dropdown-${node.id}`);
+          if (dropdown) {
+            dropdown.value = node.data.selectedModel || 'openai/gpt-4o-mini'; // Default if missing
+            console.log(`📥 Restored model selection for Node ${node.id}:`, dropdown.value);
+          }
+        }
+      });
+    }, 100);
     reattachAllListeners();
     closeLoadFlowModal();
   } catch (error) {

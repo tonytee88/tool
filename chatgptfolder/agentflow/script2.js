@@ -245,16 +245,18 @@ async function loadSelectedFlow() {
     // ✅ Import the flow
     editor.import(drawflowData);
 
-    // ✅ After import, update each LLM node's dropdown to reflect the saved model
-    Object.values(drawflowData.drawflow.Home.data).forEach(node => {
-      if (node.name === "LLM Call") {
-        const dropdown = document.getElementById(`model-dropdown-${node.id}`);
-        if (dropdown) {
-          dropdown.value = node.data.selectedModel || 'openai/gpt-4o-mini'; // ✅ Set saved model or default
-          console.log(`🎯 Set model for Node ${node.id}:`, dropdown.value);
+    // ✅ Restore the selected model for each LLM Call node
+    setTimeout(() => {
+      Object.values(drawflowData.drawflow.Home.data).forEach(node => {
+        if (node.name === "LLM Call") {
+          const dropdown = document.getElementById(`model-dropdown-${node.id}`);
+          if (dropdown) {
+            dropdown.value = node.data.selectedModel || 'openai/gpt-4o-mini'; // Default if missing
+            console.log(`📥 Restored model selection for Node ${node.id}:`, dropdown.value);
+          }
         }
-      }
-    });
+      });
+    }, 100);
 
     // ✅ Reattach event listeners for nodes
     reattachAllListeners();
