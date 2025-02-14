@@ -212,7 +212,7 @@ async function sendSlackMessage(channelId, message, filePath) {
 
   await axios.post('https://slack.com/api/chat.postMessage', {
     channel: channelId,
-    text: message
+    text: formattedMessage
   }, {
     headers: { 'Authorization': `Bearer ${slackToken}`, 'Content-Type': 'application/json' }
   });
