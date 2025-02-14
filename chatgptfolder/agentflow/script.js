@@ -194,7 +194,7 @@ function closeLoadFlowModal() {
 }
 
 function toDrawflowFormat(apiResponse) {
-  console.log("🛠 Raw API Response:", JSON.stringify(apiResponse, null, 2));
+  //console.log("🛠 Raw API Response:", JSON.stringify(apiResponse, null, 2));
 
   // If response is an object, wrap it in an array
   if (!Array.isArray(apiResponse)) {

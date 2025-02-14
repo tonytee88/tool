@@ -59,7 +59,7 @@ async function executeLLMFlow(flowData, requestType) {
             // 🌟 Only store response in MongoDB if request is from browser
             if (requestType === "browser") {
                 await saveExecutionResponse(executionId, nodeId, messageResponse);
-                console.log("stored with execution id : "+executionId)
+                console.log("stored with executionId, nodeId, messageResponse : ",executionId, nodeId, messageResponse)
             }
 
           } catch (error) {
