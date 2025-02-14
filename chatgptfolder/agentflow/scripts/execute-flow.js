@@ -207,7 +207,6 @@ async function sendSlackMessage(channelId, message, filePath) {
     .replace(/<li>/g, "- ") // Convert <li> to bullet points
     .replace(/<\/li>/g, "\n") // End bullet points
     .replace(/<\/?[^>]+(>|$)/g, "") // Remove any other HTML tags
-    .replace(/\*/g, '\n*')
     .replace(/\n\*/g, '\n')      // Remove unnecessary stars in list items
     .replace(/(\*)+/g, '*');     // Ensure single stars around bold text
 
