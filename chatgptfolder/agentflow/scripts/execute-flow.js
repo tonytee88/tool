@@ -196,6 +196,18 @@ function areInputsReady(nodeId, structuredFlow) {
 // ✅ Send final output to Slack
 async function sendSlackMessage(channelId, message, filePath) {
   console.log(`📩 Sending message to Slack (${channelId})`);
+
+  // ✅ Convert HTML to Slack Markdown-like format
+  const formattedMessage = message
+    .replace(/<br\s*\/?>/g, "\n") // Convert <br> to newlines
+    .replace(/<\/?strong>/g, "*") // Convert <strong> to Slack bold (*bold*)
+    .replace(/<\/?h3>/g, "*") // Convert <h3> to Slack bold headers (*Header*)
+    .replace(/<hr>/g, "――――――――――") // Convert <hr> to line separator
+    .replace(/<ul>|<\/ul>/g, "") // Remove <ul> tags
+    .replace(/<li>/g, "- ") // Convert <li> to bullet points
+    .replace(/<\/li>/g, "\n") // End bullet points
+    .replace(/<\/?[^>]+(>|$)/g, ""); // Remove any other HTML tags
+
   const slackToken = process.env.SLACK_BOT_TOKEN;
 
   await axios.post('https://slack.com/api/chat.postMessage', {
