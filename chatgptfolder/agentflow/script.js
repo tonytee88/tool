@@ -243,7 +243,7 @@ async function loadSelectedFlow() {
 
     const apiResponse = await response.json();
     if (!apiResponse) throw new Error('Empty response from API');
-    console.log("response: " + JSON.stringify(apiResponse))
+    //console.log("response: " + JSON.stringify(apiResponse))
     const drawflowData = toDrawflowFormat(apiResponse);
     editor.clear();
     editor.import(drawflowData);

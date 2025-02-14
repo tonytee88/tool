@@ -7,11 +7,11 @@ const FormData = require('form-data');
 const flowId = process.env.FLOW_ID || "y";
 const channelId = process.env.SLACK_CHANNEL_ID || "x" ; 
 const requestType = process.env.REQUEST_TYPE || "defaultRequestType" ; 
-console.log("requestType: " + requestType)
 
-async function main() {
+
+async function main() { 
   console.log('🔍 Starting fetch-drawflow.js execution...');
-
+  console.log("requestType: " + requestType)
   try {
     // ✅ Get flowId & channelId from GitHub Action request
 
