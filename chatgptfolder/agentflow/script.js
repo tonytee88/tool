@@ -247,7 +247,7 @@ async function loadSelectedFlow() {
     const drawflowData = toDrawflowFormat(apiResponse);
     editor.clear();
     editor.import(drawflowData);
-
+    reattachAllListeners();
     closeLoadFlowModal();
   } catch (error) {
     console.error('❌ Error loading flow:', error);

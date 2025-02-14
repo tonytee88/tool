@@ -29,6 +29,7 @@ async function main() {
         }
     });
     
+    console.log("response: " +response)
 
     const flowData = response.data;
     if (!flowData || flowData.length === 0) {
