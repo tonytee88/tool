@@ -56,21 +56,11 @@ async function executeLLMFlow(flowData, requestType) {
             storedResponses[nodeId] = messageResponse;
             updateOutputNodes(structuredFlow, nodeId, messageResponse);
 
-        // 🌟 Store response in MongoDB in the "responses" collection
-        if (requestType === "browser") { 
-            console.log(`📥 Storing response in 'responses' collection for Execution ID: ${executionId}, Node: ${nodeId}`); // Debugging
-
-            await axios.post('https://j7-magic-tool.vercel.app/api/agentFlowCRUD', {
-                flowId: executionId,  // 🌟 Unique execution ID
-                nodeId,               // 🌟 Output node ID
-                content: messageResponse, // 🌟 Store generated response
-                timestamp: new Date().toISOString(), // 🌟 Track creation time
-                collection: "responses" // 🌟 Specify the correct collection
-            });
-
-            console.log(`✅ Response Stored: Execution ID: ${executionId}, Node: ${nodeId}`);
-        }
-
+            // 🌟 Only store response in MongoDB if request is from browser
+            if (requestType === "browser") {
+                await saveExecutionResponse(executionId, nodeId, messageResponse);
+                console.log("stored with execution id : "+executionId)
+            }
 
           } catch (error) {
             console.error(`❌ LLM Call Node (${nodeId}) Error:`, error);
@@ -432,6 +422,43 @@ function generateOutputFile(outputText) {
   console.log('✅ Final Output File Created:', filePath);
   return filePath;
 }
+
+async function saveExecutionResponse(executionId, nodeId, messageResponse) {
+    try {
+      await fetch('https://j7-magic-tool.vercel.app/api/agentFlowCRUD', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          operation: "save_response", // 🌟 Save execution response separately
+          executionId,
+          nodeId,
+          content: messageResponse,
+          timestamp: new Date().toISOString(),
+        }),
+      });
+  
+      console.log(`📤 Stored response for Execution ID: ${executionId}, Output ID: ${nodeId}`);
+    } catch (error) {
+      console.error("❌ Error saving execution response:", error);
+    }
+  }
+  
+  async function cleanupOldResponses() {
+    try {
+      await fetch('https://j7-magic-tool.vercel.app/api/agentFlowCRUD', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          operation: "cleanup_old", // 🌟 Trigger automatic cleanup
+        }),
+      });
+  
+      console.log("🧹 Old responses cleaned up successfully!");
+    } catch (error) {
+      console.error("❌ Error during cleanup:", error);
+    }
+  }
+  
 
 
 // ✅ Export function

@@ -119,6 +119,7 @@ async function saveFlow() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
+        operation: "save_flow",
         flowId: flowName,
         flowData: updatedFlowData,
         metadata: {
@@ -155,7 +156,11 @@ function extractContentNodeHtml(nodeElement) {
 async function openLoadFlowModal() {
   try {
     const response = await fetch('https://j7-magic-tool.vercel.app/api/agentFlowCRUD', {
-      method: 'GET'
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        operation: "get_flows", // 🌟 Fetch list of all saved flows
+      }),
     });
 
     if (!response.ok) {
@@ -163,11 +168,9 @@ async function openLoadFlowModal() {
     }
 
     const flows = await response.json();
-    
-    // Populate the dropdown
     const flowList = document.getElementById('flow-list');
-    flowList.innerHTML = ''; // Clear existing options
-    
+    flowList.innerHTML = '';
+
     flows.forEach(flow => {
       const option = document.createElement('option');
       option.value = flow.flowId;
@@ -175,7 +178,6 @@ async function openLoadFlowModal() {
       flowList.appendChild(option);
     });
 
-    // Show the modal
     document.getElementById('load-modal').style.display = 'block';
     document.getElementById('modal-overlay').style.display = 'block';
   } catch (error) {
@@ -183,6 +185,7 @@ async function openLoadFlowModal() {
     alert('Failed to load flows');
   }
 }
+
   
 // Function to close the load flow modal
 function closeLoadFlowModal() {
@@ -214,61 +217,38 @@ function toDrawflowFormat(apiResponse) {
 
 async function loadSelectedFlow() {
   try {
-    const flowList = document.getElementById('flow-list');
-    const selectedFlowId = flowList.value;
-
+    const selectedFlowId = document.getElementById('flow-list').value;
     if (!selectedFlowId) {
       alert('Please select a flow to load');
       return;
     }
 
-    const flowNameInput = document.getElementById('flow-name');
-    flowNameInput.value = selectedFlowId;
-
-    const response = await fetch(`https://j7-magic-tool.vercel.app/api/agentFlowCRUD?flowId=${selectedFlowId}`);
+    const response = await fetch('https://j7-magic-tool.vercel.app/api/agentFlowCRUD', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        operation: "get_single_flow", // 🌟 Fetch a specific flow
+        flowId: selectedFlowId,
+      }),
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const apiResponse = await response.json();
-
-    if (!apiResponse) {
-      throw new Error('Empty response from API');
-    }
+    if (!apiResponse) throw new Error('Empty response from API');
 
     const drawflowData = toDrawflowFormat(apiResponse);
-
-    // ✅ Clear existing nodes before importing
     editor.clear();
-
-    // ✅ Import the flow
     editor.import(drawflowData);
 
-    // ✅ After import, update each LLM node's dropdown to reflect the saved model
-    Object.values(drawflowData.drawflow.Home.data).forEach(node => {
-      if (node.name === "LLM Call") {
-        const dropdown = document.getElementById(`model-dropdown-${node.id}`);
-        if (dropdown) {
-          dropdown.value = node.data.selectedModel || 'openai/gpt-4o-mini'; // ✅ Set saved model or default
-          console.log(`🎯 Set model for Node ${node.id}:`, dropdown.value);
-        }
-      }
-    });
-
-    // ✅ Reattach event listeners for nodes
-    reattachAllListeners();
-
-    // ✅ Close the modal
     closeLoadFlowModal();
   } catch (error) {
     console.error('❌ Error loading flow:', error);
     alert(`Failed to load flow: ${error.message}`);
   }
 }
-
-
-
 
 // --- START NODE ---
 function createStartNode(x, y) {
@@ -485,23 +465,23 @@ function attachOutputListeners(nodeId) {
 })};
 
 // Optional: Add a method to list available flows
-async function listFlows() {
-  try {
-    const response = await fetch('https://j7-magic-tool.vercel.app/api/agentFlowCRUD/list', {
-      method: 'GET'
-    });
+// async function listFlows() {
+//   try {
+//     const response = await fetch('https://j7-magic-tool.vercel.app/api/agentFlowCRUD/list', {
+//       method: 'GET'
+//     });
 
-    if (!response.ok) {
-      throw new Error('Failed to retrieve flows');
-    }
+//     if (!response.ok) {
+//       throw new Error('Failed to retrieve flows');
+//     }
 
-    const flows = await response.json();
-    // Implement UI to display and select flows
-    displayFlowsList(flows);
-  } catch (error) {
-    console.error('Error listing flows:', error);
-  }
-}
+//     const flows = await response.json();
+//     // Implement UI to display and select flows
+//     displayFlowsList(flows);
+//   } catch (error) {
+//     console.error('Error listing flows:', error);
+//   }
+// }
 
 function reattachAllListeners() {
   // Iterate through all nodes in the flow
