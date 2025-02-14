@@ -5,7 +5,8 @@ const axios = require('axios');
 const FormData = require('form-data');
 
 const flowId = process.env.FLOW_ID || "y";
-const channelId = process.env.SLACK_CHANNEL_ID || "x" ; // 🔹 Capture dynamically
+const channelId = process.env.SLACK_CHANNEL_ID || "x" ; 
+const requestType = process.env.REQUEST_TYPE || "defaultRequestType" ; 
 
 async function main() {
   console.log('🔍 Starting fetch-drawflow.js execution...');
@@ -41,7 +42,7 @@ async function main() {
     try {
       console.log(`🚀 Triggering execute-flow.js for flowId: ${flowId}...`);
       const executeFlow = require("./execute-flow");
-      await executeFlow(flowData);
+      await executeFlow(flowData, requestType);
       console.log('✅ execute-flow.js completed successfully.');
     } catch (execError) {
       console.error('❌ Error executing execute-flow.js:', execError);
@@ -50,7 +51,7 @@ async function main() {
     }
 
     // ✅ Upload file to Slack (to correct channel)
-    await uploadFileToSlack(filePath, channelId);
+    //await uploadFileToSlack(filePath, channelId);
     await sendSlackMessage(channelId, `✅ Flow *${flowId}* executed successfully!`, filePath);
 
     console.log(`✅ Fetch & Execute Flow completed successfully!`);

@@ -4,7 +4,7 @@ const axios = require('axios');
 
 const channelId = process.env.SLACK_CHANNEL_ID || "x"; // Capture dynamically
 
-async function executeLLMFlow(flowData) {
+async function executeLLMFlow(flowData, requestType) {
     console.log("🚀 Starting Flow Execution...");
   
     if (!flowData || !flowData.length) {
@@ -12,9 +12,7 @@ async function executeLLMFlow(flowData) {
       return;
     }
   
-    // ✅ Extract proper flow data structure
     const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data || flowData[0]?.flowData?.drawflow?.data;
-    //console.log("structuredflow data: ", JSON.stringify(structuredFlow, null, 2));
     if (!structuredFlow || typeof structuredFlow !== "object") {
         console.error("❌ Invalid flowData format! Expected an object but got:", structuredFlow);
         return;
@@ -22,12 +20,9 @@ async function executeLLMFlow(flowData) {
     
     console.log("✅ Valid structured flow data loaded!");
 
-    // ✅ Extract callback URL from flowData
-    const callbackUrl = process.env.CALLBACK_URL;
-    if (!callbackUrl) {
-        console.warn("⚠️ No callback URL provided. Response will not be sent to the browser.");
-    }
-  
+    const executionId = `exec_${Date.now()}`; // 🌟 Generate unique executionId
+    console.log("🔄 Generated Execution ID:", executionId); // 🌟 Debugging executionId
+
     const executionOrder = determineExecutionOrder(structuredFlow);
     const storedResponses = {}; // ✅ Cache responses to avoid redundant API calls
   
@@ -60,6 +55,20 @@ async function executeLLMFlow(flowData) {
             currentNode.data.output = messageResponse;
             storedResponses[nodeId] = messageResponse;
             updateOutputNodes(structuredFlow, nodeId, messageResponse);
+
+        // 🌟 Store response only if it's a Browser request 🌟
+        if (requestType === "browser") {
+            await axios.post('https://j7-magic-tool.vercel.app/api/agentFlowCRUD', {
+            flowId: executionId, // 🌟 Unique execution ID
+            nodeId, // 🌟 Output node ID
+            content: messageResponse,
+            timestamp: new Date().toISOString() // 🌟 Add timestamp for cleanup
+            });
+            console.log(`📤 Stored response for Execution ID: ${executionId}, Output ID: ${nodeId}`);
+        } else {
+          console.log(`🚀 Request from Slack - Not storing response`);
+        }
+
           } catch (error) {
             console.error(`❌ LLM Call Node (${nodeId}) Error:`, error);
             markNodeAsError(nodeId, error.message);
