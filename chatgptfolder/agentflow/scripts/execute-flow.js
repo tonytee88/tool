@@ -56,18 +56,21 @@ async function executeLLMFlow(flowData, requestType) {
             storedResponses[nodeId] = messageResponse;
             updateOutputNodes(structuredFlow, nodeId, messageResponse);
 
-        // 🌟 Store response only if it's a Browser request 🌟
-        if (requestType === "browser") {
+        // 🌟 Store response in MongoDB in the "responses" collection
+        if (requestType === "browser") { 
+            console.log(`📥 Storing response in 'responses' collection for Execution ID: ${executionId}, Node: ${nodeId}`); // Debugging
+
             await axios.post('https://j7-magic-tool.vercel.app/api/agentFlowCRUD', {
-            flowId: executionId, // 🌟 Unique execution ID
-            nodeId, // 🌟 Output node ID
-            content: messageResponse,
-            timestamp: new Date().toISOString() // 🌟 Add timestamp for cleanup
+                flowId: executionId,  // 🌟 Unique execution ID
+                nodeId,               // 🌟 Output node ID
+                content: messageResponse, // 🌟 Store generated response
+                timestamp: new Date().toISOString(), // 🌟 Track creation time
+                collection: "responses" // 🌟 Specify the correct collection
             });
-            console.log(`📤 Stored response for Execution ID: ${executionId}, Output ID: ${nodeId}`);
-        } else {
-          console.log(`🚀 Request from Slack - Not storing response`);
+
+            console.log(`✅ Response Stored: Execution ID: ${executionId}, Node: ${nodeId}`);
         }
+
 
           } catch (error) {
             console.error(`❌ LLM Call Node (${nodeId}) Error:`, error);
@@ -115,7 +118,7 @@ async function executeLLMFlow(flowData, requestType) {
         // ✅ Still send to Slack as before
         if (requestType !== "browser") {
         const filePath = generateOutputFile(finalOutputText);
-        await sendSlackMessage(channelId, "✅ Here's the final output:" + finalOutputText, filePath);
+        await sendSlackMessage(channelId, "Here's the final output: " + finalOutputText, filePath);
     }
     }
   }
