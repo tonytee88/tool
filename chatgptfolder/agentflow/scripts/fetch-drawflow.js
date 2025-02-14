@@ -29,7 +29,7 @@ async function main() {
         }
     });
     
-    console.log("response: " +JSON.stringify(response))
+    console.log("response: " +JSON.stringify(response.data))
 
     const flowData = response.data;
     if (!flowData || flowData.length === 0) {
