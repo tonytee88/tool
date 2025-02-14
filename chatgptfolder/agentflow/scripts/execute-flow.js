@@ -209,6 +209,7 @@ async function sendSlackMessage(channelId, message, filePath) {
     .replace(/<\/?[^>]+(>|$)/g, "") // Remove any other HTML tags
     .replace(/\n\*/g, '\n')      // Remove unnecessary stars in list items
     .replace(/(\*)+/g, '*');     // Ensure single stars around bold text
+    .replace(/(?<!\n)\*(.*?)\*/g, '\n*$1*');
 
   const slackToken = process.env.SLACK_BOT_TOKEN;
 
