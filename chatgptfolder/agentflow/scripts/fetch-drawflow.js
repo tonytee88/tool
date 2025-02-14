@@ -20,8 +20,15 @@ async function main() {
     }
 
     console.log(`📡 Fetching drawflow for flowId: ${flowId}...`);
-    const response = await axios.get(`https://j7-magic-tool.vercel.app/api/agentFlowCRUD?flowId=${encodeURIComponent(flowId)}`);
-    //console.log("drawflow data: " + JSON.stringify(response.data, null, 2));
+    const response = await axios.post('https://j7-magic-tool.vercel.app/api/agentFlowCRUD', {
+        operation: 'get_flow',
+        flowId: flowId
+    }, {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    
 
     const flowData = response.data;
     if (!flowData || flowData.length === 0) {

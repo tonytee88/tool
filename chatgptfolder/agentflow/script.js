@@ -194,30 +194,35 @@ function closeLoadFlowModal() {
 }
 
 function toDrawflowFormat(apiResponse) {
-  //console.log('Raw API Response:', apiResponse);
+  console.log("🛠 Raw API Response:", JSON.stringify(apiResponse, null, 2));
+
+  // If response is an object, wrap it in an array
+  if (!Array.isArray(apiResponse)) {
+      apiResponse = [apiResponse];
+  }
 
   // Check if we have valid data
-  if (!Array.isArray(apiResponse) || apiResponse.length === 0 || !apiResponse[0]?.flowData?.drawflow?.Home?.data) {
-      console.error('Data structure is not as expected');
+  if (apiResponse.length === 0 || !apiResponse[0]?.flowData?.drawflow?.Home?.data) {
+      console.error('❌ Data structure is not as expected or response is empty');
       return createDefaultFlow();
   }
 
   // Extract the drawflow data
   const drawflowData = apiResponse[0].flowData;
-  //console.log('Extracted Drawflow Data:', drawflowData);
 
-  // If the data object is empty, return a default flow
-  if (Object.keys(drawflowData.drawflow.Home.data).length === 0) {
-      console.log('Flow data is empty, creating default flow');
+  if (!drawflowData || Object.keys(drawflowData.drawflow.Home.data).length === 0) {
+      console.warn('⚠️ Flow data is empty or missing, returning default flow.');
       return createDefaultFlow();
   }
 
   return drawflowData;
 }
 
+
 async function loadSelectedFlow() {
   try {
     const selectedFlowId = document.getElementById('flow-list').value;
+
     if (!selectedFlowId) {
       alert('Please select a flow to load');
       return;
@@ -227,7 +232,7 @@ async function loadSelectedFlow() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        operation: "get_single_flow", // 🌟 Fetch a specific flow
+        operation: 'get_flow', // 🌟 Fetch a specific flow
         flowId: selectedFlowId,
       }),
     });
@@ -238,7 +243,7 @@ async function loadSelectedFlow() {
 
     const apiResponse = await response.json();
     if (!apiResponse) throw new Error('Empty response from API');
-
+    console.log("response: " + JSON.stringify(apiResponse))
     const drawflowData = toDrawflowFormat(apiResponse);
     editor.clear();
     editor.import(drawflowData);
