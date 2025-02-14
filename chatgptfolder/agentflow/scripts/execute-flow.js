@@ -40,8 +40,8 @@ async function executeLLMFlow(flowData, requestType) {
         } else {
           await waitForInputs(nodeId, structuredFlow);
   
-          const combinedInputs = getSortedInputs(nodeId, structuredFlow.substring(0, 20) + "...");
-          console.log("📝 Combined Inputs:", combinedInputs);
+          const combinedInputs = getSortedInputs(nodeId, structuredFlow)
+          console.log("📝 Combined Inputs:", combinedInputs.substring(0, 20) + "...");
   
           const selectedModel = currentNode.data.selectedModel || 'openai/gpt-4o-mini';
           console.log(`📝 Model selected for Node ${nodeId}: ${selectedModel}`);
