@@ -3,6 +3,7 @@ const path = require('path');
 const axios = require('axios');
 
 const channelId = process.env.SLACK_CHANNEL_ID || "x"; // Capture dynamically
+const flowId = process.env.FLOW_ID || "y";
 
 async function executeLLMFlow(flowData, requestType) {
     console.log("🚀 Starting Flow Execution...");
@@ -58,7 +59,7 @@ async function executeLLMFlow(flowData, requestType) {
 
             // 🌟 Only store response in MongoDB if request is from browser
             if (requestType === "browser") {
-                await saveExecutionResponse(executionId, nodeId, messageResponse);
+                await saveExecutionResponse(flowId, nodeId, messageResponse);
                 console.log("stored with executionId, nodeId, messageResponse : ",executionId, nodeId, messageResponse)
             }
 
@@ -423,14 +424,14 @@ function generateOutputFile(outputText) {
   return filePath;
 }
 
-async function saveExecutionResponse(executionId, nodeId, messageResponse) {
+async function saveExecutionResponse(flowId, nodeId, messageResponse) {
     try {
       await fetch('https://j7-magic-tool.vercel.app/api/agentFlowCRUD', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          operation: "save_response", // 🌟 Save execution response separately
-          executionId,
+          operation: "save_response",
+          flowId,
           nodeId,
           content: messageResponse,
           timestamp: new Date().toISOString(),
