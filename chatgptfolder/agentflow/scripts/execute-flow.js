@@ -60,7 +60,7 @@ async function executeLLMFlow(flowData, requestType) {
             // 🌟 Only store response in MongoDB if request is from browser
             if (requestType === "browser") {
                 await saveExecutionResponse(flowId, nodeId, messageResponse);
-                console.log("stored with executionId, nodeId, messageResponse : ",executionId, nodeId, messageResponse)
+                //console.log("stored with executionId, nodeId, messageResponse : ",executionId, nodeId, messageResponse)
             }
 
           } catch (error) {
@@ -438,7 +438,7 @@ async function saveExecutionResponse(flowId, nodeId, messageResponse) {
         }),
       });
   
-      console.log(`📤 Stored response for Execution ID: ${executionId}, Output ID: ${nodeId}`);
+      console.log(`📤 Stored response for Execution ID: ${flowId}, Output ID: ${nodeId}`);
     } catch (error) {
       console.error("❌ Error saving execution response:", error);
     }
