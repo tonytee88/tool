@@ -40,7 +40,7 @@ async function executeLLMFlow(flowData, requestType) {
         } else {
           await waitForInputs(nodeId, structuredFlow);
   
-          const combinedInputs = getSortedInputs(nodeId, structuredFlow);
+          const combinedInputs = getSortedInputs(nodeId, structuredFlow.substring(0, 20) + "...");
           console.log("📝 Combined Inputs:", combinedInputs);
   
           const selectedModel = currentNode.data.selectedModel || 'openai/gpt-4o-mini';
@@ -166,8 +166,8 @@ function areInputsReady(nodeId, structuredFlow) {
       const outputData = inputNode.data?.output?.trim() || "";
   
       console.log(`🔍 Checking inputs for Node ${inputNodeId}:`);
-      console.log("✅ Output Data:", outputData);
-      console.log("✅ Prompt Data:", promptData);
+      console.log("✅ Output Data:", outputData.substring(0, 20) + "...");
+      console.log("✅ Prompt Data:", promptData.substring(0, 20) + "...");
   
       // 🚨 Check each input node type 🚨
       if (inputNode.name === "Prompt") {
@@ -405,7 +405,7 @@ function compileFinalOutputs(flowData) {
       }
     });
   
-    console.log("✅ Final Output Compilation Complete:", finalOutputText.trim());
+    console.log("✅ Final Output Compilation Complete:", finalOutputText.trim().substring(0, 20) + "...");
     return finalOutputText.trim();
   }
   
