@@ -199,14 +199,17 @@ async function sendSlackMessage(channelId, message, filePath) {
 
   // ✅ Convert HTML to Slack Markdown-like format
   const formattedMessage = message
-    .replace(/<br\s*\/?>/g, "\n") // Convert <br> to newlines
+    .replace(/<\/?br>/g, '\n') // Convert <br> to newlines
     .replace(/<\/?strong>/g, "*") // Convert <strong> to Slack bold (*bold*)
     .replace(/<\/?h3>/g, "*") // Convert <h3> to Slack bold headers (*Header*)
     .replace(/<hr>/g, "――――――――――") // Convert <hr> to line separator
     .replace(/<ul>|<\/ul>/g, "") // Remove <ul> tags
     .replace(/<li>/g, "- ") // Convert <li> to bullet points
     .replace(/<\/li>/g, "\n") // End bullet points
-    .replace(/<\/?[^>]+(>|$)/g, ""); // Remove any other HTML tags
+    .replace(/<\/?[^>]+(>|$)/g, "") // Remove any other HTML tags
+    .replace(/\*/g, '\n*')
+    .replace(/\n\*/g, '\n')      // Remove unnecessary stars in list items
+    .replace(/(\*)+/g, '*');     // Ensure single stars around bold text
 
   const slackToken = process.env.SLACK_BOT_TOKEN;
 
