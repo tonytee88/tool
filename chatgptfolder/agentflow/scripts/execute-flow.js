@@ -197,19 +197,19 @@ function areInputsReady(nodeId, structuredFlow) {
 async function sendSlackMessage(channelId, message, filePath) {
   console.log(`📩 Sending message to Slack (${channelId})`);
 
-  // ✅ Convert HTML to Slack Markdown-like format
   const formattedMessage = message
-    .replace(/<\/?br>/g, '\n') // Convert <br> to newlines
-    .replace(/<\/?strong>/g, "*") // Convert <strong> to Slack bold (*bold*)
-    .replace(/<\/?h3>/g, "*") // Convert <h3> to Slack bold headers (*Header*)
-    .replace(/<hr>/g, "――――――――――") // Convert <hr> to line separator
-    .replace(/<ul>|<\/ul>/g, "") // Remove <ul> tags
-    .replace(/<li>/g, "- ") // Convert <li> to bullet points
-    .replace(/<\/li>/g, "\n") // End bullet points
-    .replace(/<\/?[^>]+(>|$)/g, "") // Remove any other HTML tags
-    .replace(/\n\*/g, '\n')      // Remove unnecessary stars in list items
-    .replace(/(\*)+/g, '*')     // Ensure single stars around bold text
-    .replace(/(?<!\n)\*(.*?)\*/g, '\n*$1*');
+  .replace(/<\/?br>/g, '\n') // Convert <br> to newlines
+  .replace(/<\/?strong>/g, "*") // Convert <strong> to Slack bold (*bold*)
+  .replace(/<\/?h3>/g, "\n\n*") // Convert <h3> to Slack bold headers (*Header*)
+  .replace(/<hr>/g, "\n――――――――――\n") // Convert <hr> to line separator
+  .replace(/<ul>|<\/ul>/g, "") // Remove <ul> tags
+  .replace(/<li>/g, "\n- ") // Convert <li> to bullet points with proper spacing
+  .replace(/<\/li>/g, "") // Remove </li>, spacing handled above
+  .replace(/<\/?[^>]+(>|$)/g, "") // Remove any other HTML tags
+  .replace(/\n\*/g, '\n\n*') // Ensure new lines before bold sections
+  .replace(/(\*)([^*\n]+)\*/g, '\n*$2*\n'); // 🌟 Ensure bold text gets line breaks
+
+
 
   const slackToken = process.env.SLACK_BOT_TOKEN;
 
