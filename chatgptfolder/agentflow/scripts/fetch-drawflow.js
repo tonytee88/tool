@@ -29,9 +29,9 @@ async function main() {
         }
     });
     
-    console.log("response: " +JSON.stringify(response.data))
-
-    const flowData = response.data;
+    //console.log("response: " +JSON.stringify(response.data))
+    
+    const flowData = Array.isArray(response.data) ? response.data : [response.data];
     if (!flowData || flowData.length === 0) {
       console.warn(`⚠️ No flow found for flowId: ${flowId}`);
       await sendSlackMessage(channelId, `⚠️ No flow found for *${flowId}*. Please check and try again.`);
