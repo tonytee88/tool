@@ -99,18 +99,18 @@ async function executeLLMFlow(flowData, requestType) {
         console.log("✅ Final Output Ready:", finalOutputText);
 
         // ✅ Send response to the provided callback URL (if available)
-        if (callbackUrl) {
-            try {
-                await axios.post(callbackUrl, {
-                    flowName: flowData[0].flowName,
-                    response: finalOutputText
-                });
+        // if (callbackUrl) {
+        //     try {
+        //         await axios.post(callbackUrl, {
+        //             flowName: flowData[0].flowName,
+        //             response: finalOutputText
+        //         });
 
-                console.log(`✅ Sent response to callback: ${callbackUrl}`);
-            } catch (error) {
-                console.error("❌ Failed to send response to callback URL:", error);
-            }
-        }
+        //         console.log(`✅ Sent response to callback: ${callbackUrl}`);
+        //     } catch (error) {
+        //         console.error("❌ Failed to send response to callback URL:", error);
+        //     }
+        // }
 
         // ✅ Still send to Slack as before
         const filePath = generateOutputFile(finalOutputText);
