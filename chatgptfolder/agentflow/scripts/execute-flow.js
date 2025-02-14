@@ -199,17 +199,15 @@ async function sendSlackMessage(channelId, message, filePath) {
 
   const formattedMessage = message
   .replace(/<\/?br>/g, '\n') // Convert <br> to newlines
-  .replace(/<\/?strong>/g, "*") // Convert <strong> to Slack bold (*bold*)
-  .replace(/<\/?h3>/g, "\n\n*") // Convert <h3> to Slack bold headers (*Header*)
-  .replace(/<hr>/g, "\n――――――――――\n") // Convert <hr> to line separator
+  .replace(/<\/?h3>/g, "\n\n") // Ensure double line break after headings
+  .replace(/<hr>/g, "\n――――――――――\n") // Convert <hr> to a clean separator
   .replace(/<ul>|<\/ul>/g, "") // Remove <ul> tags
   .replace(/<li>/g, "\n- ") // Convert <li> to bullet points
-  .replace(/<\/li>/g, "") // Remove </li>, spacing handled above
-  .replace(/<\/?[^>]+(>|$)/g, "") // Remove remaining HTML tags
-  .replace(/\n\*/g, '\n\n*') // Ensure double new lines before bold sections
-  .replace(/(\*)([^*\n]+)\*/g, '\n*$2*\n') // Ensure bold text gets a proper line break
-  .replace(/-\s\*/g, '\n*') // Fix bullet point merging issues with bold
-  .replace(/\n-\s/g, "\n- "); // Ensure proper bullet formatting
+  .replace(/<\/li>/g, "") // Remove </li>
+  .replace(/<\/?strong>/g, "") // Remove strong (no bolding needed)
+  .replace(/<\/?[^>]+(>|$)/g, "") // Remove any other HTML tags
+  .replace(/\n\s*\n\s*\n/g, "\n\n"); // Prevent excessive blank lines
+
 
   const slackToken = process.env.SLACK_BOT_TOKEN;
 
