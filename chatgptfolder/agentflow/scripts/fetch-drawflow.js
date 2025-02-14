@@ -29,7 +29,7 @@ async function main() {
         }
     });
     
-    console.log("response: " +response)
+    console.log("response: " +JSON.stringify(response))
 
     const flowData = response.data;
     if (!flowData || flowData.length === 0) {
@@ -44,7 +44,7 @@ async function main() {
     const filePath = path.join(__dirname, 'drawflow.txt');
     fs.writeFileSync(filePath, JSON.stringify(flowData, null, 2));
 
-    console.log(`📄 Drawflow file created at: ${filePath}`);
+    //console.log(`📄 Drawflow file created at: ${filePath}`);
 
     // ✅ Call execution script
     try {
