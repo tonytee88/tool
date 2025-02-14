@@ -113,7 +113,7 @@ async function executeLLMFlow(flowData, requestType) {
         // }
 
         // ✅ Still send to Slack as before
-        if (!requestType === "browser") {
+        if (requestType !== "browser") {
         const filePath = generateOutputFile(finalOutputText);
         await sendSlackMessage(channelId, "✅ Here's the final output:" + finalOutputText, filePath);
     }

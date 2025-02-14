@@ -132,7 +132,7 @@ async function uploadFileToSlack(filePath, channels) {
 
 // ✅ Sends a message to Slack (to correct channel)
 async function sendSlackMessage(channelId, message, filePath = null) {
-    if (!requestType === "browser") {
+    if (requestType !== "browser") {
     try {
     console.log(`📩 Sending message to Slack Channel (${channelId}): "${message}"`);
 
