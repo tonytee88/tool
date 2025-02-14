@@ -132,7 +132,8 @@ async function uploadFileToSlack(filePath, channels) {
 
 // ✅ Sends a message to Slack (to correct channel)
 async function sendSlackMessage(channelId, message, filePath = null) {
-  try {
+    if (!requestType === "browser") {
+    try {
     console.log(`📩 Sending message to Slack Channel (${channelId}): "${message}"`);
 
     const slackToken = process.env.SLACK_BOT_TOKEN;
@@ -157,7 +158,7 @@ async function sendSlackMessage(channelId, message, filePath = null) {
     console.log(`✅ Message successfully sent to Slack.`);
   } catch (error) {
     console.error('❌ Error sending message to Slack:', error);
-  }
+  }}
 }
 
 // ✅ Automatically run the script when executed
