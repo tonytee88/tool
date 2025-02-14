@@ -50,7 +50,7 @@ async function executeLLMFlow(flowData, requestType) {
             const response = await callLLMAPI(combinedInputs, selectedModel);
             const messageResponse = response.data?.completions?.[selectedModel]?.completion?.choices?.[0]?.message?.content || "⚠️ No valid response";
   
-            console.log(`✅ LLM Call Node (${nodeId}) Response:`, messageResponse);
+            console.log(`✅ LLM Call Node (${nodeId}) works`);
   
             currentNode.data.output = messageResponse;
             storedResponses[nodeId] = messageResponse;
@@ -84,7 +84,7 @@ async function executeLLMFlow(flowData, requestType) {
           const formattedResponse = formatTextAsHTML(storedResponses[linkedLLMNode]);
           currentNode.data.output = formattedResponse;
   
-          console.log(`✅ Output Node (${nodeId}) Displaying:`, formattedResponse);
+          console.log(`✅ Output Node (${nodeId}) Displaying:`, formattedResponse.substring(0, 20) + "...");
           updateOutputNodes(structuredFlow, nodeId, formattedResponse);
         } else {
           console.warn(`⚠️ Output Node (${nodeId}) has no valid LLM input.`);
@@ -96,7 +96,7 @@ async function executeLLMFlow(flowData, requestType) {
     const finalOutputText = compileFinalOutputs(structuredFlow);
   
     if (finalOutputText) {
-        console.log("✅ Final Output Ready:", finalOutputText);
+        console.log("✅ Final Output Ready and good");
 
         // ✅ Send response to the provided callback URL (if available)
         // if (callbackUrl) {
@@ -367,7 +367,7 @@ function updateOutputNodes(structuredFlow, nodeId, responseText) {
     // ✅ Update output in the object-based flowData
     structuredFlow[nodeId].data.output = responseText;
   
-    console.log(`✅ Updated output for Node ${nodeId}:`, responseText);
+    console.log(`✅ Updated output for Node ${nodeId}`);
   }
     
 function markNodeAsError(flowData, nodeId, errorMessage) {
