@@ -203,13 +203,13 @@ async function sendSlackMessage(channelId, message, filePath) {
   .replace(/<\/?h3>/g, "\n\n*") // Convert <h3> to Slack bold headers (*Header*)
   .replace(/<hr>/g, "\n――――――――――\n") // Convert <hr> to line separator
   .replace(/<ul>|<\/ul>/g, "") // Remove <ul> tags
-  .replace(/<li>/g, "\n- ") // Convert <li> to bullet points with proper spacing
+  .replace(/<li>/g, "\n- ") // Convert <li> to bullet points
   .replace(/<\/li>/g, "") // Remove </li>, spacing handled above
-  .replace(/<\/?[^>]+(>|$)/g, "") // Remove any other HTML tags
-  .replace(/\n\*/g, '\n\n*') // Ensure new lines before bold sections
-  .replace(/(\*)([^*\n]+)\*/g, '\n*$2*\n'); // 🌟 Ensure bold text gets line breaks
-
-
+  .replace(/<\/?[^>]+(>|$)/g, "") // Remove remaining HTML tags
+  .replace(/\n\*/g, '\n\n*') // Ensure double new lines before bold sections
+  .replace(/(\*)([^*\n]+)\*/g, '\n*$2*\n') // Ensure bold text gets a proper line break
+  .replace(/-\s\*/g, '\n*') // Fix bullet point merging issues with bold
+  .replace(/\n-\s/g, "\n- "); // Ensure proper bullet formatting
 
   const slackToken = process.env.SLACK_BOT_TOKEN;
 
