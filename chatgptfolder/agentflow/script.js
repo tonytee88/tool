@@ -583,6 +583,7 @@ async function startFlowExecution() {
   const callbackUrl = "https://j7-magic-tool.vercel.app/api/slack?operation=receive_response";
 
   await callBrowserFlow(flowName, channelId, callbackUrl, executionId);
+  checkWorkflowStatus(executionId);
 
   // HERE'S THE FINAL ONE I THINK?
 }
@@ -640,6 +641,34 @@ function clearOutputNodes() {
     });
   }, 100);
 }
+
+async function checkWorkflowStatus(executionId) {
+  try {
+      const response = await fetch("https://j7-magic-tool.vercel.app/api/slack?operation=get_status", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ executionId })
+      });
+
+      const data = await response.json();
+      console.log(`🔍 Workflow Status for ${executionId}:`, data);
+
+      if (data.status === "completed") {
+          console.log("✅ Workflow completed!");
+          updateUIWithResults(executionId); // Call function to update UI
+      } else {
+          console.log(`⏳ Workflow in progress... checking again in 10 sec`);
+          setTimeout(() => checkWorkflowStatus(executionId), 10000);
+      }
+
+  } catch (error) {
+      console.error("❌ Error checking workflow status:", error);
+  }
+}
+
+
+
+
 
 
 
