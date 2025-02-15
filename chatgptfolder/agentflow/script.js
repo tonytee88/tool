@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
-
 // Initialize Drawflow
 const editor = new Drawflow(document.getElementById("drawflow"));
 editor.start();
@@ -578,7 +576,7 @@ async function startFlowExecution() {
   clearOutputNodes();
 
   const flowName = document.getElementById('flow-name').value.trim() || 'New Flow 01z';
-  const executionId = `exec_${uuidv4()}`; // 🔥 Generate unique execution ID
+  const executionId = uuidv4(); // 🔥 Generate unique execution ID
   console.log("🚀 Executing flow:", flowName);
 
   const channelId = "nochan"; 
