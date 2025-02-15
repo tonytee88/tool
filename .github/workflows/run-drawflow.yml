@@ -12,6 +12,7 @@ jobs:
       SLACK_CHANNEL_ID: ${{ github.event.client_payload.channelId }}  # ✅ Correctly passing the Slack Channel ID
       CALLBACK_URL: ${{ github.event.client_payload.callbackUrl }}
       REQUEST_TYPE: ${{ github.event.client_payload.requestType }}
+      EXECUTION_ID: ${{ github.event.client_payload.executionId }}
 
     steps:
       - name: Checkout repository
