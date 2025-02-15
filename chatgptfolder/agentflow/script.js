@@ -576,7 +576,7 @@ async function startFlowExecution() {
   clearOutputNodes();
 
   const flowName = document.getElementById('flow-name').value.trim() || 'New Flow 01z';
-  const executionId = uuidv4(); // 🔥 Generate unique execution ID
+  const executionId = `exec_${Date.now()}`; // 🔥 Generate unique execution ID
   console.log("🚀 Executing flow:", flowName);
 
   const channelId = "nochan"; 

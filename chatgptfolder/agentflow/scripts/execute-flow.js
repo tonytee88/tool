@@ -98,7 +98,6 @@ async function executeLLMFlow(flowData, requestType, executionId) {
         await sendSlackMessage(channelId, "Here's the final output: " + finalOutputText, filePath);
     }
     }
-    return executionId
   }
   
 
