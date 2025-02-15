@@ -7,10 +7,11 @@ const FormData = require('form-data');
 const flowId = process.env.FLOW_ID || "y";
 const channelId = process.env.SLACK_CHANNEL_ID || "x" ; 
 const requestType = process.env.REQUEST_TYPE || "defaultRequestType" ; 
+const executionId = process.env.EXECUTION_ID; 
 
 
 async function main() { 
-  console.log('🔍 Starting fetch-drawflow.js execution...');
+  console.log(`🔍 Starting fetch-drawflow.js execution (Execution ID: ${executionId})`);
   console.log("requestType: " + requestType)
   try {
     // ✅ Get flowId & channelId from GitHub Action request
@@ -51,7 +52,7 @@ async function main() {
     try {
       console.log(`🚀 Triggering execute-flow.js for flowId: ${flowId}...`);
       const executeFlow = require("./execute-flow");
-      await executeFlow(flowData, requestType);
+      executionId = await executeFlow(flowData, requestType, executionId);
       console.log('✅ execute-flow.js completed successfully.');
     } catch (execError) {
       console.error('❌ Error executing execute-flow.js:', execError);
@@ -70,6 +71,7 @@ async function main() {
     await sendSlackMessage(channelId, `❌ Error fetching drawflow for *${flowId}*. Check logs.`);
     process.exit(1);
   }
+  return executionId
 }
 
 // ✅ Uploads a file to Slack
@@ -170,5 +172,4 @@ async function sendSlackMessage(channelId, message, filePath = null) {
   }}
 }
 
-// ✅ Automatically run the script when executed
 main();

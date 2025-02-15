@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 // Initialize Drawflow
 const editor = new Drawflow(document.getElementById("drawflow"));
 editor.start();
@@ -576,16 +578,18 @@ async function startFlowExecution() {
   clearOutputNodes();
 
   const flowName = document.getElementById('flow-name').value.trim() || 'New Flow 01z';
-
+  const executionId = `exec_${uuidv4()}`; // 🔥 Generate unique execution ID
   console.log("🚀 Executing flow:", flowName);
 
   const channelId = "nochan"; 
   const callbackUrl = "https://j7-magic-tool.vercel.app/api/slack?operation=receive_response";
 
-  await callBrowserFlow(flowName, channelId, callbackUrl);
+  await callBrowserFlow(flowName, channelId, callbackUrl, executionId);
+
+  // HERE'S THE FINAL ONE I THINK?
 }
 
-async function callBrowserFlow(flowName, channelId, callbackUrl) {
+async function callBrowserFlow(flowName, channelId, callbackUrl, executionId) {
   const endpointUrl = "https://j7-magic-tool.vercel.app/api/slack?operation=notslack";
 
   try {
@@ -594,7 +598,7 @@ async function callBrowserFlow(flowName, channelId, callbackUrl) {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ flowName, channelId, callbackUrl })
+      body: JSON.stringify({ flowName, channelId, callbackUrl, executionId })
     });
 
     if (!response.ok) {

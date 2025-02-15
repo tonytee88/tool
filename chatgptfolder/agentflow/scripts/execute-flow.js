@@ -5,7 +5,7 @@ const axios = require('axios');
 const channelId = process.env.SLACK_CHANNEL_ID || "x"; // Capture dynamically
 const flowId = process.env.FLOW_ID || "y";
 
-async function executeLLMFlow(flowData, requestType) {
+async function executeLLMFlow(flowData, requestType, executionId) {
     console.log("🚀 Starting Flow Execution...");
   
     if (!flowData || !flowData.length) {
@@ -21,8 +21,8 @@ async function executeLLMFlow(flowData, requestType) {
     
     console.log("✅ Valid structured flow data loaded!");
 
-    const executionId = `exec_${Date.now()}`; // 🌟 Generate unique executionId
-    console.log("🔄 Generated Execution ID:", executionId); // 🌟 Debugging executionId
+
+    console.log("🔄 Using this executionId in execute-flowjs:", executionId); // 🌟 Debugging executionId
 
     const executionOrder = determineExecutionOrder(structuredFlow);
     const storedResponses = {}; // ✅ Cache responses to avoid redundant API calls
@@ -45,7 +45,7 @@ async function executeLLMFlow(flowData, requestType) {
           console.log("📝 Combined Inputs:", combinedInputs.substring(0, 20) + "...");
   
           const selectedModel = currentNode.data.selectedModel || 'openai/gpt-4o-mini';
-          console.log(`📝 Model selected for Node ${nodeId}: ${selectedModel}`);
+          //console.log(`📝 Model selected for Node ${nodeId}: ${selectedModel}`);
   
           try {
             const response = await callLLMAPI(combinedInputs, selectedModel);
@@ -92,26 +92,13 @@ async function executeLLMFlow(flowData, requestType) {
     if (finalOutputText) {
         console.log("✅ Final Output Ready and good");
 
-        // ✅ Send response to the provided callback URL (if available)
-        // if (callbackUrl) {
-        //     try {
-        //         await axios.post(callbackUrl, {
-        //             flowName: flowData[0].flowName,
-        //             response: finalOutputText
-        //         });
-
-        //         console.log(`✅ Sent response to callback: ${callbackUrl}`);
-        //     } catch (error) {
-        //         console.error("❌ Failed to send response to callback URL:", error);
-        //     }
-        // }
-
         // ✅ Still send to Slack as before
         if (requestType !== "browser") {
         const filePath = generateOutputFile(finalOutputText);
         await sendSlackMessage(channelId, "Here's the final output: " + finalOutputText, filePath);
     }
     }
+    return executionId
   }
   
 
