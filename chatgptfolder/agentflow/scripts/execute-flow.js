@@ -55,6 +55,18 @@ async function executeLLMFlow(flowData, requestType, executionId) {
   
             currentNode.data.output = messageResponse;
             storedResponses[nodeId] = messageResponse;
+
+            // 🌟 **Find the correct Output Node ID**
+            const outputNodeId = findConnectedOutputNode(nodeId, structuredFlow);
+            if (outputNodeId) {
+                console.log(`🔗 Mapping LLM Node ${nodeId} → Output Node ${outputNodeId}`);
+            }
+
+            // 🌟 **Save response with the correct Output Node ID**
+            if (requestType === "browser" && outputNodeId) {
+                await saveExecutionResponse(executionId, outputNodeId, messageResponse);
+            }
+
             updateOutputNodes(structuredFlow, nodeId, messageResponse);
 
             // 🌟 Only store response in MongoDB if request is from browser
@@ -430,6 +442,20 @@ async function saveExecutionResponse(executionId, nodeId, messageResponse) {
     }
   }
   
+  function findConnectedOutputNode(llmNodeId, structuredFlow) {
+    for (const nodeId in structuredFlow) {
+        const node = structuredFlow[nodeId];
+
+        if (node.name === "Output") {
+            const inputConnections = node.inputs?.input_1?.connections?.map(conn => conn.node) || [];
+            if (inputConnections.includes(llmNodeId)) {
+                return nodeId; // ✅ Return the first connected Output Node ID
+            }
+        }
+    }
+    return null; // ❌ No Output Node found
+}
+
   async function cleanupOldResponses() {
     try {
       await fetch('https://j7-magic-tool.vercel.app/api/agentFlowCRUD', {

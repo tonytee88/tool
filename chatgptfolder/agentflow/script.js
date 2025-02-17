@@ -584,8 +584,8 @@ async function startFlowExecution() {
 
   await callBrowserFlow(flowName, channelId, callbackUrl, executionId);
   checkWorkflowStatus(executionId);
+  pollForResponses(executionId);
 
-  // HERE'S THE FINAL ONE I THINK?
 }
 
 async function callBrowserFlow(flowName, channelId, callbackUrl, executionId) {
@@ -642,29 +642,66 @@ function clearOutputNodes() {
   }, 100);
 }
 
-async function checkWorkflowStatus(executionId) {
-  try {
-      const response = await fetch("https://j7-magic-tool.vercel.app/api/slack?operation=get_status", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ executionId })
-      });
+async function updateUIWithResults(executionId) {
+  console.log(`📡 Fetching responses for executionId: ${executionId}`);
 
-      const data = await response.json();
-      console.log(`🔍 Workflow Status for ${executionId}:`, data);
+  const response = await fetch("https://j7-magic-tool.vercel.app/api/agentFlowCRUD", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ operation: "get_responses", executionId })
+  });
 
-      if (data.status === "completed") {
-          console.log("✅ Workflow completed!");
-          updateUIWithResults(executionId); // Call function to update UI
-      } else {
-          console.log(`⏳ Workflow in progress... checking again in 10 sec`);
-          setTimeout(() => checkWorkflowStatus(executionId), 10000);
+  const data = await response.json();
+
+  console.log("📥 Retrieved responses:", data);
+
+  // Now, loop through and update the correct UI blocks
+  data.forEach(response => {
+      const nodeElement = document.querySelector(`#node-${response.nodeId} .output-response`);
+      if (nodeElement) {
+          nodeElement.innerHTML = response.content;
       }
+  });
+
+  console.log("✅ UI updated with responses!");
+}
+
+async function pollForResponses(executionId, maxAttempts = 10, attempt = 1) {
+  console.log(`🔍 Checking MongoDB for Execution ID: ${executionId} (Attempt ${attempt}/${maxAttempts})`);
+
+  try {
+    const response = await fetch("https://j7-magic-tool.vercel.app/api/agentFlowCRUD", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        operation: "get_all_responses", // 🌟 New API operation to get all responses for executionId
+        executionId
+      })
+    });
+
+    const data = await response.json();
+    console.log("📡 Retrieved responses:", data);
+
+    if (data && data.length > 0) {
+      console.log("✅ Responses found! Updating UI...");
+      updateUIWithResults(data); // 🌟 Function to insert responses into the UI
+      return; // Stop polling since we got the responses
+    }
+
+    if (attempt < maxAttempts) {
+      setTimeout(() => pollForResponses(executionId, maxAttempts, attempt + 1), 5000); // Retry every 5s
+    } else {
+      console.warn("⚠️ Max polling attempts reached. Responses may not be available yet.");
+    }
 
   } catch (error) {
-      console.error("❌ Error checking workflow status:", error);
+    console.error("❌ Error fetching responses:", error);
+    if (attempt < maxAttempts) {
+      setTimeout(() => pollForResponses(executionId, maxAttempts, attempt + 1), 5000);
+    }
   }
 }
+
 
 
 
