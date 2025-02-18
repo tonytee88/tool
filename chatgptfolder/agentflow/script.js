@@ -6,8 +6,8 @@ editor.editor_mode = "edit";
 // Track which node is being edited in the modal
 let currentEditNodeId = null;
 let currentZoom = .2; 
-let delayPerNode = 5000;
-let delayBetweenPoll = 7000;
+let delayPerNode = 8000;
+let delayBetweenPoll = 8000;
 
 // Get the modal elements
 const modalOverlay = document.getElementById('modal-overlay');
@@ -290,8 +290,8 @@ function createStartNode(x, y) {
 function createPromptNode(x, y) {
   const nodeId = editor.addNode(
     'Prompt',
-    1, // inputs
-    1, // outputs
+    2, // inputs
+    2, // outputs
     x,
     y,
     'prompt', // CSS class/type
@@ -304,7 +304,7 @@ function createPromptNode(x, y) {
       </div>
     `
   );
-
+  fixInputOutputNodes(nodeId)
   // Attach listeners after the node is created
   setTimeout(() => attachPromptListeners(nodeId), 0);
 }
@@ -322,25 +322,6 @@ function attachPromptListeners(nodeId) {
     editButton.onclick = () => openPromptModal(nodeId);
   }
 }
-
-// function updatePromptContent(value, nodeId, previewDiv) {
-//   const node = editor.getNodeFromId(nodeId);
-//   if (node) {
-//     node.data.promptText = value;
-//     previewDiv.textContent = value.length > 50 
-//       ? value.substring(0, 50) + '...'
-//       : value;
-//   }
-// }
-
-// function updatePromptName(value, nodeId) {
-//   const node = editor.getNodeFromId(nodeId);
-//   if (node) {
-//     node.data.name = value;
-//   }
-// }
-
-// Open the modal for the prompt's big text
 
 function openPromptModal(nodeId) {
   currentEditNodeId = nodeId;
@@ -364,43 +345,13 @@ function openPromptModal(nodeId) {
   document.getElementById('prompt-modal').style.display = 'block';
 }
 
-// function closePromptModal(doSave) {
-//   if (currentEditNodeId !== null && doSave) {
-//     const node = editor.getNodeFromId(currentEditNodeId);
-//     if (node) {
-//       const promptModalNameInput = document.getElementById('prompt-modal-name');
-//       const promptModalTextarea = document.getElementById('prompt-modal-textarea');
-
-//       // Save full input and name to the node
-//       node.data.name = promptModalNameInput.value;
-//       node.data.promptText = promptModalTextarea.value;
-
-//       // Update the node display with capped text
-//       const nodeElement = document.querySelector(`#node-${currentEditNodeId} .df-node-content.block-prompt`);
-//       const nameDisplay = nodeElement.querySelector('.prompt-name-display');
-//       const textDisplay = nodeElement.querySelector('.prompt-text-display');
-
-//       nameDisplay.textContent = node.data.name;
-//       textDisplay.textContent =
-//         node.data.promptText.length > 100
-//           ? node.data.promptText.substring(0, 100) + "..."
-//           : node.data.promptText;
-//     }
-//   }
-
-//   // Hide the modal and overlay
-//   document.getElementById('modal-overlay').style.display = 'none';
-//   document.getElementById('prompt-modal').style.display = 'none';
-//   currentEditNodeId = null;
-// }
-
 // --- LLM NODE ---
 function createLLMNode(x, y) {
   // ✅ Add node first and get its ID
   const nodeId = editor.addNode(
     'LLM Call',
-    1,
-    1,
+    2,
+    2,
     x,
     y,
     'llm',
@@ -427,16 +378,18 @@ function createLLMNode(x, y) {
       dropdown.id = `model-dropdown-${nodeId}`; // ✅ Set correct ID
     }
   }, 100);
+
+  fixInputOutputNodes(nodeId)
 }
 
 
 
 // --- OUTPUT NODE ---
 function createOutputNode(x, y) {
-  editor.addNode(
+  nodeId = editor.addNode(
     'Output',
-    1, // Inputs
-    1, // 1 Output now correctly placed
+    2, // Inputs
+    2, // 1 Output now correctly placed
     x,
     y,
     'output',
@@ -463,7 +416,40 @@ function createOutputNode(x, y) {
       </div>
     `
   );
+  fixInputOutputNodes(nodeId)
 }
+
+  //fixing node positionning
+  function fixInputOutputNodes(nodeId) {
+    const nodeElement = document.querySelector(`#node-${nodeId}`);
+    if (!nodeElement) return;
+  
+    // ✅ Get the actual height of the node
+    const nodeHeight = nodeElement.offsetHeight;
+    const totalHeight = nodeHeight + 2; // ✅ Add 6px spacing
+  
+    console.log(`🔧 Adjusting node ${nodeId} - Height: ${nodeHeight}px, Adjusted Output Position: ${totalHeight}px`);
+  
+    // ✅ Move the second input to the TOP
+    const inputPorts = nodeElement.querySelectorAll(".input");
+    if (inputPorts.length > 1) {
+      inputPorts[1].style.position = "absolute";
+      inputPorts[1].style.top = "-28px"; // Move it above the node
+      inputPorts[1].style.left = "50%"; // Center it horizontally
+      inputPorts[1].style.transform = "translateX(-50%)";
+    }
+  
+    // ✅ Move the second output to the correct position (below the node)
+    const outputPorts = nodeElement.querySelectorAll(".output");
+    if (outputPorts.length > 1) {
+      outputPorts[1].style.position = "absolute";
+      outputPorts[1].style.top = `${totalHeight}px`; // Move it below the node
+      outputPorts[1].style.left = "50%"; // Center it horizontally
+      outputPorts[1].style.transform = "translateX(-50%)";
+    }
+  }
+  
+
 
 
 function attachOutputListeners(nodeId) {
