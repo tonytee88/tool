@@ -447,3 +447,22 @@
     width: 90%; /* Full width on mobile */
   }
 }
+
+.status-badge {
+  position: absolute;
+  top: 88px;
+  right: 15px;
+  background-color: #ff9800;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.3s ease;
+}
+
+#status-bubble.completed {
+  background-color: #4CAF50; /* ✅ Green when done */
+  color: white;
+}

@@ -6,6 +6,8 @@ editor.editor_mode = "edit";
 // Track which node is being edited in the modal
 let currentEditNodeId = null;
 let currentZoom = .2; 
+let delayPerNode = 5000;
+let delayBetweenPoll = 7000;
 
 // Get the modal elements
 const modalOverlay = document.getElementById('modal-overlay');
@@ -105,7 +107,7 @@ async function saveFlow() {
         const promptTextElement = nodeElement.querySelector('.prompt-text-display');
         if (promptTextElement) {
           node.data.promptText = promptTextElement.textContent.trim(); // ✅ Store updated prompt text
-          console.log(`📥 Saved prompt text for Node ${node.id}:`, node.data.promptText);
+          //console.log(`📥 Saved prompt text for Node ${node.id}:`, node.data.promptText);
         }
       }
     }
@@ -188,9 +190,12 @@ async function openLoadFlowModal() {
 
   
 // Function to close the load flow modal
-function closeLoadFlowModal() {
+function closeLoadFlowModal(selectedFlowId) {
   document.getElementById('load-modal').style.display = 'none';
   document.getElementById('modal-overlay').style.display = 'none';
+  document.getElementById('flow-name').value = selectedFlowId
+
+
 }
 
 function toDrawflowFormat(apiResponse) {
@@ -260,7 +265,7 @@ async function loadSelectedFlow() {
       });
     }, 100);
     reattachAllListeners();
-    closeLoadFlowModal();
+    closeLoadFlowModal(selectedFlowId);
   } catch (error) {
     console.error('❌ Error loading flow:', error);
     alert(`Failed to load flow: ${error.message}`);
@@ -569,22 +574,28 @@ function closePromptModal(doSave) {
 //flow execution!
 // =========================================================================================================
 
+
 async function startFlowExecution() {
   // Ensure the flow is saved and UI outputs are cleared.
   await saveFlow();
   storedResponses = {}; // Clear previous responses
   clearOutputNodes();
+  var total = getTotalResponseCount();
 
   const flowName = document.getElementById('flow-name').value.trim() || 'New Flow 01z';
-  const executionId = `exec_${Date.now()}`; // 🔥 Generate unique execution ID
-  console.log("🚀 Executing flow:", flowName);
+  const delay = addDelayToPolling();
 
+  updateStatusBubble(0, total); // 🌟 Initialize status bubble
+  document.getElementById("status-bubble").style.opacity = "1"; // 🌟 Make it visible
+
+  const executionId = `exec_${Date.now()}`; // 🔥 Generate unique execution ID
   const channelId = "nochan"; 
   const callbackUrl = "https://j7-magic-tool.vercel.app/api/slack?operation=receive_response";
+  
 
   await callBrowserFlow(flowName, channelId, callbackUrl, executionId);
-  checkWorkflowStatus(executionId);
-  pollForResponses(executionId);
+  
+  setTimeout(() => pollForResponses(executionId), delay);
 
 }
 
@@ -615,6 +626,18 @@ async function callBrowserFlow(flowName, channelId, callbackUrl, executionId) {
   }
 }
 
+function addDelayToPolling() {
+  // ✅ Count LLM Nodes to determine delay
+  const flowData = editor.export();
+  const nodeEntries = Object.entries(flowData.drawflow.Home.data);
+  const llmCount = nodeEntries.filter(([_, node]) => node.name === "LLM Call").length;
+  console.log("adddelaypolling function count : " + llmCount);
+  
+  const delayBeforePolling = llmCount * delayPerNode; // 🌟 3 sec per LLM Call
+  console.log(`⏳ Waiting ${delayBeforePolling / 1000} seconds before polling responses...`);
+  return delayBeforePolling
+}
+
 function clearOutputNodes() {
   const flowData = editor.export();
   const allNodes = flowData.drawflow.Home.data;
@@ -642,65 +665,149 @@ function clearOutputNodes() {
   }, 100);
 }
 
-async function updateUIWithResults(executionId) {
-  console.log(`📡 Fetching responses for executionId: ${executionId}`);
+async function updateUIWithResults(responses) {
+  console.log(`📡 Updating UI with ${responses.length} responses...`);
 
-  const response = await fetch("https://j7-magic-tool.vercel.app/api/agentFlowCRUD", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ operation: "get_responses", executionId })
-  });
+  if (!Array.isArray(responses) || responses.length === 0) {
+      console.warn("⚠️ No valid responses received for UI update.");
+      return;
+  }
 
-  const data = await response.json();
+  responses.forEach(({ nodeId, content }) => {
+      const nodeElement = document.querySelector(`#node-${nodeId} .output-response`);
 
-  console.log("📥 Retrieved responses:", data);
-
-  // Now, loop through and update the correct UI blocks
-  data.forEach(response => {
-      const nodeElement = document.querySelector(`#node-${response.nodeId} .output-response`);
       if (nodeElement) {
-          nodeElement.innerHTML = response.content;
+          console.log(`🔄 Updating UI for Output Node ${nodeId}`);
+          nodeElement.innerHTML = formatTextAsHTML(content); // ✅ Properly format & update UI
+      } else {
+          console.warn(`⚠️ UI Element not found for Node ID ${nodeId}.`);
       }
   });
 
   console.log("✅ UI updated with responses!");
 }
 
+function getTotalResponseCount (){
+    const flowData = editor.export();
+    const nodeEntries = Object.entries(flowData.drawflow.Home.data);
+    const llmCount = nodeEntries.filter(([_, node]) => node.name === "LLM Call").length;
+    const outputCount = nodeEntries.filter(([_, node]) => node.name === "Output").length;
+    const totalllmoutput = llmCount + outputCount;
+    console.log("total count is : " + totalllmoutput);
+  return totalllmoutput  
+}
+
 async function pollForResponses(executionId, maxAttempts = 10, attempt = 1) {
   console.log(`🔍 Checking MongoDB for Execution ID: ${executionId} (Attempt ${attempt}/${maxAttempts})`);
-
+  var total = getTotalResponseCount();
   try {
-    const response = await fetch("https://j7-magic-tool.vercel.app/api/agentFlowCRUD", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        operation: "get_all_responses", // 🌟 New API operation to get all responses for executionId
-        executionId
-      })
-    });
+      const response = await fetch("https://j7-magic-tool.vercel.app/api/agentFlowCRUD", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+              operation: "get_all_responses",
+              executionId
+          })
+      });
 
-    const data = await response.json();
-    console.log("📡 Retrieved responses:", data);
+      const data = await response.json();
+      console.log("📡 Retrieved responses:", data);
 
-    if (data && data.length > 0) {
-      console.log("✅ Responses found! Updating UI...");
-      updateUIWithResults(data); // 🌟 Function to insert responses into the UI
-      return; // Stop polling since we got the responses
-    }
+      const receivedResponses = data.length; // ✅ Count responses received
+      updateStatusBubble(receivedResponses, total); // 🌟 Update status
 
-    if (attempt < maxAttempts) {
-      setTimeout(() => pollForResponses(executionId, maxAttempts, attempt + 1), 5000); // Retry every 5s
-    } else {
-      console.warn("⚠️ Max polling attempts reached. Responses may not be available yet.");
-    }
+      // ✅ Extract output nodes
+      const flowData = editor.export();
+      const outputNodes = Object.entries(flowData.drawflow.Home.data)
+          .filter(([_, node]) => node.name === "Output")
+          .map(([nodeId, _]) => nodeId);
+
+      console.log(`🔎 Tracking ${outputNodes.length} Output Nodes:`, outputNodes);
+
+      // ✅ Check if **all** Output Nodes have responses
+      const allOutputsReady = outputNodes.every(nodeId =>
+          data.some(response => response.nodeId === nodeId && response.content !== null)
+      );
+
+      if (allOutputsReady) {
+          console.log("✅ All Output Nodes received responses! Updating UI...");
+          updateUIWithResults(data);
+
+          console.log("🗑️ Cleaning up responses from DB...");
+          await fetch("https://j7-magic-tool.vercel.app/api/agentFlowCRUD", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                  operation: "delete_response",
+                  executionId
+              })
+          });
+
+          console.log("✅ Responses deleted successfully!");
+
+          // 🌟 Track Execution Count & Cleanup Old Data Every 20 Runs
+          console.log("📊 Updating execution count in MongoDB...");
+          await trackExecutionAndCleanup();
+
+          return; // 🌟 Stop polling!
+      }
+
+      if (attempt < maxAttempts) {
+          console.log(`⏳ Responses not complete yet... Retrying in 8s`);
+          setTimeout(() => pollForResponses(executionId, maxAttempts, attempt + 1), delayBetweenPoll);
+      } else {
+          console.warn("⚠️ Max polling attempts reached. Some responses may still be missing.");
+      }
 
   } catch (error) {
-    console.error("❌ Error fetching responses:", error);
-    if (attempt < maxAttempts) {
-      setTimeout(() => pollForResponses(executionId, maxAttempts, attempt + 1), 5000);
-    }
+      console.error("❌ Error fetching responses:", error);
+      if (attempt < maxAttempts) {
+          setTimeout(() => pollForResponses(executionId, maxAttempts, attempt + 1), 5000);
+      }
   }
 }
+
+
+async function trackExecutionAndCleanup() {
+  try {
+      const response = await fetch("https://j7-magic-tool.vercel.app/api/agentFlowCRUD", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+              operation: "track_execution",
+              requestType_count: "execution_browser"
+          })
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+          console.error("❌ Error from API:", data.error);
+          return;
+      }
+
+      const executionCount = data.execution_browser;
+      console.log(`📊 Execution Count Updated: ${executionCount}`);
+      console.log("📊 If count is a multiple of 20, cleanup has been triggered!");
+
+  } catch (error) {
+      console.error("❌ Error updating execution count or cleaning up old data:", error);
+  }
+}
+
+function updateStatusBubble(received, total) {
+  const statusBubble = document.getElementById("status-bubble");
+  if (!statusBubble) return;
+
+  statusBubble.innerHTML = `${received} / ${total}`; // 🔥 Update text
+
+  if (received >= total) {
+    statusBubble.classList.add("completed"); // ✅ Add completed state if all responses are received
+  } else {
+    statusBubble.classList.remove("completed");
+  }
+}
+
 
 
 

@@ -456,23 +456,5 @@ async function saveExecutionResponse(executionId, nodeId, messageResponse) {
     return null; // ❌ No Output Node found
 }
 
-  async function cleanupOldResponses() {
-    try {
-      await fetch('https://j7-magic-tool.vercel.app/api/agentFlowCRUD', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          operation: "cleanup_old", // 🌟 Trigger automatic cleanup
-        }),
-      });
-  
-      console.log("🧹 Old responses cleaned up successfully!");
-    } catch (error) {
-      console.error("❌ Error during cleanup:", error);
-    }
-  }
-  
-
-
 // ✅ Export function
 module.exports = executeLLMFlow;
