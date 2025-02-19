@@ -263,7 +263,15 @@ async function loadSelectedFlow() {
           }
         }
       });
-    }, 100);
+      Object.values(drawflowData.drawflow.Home.data).forEach(node => {
+        fixInputOutputNodes(node.id);
+        
+        // Optional: Add slight delay for complex nodes
+        if (node.inputs > 1 || node.outputs > 1) {
+          setTimeout(() => fixInputOutputNodes(node.id), 50);
+        }
+      })
+    }, 40);
     reattachAllListeners();
     closeLoadFlowModal(selectedFlowId);
   } catch (error) {
@@ -428,8 +436,6 @@ function createOutputNode(x, y) {
     const nodeHeight = nodeElement.offsetHeight;
     const totalHeight = nodeHeight + 2; // ✅ Add 6px spacing
   
-    console.log(`🔧 Adjusting node ${nodeId} - Height: ${nodeHeight}px, Adjusted Output Position: ${totalHeight}px`);
-  
     // ✅ Move the second input to the TOP
     const inputPorts = nodeElement.querySelectorAll(".input");
     if (inputPorts.length > 1) {
@@ -449,9 +455,6 @@ function createOutputNode(x, y) {
     }
   }
   
-
-
-
 function attachOutputListeners(nodeId) {
   setTimeout(() => { // Add slight delay to ensure elements exist
     document.addEventListener("click", function (event) {
@@ -472,24 +475,6 @@ function attachOutputListeners(nodeId) {
     })
 })};
 
-// Optional: Add a method to list available flows
-// async function listFlows() {
-//   try {
-//     const response = await fetch('https://j7-magic-tool.vercel.app/api/agentFlowCRUD/list', {
-//       method: 'GET'
-//     });
-
-//     if (!response.ok) {
-//       throw new Error('Failed to retrieve flows');
-//     }
-
-//     const flows = await response.json();
-//     // Implement UI to display and select flows
-//     displayFlowsList(flows);
-//   } catch (error) {
-//     console.error('Error listing flows:', error);
-//   }
-// }
 
 function reattachAllListeners() {
   // Iterate through all nodes in the flow

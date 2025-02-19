@@ -71,7 +71,7 @@ async function main() {
     await sendSlackMessage(channelId, `❌ Error fetching drawflow for *${flowId}*. Check logs.`);
     process.exit(1);
   }
-  return executionId
+  return
 }
 
 // ✅ Uploads a file to Slack
