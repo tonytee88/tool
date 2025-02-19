@@ -290,8 +290,8 @@ function createStartNode(x, y) {
 function createPromptNode(x, y) {
   const nodeId = editor.addNode(
     'Prompt',
-    2, // inputs
-    2, // outputs
+    1, // inputs
+    1, // outputs
     x,
     y,
     'prompt', // CSS class/type
@@ -350,8 +350,8 @@ function createLLMNode(x, y) {
   // ✅ Add node first and get its ID
   const nodeId = editor.addNode(
     'LLM Call',
-    2,
-    2,
+    1,
+    1,
     x,
     y,
     'llm',
@@ -388,8 +388,8 @@ function createLLMNode(x, y) {
 function createOutputNode(x, y) {
   nodeId = editor.addNode(
     'Output',
-    2, // Inputs
-    2, // 1 Output now correctly placed
+    1, // Inputs
+    1, // 1 Output now correctly placed
     x,
     y,
     'output',
