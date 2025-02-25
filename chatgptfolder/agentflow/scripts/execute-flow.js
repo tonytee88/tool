@@ -79,15 +79,14 @@ async function executeLLMFlow(flowData, requestType, executionId) {
       } else if (currentNode.name === 'Output') {
         console.log(`📤 Processing Output Node: ${nodeId}`);
       
-        const inputConnections = currentNode.inputs.input_1?.connections?.map(conn => conn.node) || [];
+        const inputConnections = currentNode.inputs.input_1.connections.map(conn => conn.node);
         const linkedLLMNode = inputConnections.find(id => storedResponses[id]);
       
         if (linkedLLMNode) {
           const formattedResponse = formatTextAsHTML(storedResponses[linkedLLMNode]);
           currentNode.data.output = formattedResponse;
       
-          console.log(`✅ Output Node (${nodeId}) Displaying:`, formattedResponse.substring(0, 20) + "...");
-          updateOutputNodes(structuredFlow, nodeId, formattedResponse);
+          console.log(`✅ Output Node (${nodeId}) Displaying:`, formattedResponse);
         } else {
           console.warn(`⚠️ Output Node (${nodeId}) has no valid LLM input.`);
         }
@@ -350,8 +349,6 @@ return formattedText;
 }
 
 function updateOutputNodes(structuredFlow, nodeId, responseText) {
-  // ✅ Extract the actual flowData from the array
-  //const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data;
 
   if (!structuredFlow || !structuredFlow[nodeId]) {
     console.error(`❌ Node ${nodeId} not found in flowData`);
@@ -361,22 +358,22 @@ function updateOutputNodes(structuredFlow, nodeId, responseText) {
   // ✅ Update output in the object-based flowData
   structuredFlow[nodeId].data.output = responseText;
 
-  const outputConnections = [
-    ...(structuredFlow[nodeId].outputs?.output_1?.connections || []),
-    ...(structuredFlow[nodeId].outputs?.output_2?.connections || []),
-  ];
+  // const outputConnections = [
+  //   ...(structuredFlow[nodeId].outputs?.output_1?.connections || []),
+  //   ...(structuredFlow[nodeId].outputs?.output_2?.connections || []),
+  // ];
 
-  outputConnections.forEach(conn => {
-    const connectedNodeId = conn.node;
-    const connectedNodeElement = document.getElementById(`node-${connectedNodeId}`);
+  // outputConnections.forEach(conn => {
+  //   const connectedNodeId = conn.node;
+  //   const connectedNodeElement = document.getElementById(`node-${connectedNodeId}`);
 
-    if (connectedNodeElement) {
-      const outputDiv = connectedNodeElement.querySelector('.output-response');
-      if (outputDiv) {
-        outputDiv.innerHTML = formatTextAsHTML(responseText);
-      }
-    }
-  });
+  //   if (connectedNodeElement) {
+  //     const outputDiv = connectedNodeElement.querySelector('.output-response');
+  //     if (outputDiv) {
+  //       outputDiv.innerHTML = formatTextAsHTML(responseText);
+  //     }
+  //   }
+  // });
 
   console.log(`✅ Updated output for Node ${nodeId}`);
 }
