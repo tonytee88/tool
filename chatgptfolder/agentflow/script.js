@@ -298,8 +298,8 @@ function createStartNode(x, y) {
 function createPromptNode(x, y) {
   const nodeId = editor.addNode(
     'Prompt',
-    1, // inputs
-    1, // outputs
+    2, // inputs
+    2, // outputs
     x,
     y,
     'prompt', // CSS class/type
@@ -358,8 +358,8 @@ function createLLMNode(x, y) {
   // ✅ Add node first and get its ID
   const nodeId = editor.addNode(
     'LLM Call',
-    1,
-    1,
+    2,
+    2,
     x,
     y,
     'llm',
@@ -378,7 +378,7 @@ function createLLMNode(x, y) {
       </div>
     `
   );
-
+  fixInputOutputNodes(nodeId)
   // ✅ After node is created, set correct ID for dropdown
   setTimeout(() => {
     const dropdown = document.querySelector(`#node-${nodeId} .model-dropdown`);
@@ -387,7 +387,7 @@ function createLLMNode(x, y) {
     }
   }, 100);
 
-  fixInputOutputNodes(nodeId)
+  
 }
 
 

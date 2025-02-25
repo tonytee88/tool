@@ -1,0 +1,1 @@
+code2prompt /Users/tonytran/Coding/chatgptfolder/agentflow --tokens --output /Users/tonytran/Coding/chatgptfolder/agentflowcodebase.txt

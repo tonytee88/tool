@@ -78,21 +78,20 @@ async function executeLLMFlow(flowData, requestType, executionId) {
         }
       } else if (currentNode.name === 'Output') {
         console.log(`📤 Processing Output Node: ${nodeId}`);
-  
+      
         const inputConnections = currentNode.inputs.input_1?.connections?.map(conn => conn.node) || [];
         const linkedLLMNode = inputConnections.find(id => storedResponses[id]);
-  
+      
         if (linkedLLMNode) {
           const formattedResponse = formatTextAsHTML(storedResponses[linkedLLMNode]);
           currentNode.data.output = formattedResponse;
-  
+      
           console.log(`✅ Output Node (${nodeId}) Displaying:`, formattedResponse.substring(0, 20) + "...");
           updateOutputNodes(structuredFlow, nodeId, formattedResponse);
         } else {
           console.warn(`⚠️ Output Node (${nodeId}) has no valid LLM input.`);
         }
       }
-    }
   
     // ✅ Compile final output from all terminal nodes
     const finalOutputText = compileFinalOutputs(structuredFlow);
@@ -127,55 +126,56 @@ async function waitForInputs(nodeId, flowData) {
 
 // ✅ Ensure inputs are ready before processing
 function areInputsReady(nodeId, structuredFlow) {
-    // ✅ Extract correct structure
-    //const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data;
-  
-    if (!structuredFlow || !structuredFlow[nodeId]) {
-      console.error(`❌ Node ${nodeId} is missing in flowData!`);
+  // ✅ Extract correct structure
+  //const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data;
+
+  if (!structuredFlow || !structuredFlow[nodeId]) {
+    console.error(`❌ Node ${nodeId} is missing in flowData!`);
+    return false;
+  }
+
+  const node = structuredFlow[nodeId];
+
+  const inputConnections = [
+    ...(Object.values(node.inputs?.input_1?.connections || []).map(conn => conn.node)),
+    ...(Object.values(node.inputs?.input_2?.connections || []).map(conn => conn.node)),
+  ];
+
+  for (const inputNodeId of inputConnections) {
+    const inputNode = structuredFlow[inputNodeId];
+
+    if (!inputNode) {
+      console.error(`❌ Node ${inputNodeId} is missing in flowData!`);
       return false;
     }
-  
-    const node = structuredFlow[nodeId];
-  
-    const inputConnections = Object.values(node.inputs || {})
-      .flatMap(input => input.connections || [])
-      .map(conn => conn.node);
-  
-    for (const inputNodeId of inputConnections) {
-      const inputNode = structuredFlow[inputNodeId];
-  
-      if (!inputNode) {
-        console.error(`❌ Node ${inputNodeId} is missing in flowData!`);
+
+    // ✅ Read directly from the saved flowData, not the UI
+    const promptData = inputNode.data?.promptText?.trim() || "";
+    const outputData = inputNode.data?.output?.trim() || "";
+
+    console.log(`🔍 Checking inputs for Node ${inputNodeId}:`);
+    console.log("✅ Output Data:", outputData.substring(0, 20) + "...");
+    console.log("✅ Prompt Data:", promptData.substring(0, 20) + "...");
+
+    if (inputNode.name === "Prompt") {
+      if (!promptData) {
+        console.log(`❌ Node ${inputNodeId} is a Prompt but has no text.`);
         return false;
       }
-  
-      // ✅ Read directly from the saved flowData, not the UI
-      const promptData = inputNode.data?.promptText?.trim() || "";
-      const outputData = inputNode.data?.output?.trim() || "";
-  
-      console.log(`🔍 Checking inputs for Node ${inputNodeId}:`);
-      console.log("✅ Output Data:", outputData.substring(0, 20) + "...");
-      console.log("✅ Prompt Data:", promptData.substring(0, 20) + "...");
-  
-      if (inputNode.name === "Prompt") {
-        if (!promptData) {
-          console.log(`❌ Node ${inputNodeId} is a Prompt but has no text.`);
-          return false;
-        }
-        console.log(`✅ Node ${inputNodeId} is a Prompt. Accepting.`);
-        continue;
-      } else if (inputNode.name === "LLM Call" || inputNode.name === "Output") {
-        // ❌ LLM and Output nodes must have a valid output
-        if (!outputData || outputData === "Waiting for response...") {
-          console.log(`❌ Node ${nodeId} is waiting for LLM/Output from Node ${inputNodeId}`);
-          return false;
-        }
+      console.log(`✅ Node ${inputNodeId} is a Prompt. Accepting.`);
+      continue;
+    } else if (inputNode.name === "LLM Call" || inputNode.name === "Output") {
+      // ❌ LLM and Output nodes must have a valid output
+      if (!outputData || outputData === "Waiting for response...") {
+        console.log(`❌ Node ${nodeId} is waiting for LLM/Output from Node ${inputNodeId}`);
+        return false;
       }
     }
-  
-    console.log(`✅ Node ${nodeId} is ready for execution.`);
-    return true;
   }
+
+  console.log(`✅ Node ${nodeId} is ready for execution.`);
+  return true;
+}
   
   
 
@@ -276,55 +276,57 @@ function determineExecutionOrder(structuredFlow) {
 
   
 function getSortedInputs(nodeId, structuredFlow) {
+  if (!structuredFlow || !structuredFlow[nodeId]) {
+    console.error(`❌ Node ${nodeId} not found in flowData!`);
+    return "";
+  }
 
-    if (!structuredFlow || !structuredFlow[nodeId]) {
-        console.error(`❌ Node ${nodeId} not found in flowData!`);
-        return "";
+  const node = structuredFlow[nodeId];
+  console.log("Processing Node ID:", nodeId);
+
+  const inputConnections = [
+    ...(node.inputs?.input_1?.connections || []),
+    ...(node.inputs?.input_2?.connections || []),
+  ];
+
+  if (inputConnections.length === 0) {
+    // ✅ Read from stored flowData instead of the browser DOM
+    return node.data?.promptText?.trim() || "";
+  }
+
+  // ✅ Gather all connected input nodes and read from `flowData`
+  const connectedNodes = inputConnections.map(conn => {
+    const connectedNodeId = conn.node;
+    const connectedNode = structuredFlow[connectedNodeId];
+
+    if (!connectedNode) {
+      console.warn(`⚠️ Connected Node ${connectedNodeId} is missing!`);
+      return null;
     }
 
-    const node = structuredFlow[nodeId];
-    console.log("Processing Node ID:", nodeId);
+    let connectedText = "";
 
-    const inputConnections = node.inputs?.input_1?.connections || [];
-
-    if (inputConnections.length === 0) {
-        // ✅ Read from stored flowData instead of the browser DOM
-        return node.data?.promptText?.trim() || "";
+    if (connectedNode.name === "Prompt") {
+      connectedText = connectedNode.data?.promptText?.trim() || "";
+    } else if (connectedNode.name === "Output") {
+      connectedText = connectedNode.data?.output?.trim() || "";
+    } else if (connectedNode.name === "LLM Call") {
+      connectedText = connectedNode.data?.output?.trim() || "";
     }
 
-    // ✅ Gather all connected input nodes and read from `flowData`
-    const connectedNodes = inputConnections.map(conn => {
-        const connectedNodeId = conn.node;
-        const connectedNode = structuredFlow[connectedNodeId];
+    return {
+      id: connectedNodeId,
+      x: connectedNode.pos_x,
+      y: connectedNode.pos_y,
+      text: connectedText,
+    };
+  }).filter(Boolean);
 
-        if (!connectedNode) {
-            console.warn(`⚠️ Connected Node ${connectedNodeId} is missing!`);
-            return null;
-        }
+  // ✅ Sort inputs left to right, top to bottom
+  connectedNodes.sort((a, b) => (a.y === b.y ? a.x - b.x : a.y - b.y));
 
-        let connectedText = "";
-
-        if (connectedNode.name === "Prompt") {
-            connectedText = connectedNode.data?.promptText?.trim() || "";
-        } else if (connectedNode.name === "Output") {
-            connectedText = connectedNode.data?.output?.trim() || "";
-        } else if (connectedNode.name === "LLM Call") {
-            connectedText = connectedNode.data?.output?.trim() || "";
-        }
-
-        return {
-            id: connectedNodeId,
-            x: connectedNode.pos_x,
-            y: connectedNode.pos_y,
-            text: connectedText,
-        };
-    }).filter(Boolean);
-
-    // ✅ Sort inputs left to right, top to bottom
-    connectedNodes.sort((a, b) => (a.y === b.y ? a.x - b.x : a.y - b.y));
-
-    // ✅ Combine all inputs into one string
-    return connectedNodes.map(node => node.text).join(" and ");
+  // ✅ Combine all inputs into one string
+  return connectedNodes.map(node => node.text).join(" and ");
 }
 
 
@@ -347,19 +349,36 @@ return formattedText;
 }
 
 function updateOutputNodes(structuredFlow, nodeId, responseText) {
-    // ✅ Extract the actual flowData from the array
-    //const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data;
-  
-    if (!structuredFlow || !structuredFlow[nodeId]) {
-      console.error(`❌ Node ${nodeId} not found in flowData`);
-      return;
-    }
-  
-    // ✅ Update output in the object-based flowData
-    structuredFlow[nodeId].data.output = responseText;
-  
-    console.log(`✅ Updated output for Node ${nodeId}`);
+  // ✅ Extract the actual flowData from the array
+  //const structuredFlow = flowData[0]?.flowData?.drawflow?.Home?.data;
+
+  if (!structuredFlow || !structuredFlow[nodeId]) {
+    console.error(`❌ Node ${nodeId} not found in flowData`);
+    return;
   }
+
+  // ✅ Update output in the object-based flowData
+  structuredFlow[nodeId].data.output = responseText;
+
+  const outputConnections = [
+    ...(structuredFlow[nodeId].outputs?.output_1?.connections || []),
+    ...(structuredFlow[nodeId].outputs?.output_2?.connections || []),
+  ];
+
+  outputConnections.forEach(conn => {
+    const connectedNodeId = conn.node;
+    const connectedNodeElement = document.getElementById(`node-${connectedNodeId}`);
+
+    if (connectedNodeElement) {
+      const outputDiv = connectedNodeElement.querySelector('.output-response');
+      if (outputDiv) {
+        outputDiv.innerHTML = formatTextAsHTML(responseText);
+      }
+    }
+  });
+
+  console.log(`✅ Updated output for Node ${nodeId}`);
+}
     
 function markNodeAsError(flowData, nodeId, errorMessage) {
 if (!flowData[nodeId]) {
@@ -426,19 +445,19 @@ async function saveExecutionResponse(executionId, nodeId, messageResponse) {
     }
   }
   
-// 🌟 Updated to handle new input and output connections
-function findConnectedOutputNode(llmNodeId, structuredFlow) {
-  for (const nodeId in structuredFlow) {
+  function findConnectedOutputNode(llmNodeId, structuredFlow) {
+    for (const nodeId in structuredFlow) {
       const node = structuredFlow[nodeId];
       if (node.name === "Output") {
-          const inputConnections = Object.values(node.inputs || {}).flatMap(input => input.connections.map(conn => conn.node));
-          if (inputConnections.includes(llmNodeId)) {
-              return nodeId; // 🌟 Now dynamically identifying the correct output node
-          }
+        const inputConnections = Object.values(node.inputs || {})
+          .flatMap(input => input.connections.map(conn => conn.node));
+        if (inputConnections.includes(llmNodeId)) {
+          return nodeId; // 🌟 Now dynamically identifying the correct output node
+        }
       }
+    }
+    return null;
   }
-  return null;
-}
 
 // ✅ Export functiona
 module.exports = executeLLMFlow;
