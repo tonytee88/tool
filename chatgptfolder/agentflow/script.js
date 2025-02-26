@@ -1,9 +1,24 @@
-import Drawflow from 'drawflow';
-
 // Initialize Drawflow
 const editor = new Drawflow(document.getElementById("drawflow"));
 editor.start();
 editor.editor_mode = "edit";
+editor.moveNodeToPosition = function(nodeId, x, y) {
+  if (this.drawflow.drawflow.Home.data[nodeId]) {
+    // Update the node's position in the data model
+    this.drawflow.drawflow.Home.data[nodeId].pos_x = x;
+    this.drawflow.drawflow.Home.data[nodeId].pos_y = y;
+    
+    // Update the node's position in the DOM
+    const nodeElement = document.getElementById(`node-${nodeId}`);
+    if (nodeElement) {
+      nodeElement.style.top = `${y}px`;
+      nodeElement.style.left = `${x}px`;
+    }
+    
+    // Redraw connections if needed
+    this.updateConnectionNodes(`node-${nodeId}`);
+  }
+};
 
 // Track which node is being edited in the modal
 let currentEditNodeId = null;
@@ -265,6 +280,7 @@ async function loadSelectedFlow() {
     setTimeout(() => {
       Object.values(drawflowData.drawflow.Home.data).forEach(node => {
         editor.moveNodeToPosition(node.id, node.pos_x + 1, node.pos_y + 1);
+        fixInputOutputNodes(node.id)
       });
     }, 100);
 
