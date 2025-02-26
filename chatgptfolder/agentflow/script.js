@@ -1,3 +1,5 @@
+import Drawflow from 'drawflow';
+
 // Initialize Drawflow
 const editor = new Drawflow(document.getElementById("drawflow"));
 editor.start();
@@ -252,7 +254,28 @@ async function loadSelectedFlow() {
     const drawflowData = toDrawflowFormat(apiResponse);
     editor.clear();
     editor.import(drawflowData);
-    // ✅ Restore the selected model for each LLM Call node
+
+    // Store the original positions of the nodes
+    const originalPositions = {};
+    Object.values(drawflowData.drawflow.Home.data).forEach(node => {
+      originalPositions[node.id] = { x: node.pos_x, y: node.pos_y };
+    });
+
+    // Move the nodes slightly to trigger the UI update
+    setTimeout(() => {
+      Object.values(drawflowData.drawflow.Home.data).forEach(node => {
+        editor.moveNodeToPosition(node.id, node.pos_x + 1, node.pos_y + 1);
+      });
+    }, 100);
+
+    // Move the nodes back to their original positions
+    setTimeout(() => {
+      Object.entries(originalPositions).forEach(([nodeId, { x, y }]) => {
+        editor.moveNodeToPosition(nodeId, x, y);
+      });
+    }, 200);
+
+    // Restore the selected model for each LLM Call node
     setTimeout(() => {
       Object.values(drawflowData.drawflow.Home.data).forEach(node => {
         if (node.name === "LLM Call") {
@@ -263,15 +286,7 @@ async function loadSelectedFlow() {
           }
         }
       });
-      Object.values(drawflowData.drawflow.Home.data).forEach(node => {
-        fixInputOutputNodes(node.id);
-        
-        // Optional: Add slight delay for complex nodes
-        if (node.inputs > 1 || node.outputs > 1) {
-          setTimeout(() => fixInputOutputNodes(node.id), 50);
-        }
-      })
-    }, 40);
+      }, 40);
     reattachAllListeners();
     closeLoadFlowModal(selectedFlowId);
   } catch (error) {
@@ -432,11 +447,11 @@ function createOutputNode(x, y) {
     const nodeElement = document.querySelector(`#node-${nodeId}`);
     if (!nodeElement) return;
   
-    // ✅ Get the actual height of the node
+    // Get the actual height of the node
     const nodeHeight = nodeElement.offsetHeight;
-    const totalHeight = nodeHeight + 2; // ✅ Add 6px spacing
+    const totalHeight = nodeHeight + 2; // Add 6px spacing
   
-    // ✅ Move the second input to the TOP
+    // Move the second input to the TOP
     const inputPorts = nodeElement.querySelectorAll(".input");
     if (inputPorts.length > 1) {
       inputPorts[1].style.position = "absolute";
@@ -445,7 +460,7 @@ function createOutputNode(x, y) {
       inputPorts[1].style.transform = "translateX(-50%)";
     }
   
-    // ✅ Move the second output to the correct position (below the node)
+    // Move the second output to the correct position (below the node)
     const outputPorts = nodeElement.querySelectorAll(".output");
     if (outputPorts.length > 1) {
       outputPorts[1].style.position = "absolute";

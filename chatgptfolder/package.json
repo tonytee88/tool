@@ -15,6 +15,7 @@
   "dependencies": {
     "@types/google-apps-script": "^1.0.63",
     "dotenv": "^16.3.1",
+    "drawflow": "^0.0.60",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "reactflow": "^11.11.4"
