@@ -53,23 +53,22 @@ async function executeLLMFlow(flowData, requestType, executionId) {
             storedResponses[nodeId] = messageResponse;
 
             // 🌟 **Find the correct Output Node ID**
-            const outputNodeId = findConnectedOutputNode(nodeId, structuredFlow);
-            if (outputNodeId) {
-                console.log(`🔗 Mapping LLM Node ${nodeId} → Output Node ${outputNodeId}`);
-            }
+            // Find all connected output nodes
+            const outputNodeIds = findConnectedOutputNodes(nodeId, structuredFlow);
+            console.log(`🔗 Found ${outputNodeIds.length} output nodes connected to LLM Node ${nodeId}`);
 
-            // 🌟 **Save response with the correct Output Node ID**
-            if (requestType === "browser" && outputNodeId) {
-                await saveExecutionResponse(executionId, outputNodeId, messageResponse);
-            }
-
-            updateOutputNodes(structuredFlow, nodeId, messageResponse);
-
-            // 🌟 Only store response in MongoDB if request is from browser
+            // Save response for each connected output node
             if (requestType === "browser") {
-                await saveExecutionResponse(executionId, nodeId, messageResponse);
-                //console.log("stored with executionId, nodeId, messageResponse : ",executionId, nodeId, messageResponse)
+              // Store for the LLM node itself
+              await saveExecutionResponse(executionId, nodeId, messageResponse);
+              
+              // Store for each connected output node
+              for (const outputId of outputNodeIds) {
+                console.log(`📤 Storing response for Output Node ${outputId}`);
+                await saveExecutionResponse(executionId, outputId, messageResponse);
+              }
             }
+            updateOutputNodes(structuredFlow, nodeId, messageResponse);
 
           } catch (error) {
             console.error(`❌ LLM Call Node (${nodeId}) Error:`, error);
@@ -358,23 +357,6 @@ function updateOutputNodes(structuredFlow, nodeId, responseText) {
   // ✅ Update output in the object-based flowData
   structuredFlow[nodeId].data.output = responseText;
 
-  // const outputConnections = [
-  //   ...(structuredFlow[nodeId].outputs?.output_1?.connections || []),
-  //   ...(structuredFlow[nodeId].outputs?.output_2?.connections || []),
-  // ];
-
-  // outputConnections.forEach(conn => {
-  //   const connectedNodeId = conn.node;
-  //   const connectedNodeElement = document.getElementById(`node-${connectedNodeId}`);
-
-  //   if (connectedNodeElement) {
-  //     const outputDiv = connectedNodeElement.querySelector('.output-response');
-  //     if (outputDiv) {
-  //       outputDiv.innerHTML = formatTextAsHTML(responseText);
-  //     }
-  //   }
-  // });
-
   console.log(`✅ Updated output for Node ${nodeId}`);
 }
     
@@ -442,18 +424,21 @@ async function saveExecutionResponse(executionId, nodeId, messageResponse) {
     }
   }
   
-  function findConnectedOutputNode(llmNodeId, structuredFlow) {
+  function findConnectedOutputNodes(llmNodeId, structuredFlow) {
+    const connectedOutputs = [];
+    
     for (const nodeId in structuredFlow) {
       const node = structuredFlow[nodeId];
       if (node.name === "Output") {
         const inputConnections = Object.values(node.inputs || {})
           .flatMap(input => input.connections.map(conn => conn.node));
         if (inputConnections.includes(llmNodeId)) {
-          return nodeId; // 🌟 Now dynamically identifying the correct output node
+          connectedOutputs.push(nodeId);
         }
       }
     }
-    return null;
+    
+    return connectedOutputs;
   }
 
 // ✅ Export functiona

@@ -689,14 +689,14 @@ async function updateUIWithResults(responses) {
   console.log("✅ UI updated with responses!");
 }
 
-function getTotalResponseCount (){
-    const flowData = editor.export();
-    const nodeEntries = Object.entries(flowData.drawflow.Home.data);
-    const llmCount = nodeEntries.filter(([_, node]) => node.name === "LLM Call").length;
-    const outputCount = nodeEntries.filter(([_, node]) => node.name === "Output").length;
-    const totalllmoutput = llmCount + outputCount;
-    console.log("total count is : " + totalllmoutput);
-  return totalllmoutput  
+function getTotalResponseCount() {
+  const flowData = editor.export();
+  const nodeEntries = Object.entries(flowData.drawflow.Home.data);
+  const llmNodes = nodeEntries.filter(([_, node]) => node.name === "LLM Call");
+  const outputNodes = nodeEntries.filter(([_, node]) => node.name === "Output");
+  
+  // Count the total responses we expect (all LLM nodes and all Output nodes)
+  return llmNodes.length + outputNodes.length;
 }
 
 async function pollForResponses(executionId, maxAttempts = 10, attempt = 1) {
