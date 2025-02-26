@@ -92,19 +92,24 @@ async function executeLLMFlow(flowData, requestType, executionId) {
       }
     }
   
-    // ✅ Compile final output from all terminal nodes
-    const finalOutputText = compileFinalOutputs(structuredFlow);
-  
-    if (finalOutputText) {
-        console.log("✅ Final Output Ready and good");
+// ✅ Compile final output from all output nodes
+const finalOutputText = compileFinalOutputs(structuredFlow);
 
-        // ✅ Still send to Slack as before
-        if (requestType !== "browser") {
+if (finalOutputText) {
+    console.log("✅ Final Output Ready");
+
+    // ✅ Send to Slack if not from browser
+    if (requestType !== "browser") {
         const filePath = generateOutputFile(finalOutputText);
-        await sendSlackMessage(channelId, "Here's the final output: " + finalOutputText, filePath);
+        await sendSlackMessage(channelId, "Here's the final output from your flow:", filePath);
+        
+        // If the output is very large, also send a file
+        // if (finalOutputText.length > 2000) {
+        //     console.log("📎 Output is large, also sending as file...");
+        //     await sendSlackFile(channelId, finalOutputText, `${flowId}_output.txt`);
+        }
     }
-    }
-  }
+}
   
 
 // ✅ Wait for valid input before proceeding
@@ -372,29 +377,53 @@ flowData[nodeId].data.error = errorMessage;
 console.warn(`⚠️ Marked Node ${nodeId} as error: ${errorMessage}`);
 }
   
-function compileFinalOutputs(flowData) {
-
-    const allNodes = flowData;
-    let finalOutputText = "";
+function compileFinalOutputs(structuredFlow) {
+  const allNodes = structuredFlow;
+  let finalOutputText = "";
+  const terminalOutputs = [];
   
-    Object.values(allNodes).forEach(node => {
-      if (node.name === "Output") {
-        //console.log(`🛠 Found Output Node: ${node.id}, checking connections...`);
-        //console.log(`🔗 Output connections:`, node.outputs);
-  
-        // ✅ Check if there are NO output connections at all
-        const hasConnections = node.outputs && Object.keys(node.outputs).some(key => node.outputs[key].connections.length > 0);
-  
-        if (!hasConnections) {
-          //console.log(`📌 Final Output Node Detected: ${node.id}`);
-          finalOutputText += `${node.data.output || "No output generated"}\n\n`;
+  // Identify all terminal output nodes (output nodes with no outgoing connections)
+  Object.values(allNodes).forEach(node => {
+    if (node.name === "Output") {
+      // Check if this is a terminal node (no outgoing connections)
+      const hasOutgoingConnections = node.outputs && 
+                                    Object.values(node.outputs).some(output => 
+                                      output.connections && output.connections.length > 0);
+      
+      if (!hasOutgoingConnections) {
+        console.log(`📌 Terminal Output Node Detected: ${node.id}`);
+        
+        // Only include outputs that have content
+        if (node.data && node.data.output && node.data.output.trim() !== "") {
+          terminalOutputs.push({
+            id: node.id,
+            pos_y: node.pos_y,
+            pos_x: node.pos_x,
+            content: node.data.output
+          });
+        } else {
+          console.warn(`⚠️ Terminal Output Node ${node.id} has no content`);
         }
       }
-    });
+    }
+  });
   
-    console.log("✅ Final Output Compilation Complete:", finalOutputText.trim().substring(0, 20) + "...");
-    return finalOutputText.trim();
-  }
+  // Sort terminal outputs by vertical position (top to bottom)
+  terminalOutputs.sort((a, b) => {
+    if (a.pos_y !== b.pos_y) return a.pos_y - b.pos_y; 
+    return a.pos_x - b.pos_x; // If same y, sort from left to right
+  });
+  
+  // Combine all terminal output contents
+  terminalOutputs.forEach((output, index) => {
+    // Add separator between multiple outputs
+    if (index > 0) finalOutputText += "\n\n---\n\n";
+    finalOutputText += output.content || "No output generated";
+  });
+  
+  console.log(`✅ Final Output compiled from ${terminalOutputs.length} terminal output nodes`);
+  return finalOutputText.trim();
+}
   
 
 function generateOutputFile(outputText) {
