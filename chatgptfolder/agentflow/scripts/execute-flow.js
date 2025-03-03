@@ -93,22 +93,23 @@ async function executeLLMFlow(flowData, requestType, executionId) {
     }
   
 // ✅ Compile final output from all output nodes
-const finalOutputText = compileFinalOutputs(structuredFlow);
+const finalOutput = compileFinalOutputs(structuredFlow);
 
-if (finalOutputText) {
-    console.log("✅ Final Output Ready");
+console.log(`🔄 Final output compiled, length: ${finalOutput.length}`);
 
-    // ✅ Send to Slack if not from browser
-    if (requestType !== "browser") {
-        const filePath = generateOutputFile(finalOutputText);
-        await sendSlackMessage(channelId, "Here's the final output from your flow:", filePath);
-        
-        // If the output is very large, also send a file
-        // if (finalOutputText.length > 2000) {
-        //     console.log("📎 Output is large, also sending as file...");
-        //     await sendSlackFile(channelId, finalOutputText, `${flowId}_output.txt`);
-        }
-    }
+// Check if Slack notification is required
+if (requestType !== "browser" || requestType.excludes("browser")) {
+  if (!channelId) {
+    console.error("❌ No Slack channel ID provided in environment variables");
+  } else if (!finalOutput || finalOutput.trim() === "") {
+    console.error("❌ No output to send to Slack");
+    // Send a fallback message instead of nothing
+    await sendSlackMessage(channelId, "⚠️ The flow execution completed but produced no output.");
+  } else {
+    console.log(`🚀 Sending output to Slack channel: ${channelId}`);
+    await sendSlackMessage(channelId, finalOutput);
+  }
+}
 }
   
 
@@ -185,30 +186,33 @@ function areInputsReady(nodeId, structuredFlow) {
 
 // ✅ Send final output to Slack
 async function sendSlackMessage(channelId, message, filePath) {
-  console.log(`📩 Sending message to Slack (${channelId})`);
+  if (!message || message.trim() === "") {
+    console.error("❌ Attempted to send empty message to Slack");
+    return { error: "Empty message" };
+  }
+  
+  console.log(`🔄 Preparing to send message to Slack channel: ${channelId}`);
+  console.log(`📝 Message length: ${message.length} characters`);
+  console.log(`📝 Message preview: ${message.substring(0, 100)}...`);
+  
+  try {
+    // Format the message for Slack
+    const formattedMessage = formatTextAsHTML(message);
+    
+    const slackToken = process.env.SLACK_BOT_TOKEN;
 
-  const formattedMessage = message
-  .replace(/<\/?br>/g, '\n') // Convert <br> to newlines
-  .replace(/<\/?h3>/g, "\n\n") // Ensure double line break after headings
-  .replace(/<hr>/g, "\n――――――――――\n") // Convert <hr> to a clean separator
-  .replace(/<ul>|<\/ul>/g, "") // Remove <ul> tags
-  .replace(/<li>/g, "\n- ") // Convert <li> to bullet points
-  .replace(/<\/li>/g, "") // Remove </li>
-  .replace(/<\/?strong>/g, "") // Remove strong (no bolding needed)
-  .replace(/<\/?[^>]+(>|$)/g, "") // Remove any other HTML tags
-  .replace(/\n\s*\n\s*\n/g, "\n\n"); // Prevent excessive blank lines
+    await axios.post('https://slack.com/api/chat.postMessage', {
+      channel: channelId,
+      text: formattedMessage
+    }, {
+      headers: { 'Authorization': `Bearer ${slackToken}`, 'Content-Type': 'application/json' }
+    });
 
-
-  const slackToken = process.env.SLACK_BOT_TOKEN;
-
-  await axios.post('https://slack.com/api/chat.postMessage', {
-    channel: channelId,
-    text: formattedMessage
-  }, {
-    headers: { 'Authorization': `Bearer ${slackToken}`, 'Content-Type': 'application/json' }
-  });
-
-  console.log("✅ Message sent to Slack.");
+    console.log("✅ Message sent to Slack.");
+  } catch (error) {
+    console.error(`❌ Error sending Slack message: ${error.message}`);
+    return { error: error.message };
+  }
 }
 
 // ✅ Call LLM API
@@ -382,24 +386,40 @@ function compileFinalOutputs(structuredFlow) {
   let finalOutputText = "";
   const terminalOutputs = [];
   
+  console.log("🔍 Starting compileFinalOutputs with", Object.keys(allNodes).length, "nodes");
+  
   // Identify all terminal output nodes (output nodes with no outgoing connections)
   Object.values(allNodes).forEach(node => {
-    if (node.name === "Output") {
+    if (node.type === "output" || node.name === "Output") {
       // Check if this is a terminal node (no outgoing connections)
       const hasOutgoingConnections = node.outputs && 
                                     Object.values(node.outputs).some(output => 
                                       output.connections && output.connections.length > 0);
       
       if (!hasOutgoingConnections) {
-        console.log(`📌 Terminal Output Node Detected: ${node.id}`);
+        console.log(`📌 Terminal Output Node Found: ${node.id}`);
+        console.log(`   Data available:`, JSON.stringify(node.data || {}));
         
-        // Ensure the output content is properly formatted and sanitized
-        const outputContent = node.data?.output?.trim() || "";
+        // Check different possible locations for the output content
+        let outputContent = "";
+        if (node.data?.output) {
+          outputContent = node.data.output;
+        } else if (node.data?.content) {
+          outputContent = node.data.content;
+        } else if (node.content) {
+          outputContent = node.content;
+        } else if (node.outputs?.output?.content) {
+          outputContent = node.outputs.output.content;
+        }
+        
+        outputContent = (outputContent || "").trim();
+        
         if (outputContent) {
+          console.log(`✅ Found content in node ${node.id}: ${outputContent.substring(0, 50)}...`);
           terminalOutputs.push({
             id: node.id,
-            pos_y: node.pos_y || 0, // Default to 0 if undefined
-            pos_x: node.pos_x || 0, // Default to 0 if undefined
+            pos_y: node.pos_y || 0,
+            pos_x: node.pos_x || 0,
             content: outputContent
           });
         } else {
@@ -421,11 +441,17 @@ function compileFinalOutputs(structuredFlow) {
     .filter(Boolean)
     .join("\n\n---\n\n");
   
-  console.log(`✅ Final Output compiled from ${terminalOutputs.length} terminal output nodes`);
+  console.log(`📊 Final Output compiled from ${terminalOutputs.length} terminal output nodes`);
+  console.log(`📝 Final Output length: ${finalOutputText.length} characters`);
+  if (finalOutputText.length > 0) {
+    console.log(`📝 Final Output preview: ${finalOutputText.substring(0, 100)}...`);
+  } else {
+    console.log(`⚠️ Final Output is empty!`);
+  }
   
-  // Return empty string if no valid outputs found
-  return finalOutputText.trim() || "";
+  return finalOutputText;
 }  
+
 
 function generateOutputFile(outputText) {
   
