@@ -190,10 +190,21 @@ async function sendSlackMessage(channelId, message, filePath) {
     console.error("❌ Attempted to send empty message to Slack");
     return { error: "Empty message" };
   }
+
+const formattedMessage = message
+  .replace(/<\/?br>/g, '\n') // Convert <br> to newlines
+  .replace(/<\/?h3>/g, "\n\n") // Ensure double line break after headings
+  .replace(/<hr>/g, "\n――――――――――\n") // Convert <hr> to a clean separator
+  .replace(/<ul>|<\/ul>/g, "") // Remove <ul> tags
+  .replace(/<li>/g, "\n- ") // Convert <li> to bullet points
+  .replace(/<\/li>/g, "") // Remove </li>
+  .replace(/<\/?strong>/g, "") // Remove strong (no bolding needed)
+  .replace(/<\/?[^>]+(>|$)/g, "") // Remove any other HTML tags
+  .replace(/\n\s*\n\s*\n/g, "\n\n"); // Prevent excessive blank lines
   
   console.log(`🔄 Preparing to send message to Slack channel: ${channelId}`);
-  console.log(`📝 Message length: ${message.length} characters`);
-  console.log(`📝 Message preview: ${message.substring(0, 100)}...`);
+  console.log(`📝 Message length: ${formattedMessage.length} characters`);
+  console.log(`📝 Message preview: ${formattedMessage.substring(0, 100)}...`);
   
   try {
     // Format the message for Slack
