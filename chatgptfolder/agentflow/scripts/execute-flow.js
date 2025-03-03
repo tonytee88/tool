@@ -208,7 +208,7 @@ const formattedMessage = message
   
   try {
     // Format the message for Slack
-    const formattedMessage = formatTextAsHTML(message);
+    //const formattedMessage = formatTextAsHTML(message);
     
     const slackToken = process.env.SLACK_BOT_TOKEN;
 
