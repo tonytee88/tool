@@ -393,13 +393,14 @@ function compileFinalOutputs(structuredFlow) {
       if (!hasOutgoingConnections) {
         console.log(`📌 Terminal Output Node Detected: ${node.id}`);
         
-        // Only include outputs that have content
-        if (node.data && node.data.output && node.data.output.trim() !== "") {
+        // Ensure the output content is properly formatted and sanitized
+        const outputContent = node.data?.output?.trim() || "";
+        if (outputContent) {
           terminalOutputs.push({
             id: node.id,
-            pos_y: node.pos_y,
-            pos_x: node.pos_x,
-            content: node.data.output
+            pos_y: node.pos_y || 0, // Default to 0 if undefined
+            pos_x: node.pos_x || 0, // Default to 0 if undefined
+            content: outputContent
           });
         } else {
           console.warn(`⚠️ Terminal Output Node ${node.id} has no content`);
@@ -411,22 +412,23 @@ function compileFinalOutputs(structuredFlow) {
   // Sort terminal outputs by vertical position (top to bottom)
   terminalOutputs.sort((a, b) => {
     if (a.pos_y !== b.pos_y) return a.pos_y - b.pos_y; 
-    return a.pos_x - b.pos_x; // If same y, sort from left to right
+    return a.pos_x - b.pos_x;
   });
   
-  // Combine all terminal output contents
-  terminalOutputs.forEach((output, index) => {
-    // Add separator between multiple outputs
-    if (index > 0) finalOutputText += "\n\n---\n\n";
-    finalOutputText += output.content || "No output generated";
-  });
+  // Combine all terminal outputs with clear separators
+  finalOutputText = terminalOutputs
+    .map(output => output.content)
+    .filter(Boolean)
+    .join("\n\n---\n\n");
   
   console.log(`✅ Final Output compiled from ${terminalOutputs.length} terminal output nodes`);
-  return finalOutputText.trim();
-}
   
+  // Return empty string if no valid outputs found
+  return finalOutputText.trim() || "";
+}  
 
 function generateOutputFile(outputText) {
+  
   const filePath = path.join('/tmp', 'final_output.txt');
   fs.writeFileSync(filePath, outputText, 'utf8');
   console.log('✅ Final Output File Created:', filePath);
