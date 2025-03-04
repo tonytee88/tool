@@ -13,6 +13,7 @@ jobs:
       CALLBACK_URL: ${{ github.event.client_payload.callbackUrl }}
       REQUEST_TYPE: ${{ github.event.client_payload.requestType }}
       EXECUTION_ID: ${{ github.event.client_payload.executionId }}
+      PROMPT_TEXT: ${{ github.event.client_payload.promptText }}
 
     steps:
       - name: Checkout repository
