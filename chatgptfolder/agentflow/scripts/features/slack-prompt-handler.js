@@ -15,6 +15,8 @@ function injectSlackPrompt(structuredFlow, slackPrompt) {
 
     // Iterate through all nodes
     Object.entries(structuredFlow).forEach(([nodeId, node]) => {
+        console.log("structuredFlow", structuredFlow);
+        console.log("structuredFlow", JSON.stringify(structuredFlow, null, 2));
         if (node.name === 'Prompt') {
             const promptName = node.data?.name?.toLowerCase() || '';
             const promptText = node.data?.promptText || '';
