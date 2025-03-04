@@ -4,10 +4,11 @@ const axios = require('axios');
 
 const channelId = process.env.SLACK_CHANNEL_ID || "x"; // Capture dynamically
 const flowId = process.env.FLOW_ID || "y";
+const promptText = process.env.PROMPT_TEXT || "z";
 
 async function executeLLMFlow(flowData, requestType, executionId) {
     console.log("🚀 Starting Flow Execution...");
-  
+    console.log("🚀 Starting Flow Execution..." + promptText);
     if (!flowData || !flowData.length) {
       console.error("❌ No valid flowData received.");
       return;
