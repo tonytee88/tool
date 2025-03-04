@@ -20,6 +20,7 @@ function injectSlackPrompt(structuredFlow, slackPrompt) {
             const promptText = node.data?.promptText || '';
 
             // Check if this prompt block should receive the Slack prompt
+            console.log("checking promptName", promptName);
             if (promptName.includes('slack') || promptText.toLowerCase().includes('slack')) {
                 console.log(`✨ Found Slack prompt block: ${nodeId}`);
                 
