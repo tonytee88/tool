@@ -1,468 +1,528 @@
- /* ------------------------------------------------
-       BASIC PAGE STYLES
-    ------------------------------------------------- */
-    body {
-      margin: 0;
-      font-family: sans-serif;
-      background-color:#1F1F1F
-    }
-    .toolbar {
-      background: #444;
-      padding: 10px;
-    }
-    .toolbar button {
-      margin-right: 8px;
-    }
+/* ------------------------------------------------
+   MODERN COLOR PALETTE & VARIABLES
+------------------------------------------------- */
+:root {
+  --bg-dark: #121212;
+  --bg-surface: #1e1e1e;
+  --bg-surface-light: #2d2d2d;
+  --bg-surface-hover: #383838;
+  --text-primary: #e0e0e0;
+  --text-secondary: #a0a0a0;
+  --accent: #00B8A9;
+  --accent-light: #00d6c4;
+  --accent-dark: #008e83;
+  --success: #4ece8a;
+  --warning: #e9b949;
+  --error: #f44747;
+  --border-radius: 8px;
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  --transition: all 0.2s ease;
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
 
-    /* ------------------------------------------------
-       NODE STYLES
-    ------------------------------------------------- */
-    .df-node-content {
-      padding: 10px;
-      border: 1px solid #666;
-      border-radius: 4px;
-      background: #2c2c2c;
-    }
-    .block-start { background-color: #444; }
-    .block-prompt {
-      background-color: #2c2c2c; /* Dark background */
-      border-radius: 8px;
-      padding: 10px;
-      color: white; /* Ensure text is white */
-    }
+/* ------------------------------------------------
+   BASIC PAGE STYLES
+------------------------------------------------- */
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
 
-    .block-llm { 
-      background-color: #2c2c2c; /* Dark background */
-      border-radius: 8px;
-      padding: 10px;
-      color: white; /* Ensure text is white */
-    }
+.toolbar {
+  background: var(--bg-surface);
+  padding: 12px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
 
-    .block-output { 
-      background-color: #2c2c2c; /* Dark background */
-      border-radius: 8px;
-      padding: 10px;
-      color: white; /* Ensure text is white */
-    }
+.toolbar button {
+  padding: 10px 16px;
+  background: var(--bg-surface-light);
+  color: var(--text-primary);
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-    /* The prompt input is the "name" of the box */
-    .prompt-name {
-      width: 100%;
-      margin-top: 5px;
-    }
-    .prompt-content {
-      width: 100%;
-      margin-top: 5px;
-    }
+.toolbar button:hover {
+  background: var(--bg-surface-hover);
+  transform: translateY(-1px);
+}
 
-    /* Ensure Output blocks get the correct size and border */
+/* Special styling for action buttons */
+#btn-start-flow {
+  background: var(--accent);
+  color: #fff;
+}
+
+#btn-start-flow:hover {
+  background: var(--accent-light);
+}
+
+#btn-save, #btn-load {
+  background: var(--bg-surface-light);
+  border-left: 3px solid var(--accent);
+}
+
+/* ------------------------------------------------
+   FLOW EDITOR CONTAINER
+------------------------------------------------- */
+#drawflow {
+  background: var(--bg-dark);
+  background-image: 
+    radial-gradient(circle, var(--bg-surface-light) 1px, transparent 1px);
+  background-size: 25px 25px;
+  width: 100vw;
+  height: calc(100vh - 110px);
+  overflow: auto;
+  position: relative;
+  touch-action: none;
+}
+
+/* ------------------------------------------------
+   NODE STYLES
+------------------------------------------------- */
+.drawflow .drawflow-node {
+  background-color: var(--bg-surface);
+  border-radius: var(--border-radius);
+  color: var(--text-primary);
+  border: 1px solid var(--bg-surface-light);
+  box-shadow: var(--shadow);
+  padding: 0;
+  min-width: 180px;
+  width: max-content;
+  cursor: move;
+  position: absolute;
+  z-index: 2;
+  pointer-events: all;
+}
+
+.drawflow .drawflow-node:hover {
+  width: max-content;
+}
+
+.df-node-content {
+  padding: 16px;
+  border-radius: var(--border-radius);
+  pointer-events: all;
+}
+
+/* Node header/title styling */
+.drawflow .drawflow-node .title-node {
+  background-color: var(--accent);
+  color: white;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+/* Specific node type styling */
+.block-start { 
+  background-color: var(--bg-surface); 
+  border-top: 4px solid var(--accent);
+}
+
+.block-prompt, .block-llm, .block-output {
+  background-color: var(--bg-surface);
+  border-radius: var(--border-radius);
+  padding: 16px;
+  color: var(--text-primary);
+}
+
+.block-prompt {
+  border-top: 4px solid var(--accent);
+}
+
+.block-llm {
+  border-top: 4px solid var(--warning);
+}
+
 .block-output {
+  border-top: 4px solid var(--success);
   width: 400px !important;
   max-width: 400px;
   min-height: 150px;
-  border: 2px solid #444 !important; /* Adjusted border */
 }
 
-/* If the Output node is selected, keep its border in sync */
-.block-output.selected {
-  border: 2px solid #007bff !important; /* Consistent with other nodes */
+/* Connections (edges) */
+.main-path {
+  stroke: var(--accent);
+  stroke-width: 2px;
+  fill: none;
+  cursor: pointer;
 }
 
-/* Override any Drawflow auto-applied borders */
-.drawflow .drawflow-node .drawflow_content_node {
-  border: none !important;
+.main-path:hover {
+  stroke: var(--accent-light);
+  stroke-width: 3px;
 }
 
-/* Output box should retain styling */
+.main-path-selection {
+  stroke: var(--accent-light);
+  stroke-width: 3px;
+}
+
+/* Connection endpoints/ports */
+.drawflow .port {
+  background: var(--bg-surface-light);
+  border: 2px solid var(--accent);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  transition: var(--transition);
+}
+
+.drawflow .port:hover {
+  background: var(--accent);
+}
+
+/* ------------------------------------------------
+   OUTPUT NODE STYLING
+------------------------------------------------- */
 .block-output .output-response {
-  width: 80%;
+  width: 100%;
   max-width: 95%;
   min-height: 120px;
   max-height: 200px;
   overflow-y: auto;
-  background: #1e1e1e;
-  color: #2c2c2c;
-  padding: 10px;
-  border-radius: 5px;
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  padding: 12px;
+  border-radius: var(--border-radius);
   font-size: 14px;
-  line-height: 1.6; /* Improve readability */
-  white-space: normal; /* Ensure text wraps properly */
+  line-height: 1.6;
+  white-space: normal;
+  margin-top: 10px;
+  border: 1px solid var(--bg-surface-light);
 }
 
 /* Make headings stand out */
 .output-response h3 {
   font-size: 16px;
   font-weight: bold;
-  color: #ff9800;
-  margin-top: 12px;
-  margin-bottom: 6px;
+  color: var(--accent);
+  margin-top: 16px;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--bg-surface-light);
 }
 
 /* Style horizontal separators */
 .output-response hr {
   border: none;
   height: 1px;
-  background: #555;
-  margin: 10px 0;
+  background: var(--bg-surface-light);
+  margin: 12px 0;
 }
 
-
-    /* ------------------------------------------------
-       MODAL STYLES
-    ------------------------------------------------- */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.5);
-      display: none;
-    }
-    .modal {
-      position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      background: #fff;
-      padding: 15px;
-      border-radius: 4px;
-      display: none;
-      width: 400px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    }
-    .modal h3 {
-      margin-top: 0;
-    }
-    .modal-buttons {
-      margin-top: 10px;
-      text-align: right;
-    }
-    .modal-buttons button {
-      margin-left: 8px;
-    }
-
-  .flow-name-container {
-  margin: 10px;
+/* ------------------------------------------------
+   BUTTONS AND CONTROLS
+------------------------------------------------- */
+.prompt-edit-btn, .copy-output-btn {
+  margin-top: 12px;
+  padding: 8px 12px;
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: 500;
+  transition: var(--transition);
   display: flex;
   align-items: center;
-  background-color: #1F1F1F;
-  padding:10px;
-  color: white;
+  justify-content: center;
+  gap: 6px;
 }
 
-.flow-name-container label {
-  margin-right: 10px;
+.prompt-edit-btn:hover, .copy-output-btn:hover {
+  background-color: var(--accent-light);
 }
 
-.flow-name-container input {
-  flex-grow: 1;
-  padding: 5px;
+.prompt-edit-btn:before {
+  content: "✏️";
+  font-size: 14px;
 }
 
-#load-modal {
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  padding: 20px;
-  z-index: 1000;
-  width: 300px;
+.copy-output-btn:before {
+  content: "📋";
+  font-size: 14px;
 }
 
-#flow-list {
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-/* Overall editor background */
-.drawflow {
-  background: #1F1F1F; /* Dark gray */
-  /*width: 10000px; /* 10x the screen width */
-  /*height: 10000px; /* 10x the screen height */
-  transform-origin: center; /* Ensures zoom scales correctly */
-  transition: transform 0.2s ease-in-out; /* Smooth zoom animation */
-}
-
-#drawflow {
-  overflow: auto; /* Enables scrolling */
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-}
-
-/* Node container */
-.drawflow .drawflow-node {
-  background-color: #2C2C2C;
-  border-radius: 6px;
-  color: #2C2C2C;
-  border: 1px solid #2C2C2C;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-  padding: 1px;
-  min-width: 160px; /* Ensure it doesn't shrink below this */
-  width: max-content; /* Expands only if needed */
-}
-
-/* When a node is selected */
-.drawflow .drawflow-node.selected {
-  border: 2px solid #007bff !important; /* Blue outline */
-  color: #007bff;
-  background-color: #ffd024;
-  min-width: 160px; /* Ensure it doesn't shrink below this */
-  width: max-content; /* Expands only if needed */
-  padding: 1px; /* Ensure spacing inside remains consistent */
-}
-
-
-
-/* Node header/title */
-.drawflow .drawflow-node .title-node {
-  background-color: #2C2C2C;
-  color: #ECECEC;
-  font-weight: 600;
-}
-
-/* Connections (edges) */
-.main-path {
-  stroke: #FF9800;     /* Orange line */
-  stroke-width: 2px;
-  fill: none;
-  cursor: pointer;
-}
-.main-path:hover {
-  stroke: #FFC107;     /* Lighter hover */
-}
-.main-path-selection {
-  stroke: #FFC107;     /* Selected line color */
-}
-
-/* Connection endpoints/ports */
-.drawflow .port {
-  background: #444;    /* Dot color */
-  border: 2px solid #888;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-
-/* When a node is selected or hovered */
-.drawflow .drawflow-node:hover {
-  border-color: #8e8e8e;
-}
-
-#prompt-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #ffffff;
-  width: 400px;
-  max-width: 90%;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-  display: none;
-}
-
-#prompt-modal h2 {
-  margin: 0;
-  margin-bottom: 15px;
-  color: #333;
-  font-size: 20px;
-  text-align: center;
-}
-
+/* ------------------------------------------------
+   MODAL STYLES - ENHANCED VISIBILITY
+------------------------------------------------- */
 #modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6); /* Semi-transparent black */
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
   display: none;
   z-index: 999;
+  pointer-events: none;
 }
 
-.prompt-name-display {
-  font-size: 14px;
-  font-weight: bold;
-  margin-bottom: 5px;
+#modal-overlay[style*="display: block"] {
+  pointer-events: auto;
 }
 
-.prompt-text-display {
+.modal, #prompt-modal, #load-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--bg-surface);
+  padding: 24px;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--accent);
+  box-shadow: 
+    0 0 0 1px var(--bg-surface-light),
+    0 4px 20px rgba(0, 0, 0, 0.4),
+    0 0 15px rgba(0, 184, 169, 0.1);
   display: none;
-  font-size: 12px;
-  margin-top: 5px;
-  word-wrap: break-word;
+  width: 450px;
+  max-width: 90vw;
+  z-index: 1000;
+  color: var(--text-primary);
 }
 
-.prompt-edit-btn {
-  margin-top: 10px;
-  padding: 5px 10px;
-  background-color: #ff9800;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+/* Enhanced modal header */
+.modal h3, #prompt-modal h2 {
+  margin-top: 0;
+  color: var(--text-primary);
+  font-size: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--accent);
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-.copy-output-btn {
-  margin-top: 10px;
-  padding: 5px 10px;
-  background-color: #ff9800;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.prompt-edit-btn:hover .copy-output-btn {
-  background-color: #775900;
+/* Form elements in modals */
+.prompt-modal-name, .prompt-modal-textarea, #flow-name, #flow-list {
+  width: 97%;
+  padding: 12px;
+  background: var(--bg-dark);
+  border: 1px solid var(--bg-surface-light);
+  border-radius: var(--border-radius);
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  font-family: var(--font-family);
+  transition: var(--transition);
 }
 
-.prompt-modal-name {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-  color: #333;
-  box-sizing: border-box;
+.prompt-modal-name:focus, .prompt-modal-textarea:focus, #flow-name:focus, #flow-list:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 184, 169, 0.2);
 }
 
 .prompt-modal-textarea {
-  width: 100%;
-  height: 120px; /* Larger height for the prompt text */
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-  color: #333;
-  box-sizing: border-box;
-  resize: none; /* Disable resizing */
+  height: 150px;
+  resize: none;
+  line-height: 1.5;
 }
 
-/* Modal Buttons */
+.prompt-text-display {
+  display:none;
+}
+
+/* Modal buttons */
 .modal-buttons {
-  margin-top: 15px;
+  margin-top: 20px;
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 12px;
 }
 
-.save-button,
-.cancel-button {
-  padding: 8px 15px;
+.save-button, .cancel-button, #load-confirm, #load-cancel {
+  padding: 10px 18px;
   font-size: 14px;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius);
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: var(--transition);
+  font-weight: 500;
 }
 
-.save-button {
-  background: #4caf50;
+.save-button, #load-confirm {
+  background: var(--accent);
   color: white;
 }
 
-.save-button:hover {
-  background: #45a049;
+.save-button:hover, #load-confirm:hover {
+  background: var(--accent-light);
 }
 
-.cancel-button {
-  background: #f44336;
-  color: white;
+.cancel-button, #load-cancel {
+  background: var(--bg-surface-light);
+  color: var(--text-primary);
 }
 
-.cancel-button:hover {
-  background: #e53935;
+.cancel-button:hover, #load-cancel:hover {
+  background: var(--bg-surface-hover);
 }
 
 /* ------------------------------------------------
-    ZOOM CONTROLS (FLOATING ON MOBILE)
+   FLOW NAME CONTAINER
 ------------------------------------------------- */
-.zoom-controls {
-  position: fixed;
-  bottom: 10px;
-  right: 10px;
+.flow-name-container {
+  margin: 0;
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  background-color: var(--bg-surface);
+  padding: 16px;
+  color: var(--text-primary);
+  box-shadow: var(--shadow);
 }
 
-.zoom-controls button {
-  padding: 12px;
-  font-size: 16px;
-  border-radius: 50%;
-  border: none;
-  background: #007bff;
-  color: white;
-  cursor: pointer;
-  transition: background 0.2s;
+.flow-name-container label {
+  margin-right: 12px;
+  font-weight: 500;
 }
 
-.zoom-controls button:hover {
-  background: #0056b3;
+.flow-name-container input {
+  flex-grow: 1;
+  padding: 10px 12px;
+  background: var(--bg-dark);
+  border: 1px solid var(--bg-surface-light);
+  border-radius: var(--border-radius);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  transition: var(--transition);
 }
 
-@media (max-width: 600px) {
-  .zoom-controls {
-    bottom: 20px;
-    right: 20px;
-  }
+.flow-name-container input:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 184, 169, 0.2);
 }
 
 /* ------------------------------------------------
-    RESPONSIVE TOOLBAR
+   STATUS BADGE
 ------------------------------------------------- */
-.toolbar {
-  background: #444;
-  padding: 10px;
-  display: flex;
-  flex-wrap: wrap; /* Wraps buttons on small screens */
-  justify-content: center;
-  gap: 8px;
-}
-
-.toolbar button {
-  padding: 12px 16px;
-  font-size: 16px;
-  border-radius: 8px;
-  border: none;
-  background: #000000;
-  color: white;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.toolbar button:hover {
-  background: #0056b3;
-}
-
-@media (max-width: 600px) {
-  .toolbar {
-    flex-direction: column;
-    align-items: center;
-  }
-  .toolbar button {
-    width: 90%; /* Full width on mobile */
-  }
-}
-
 .status-badge {
   position: absolute;
-  top: 88px;
+  top: 80px;
   right: 15px;
-  background-color: #ff9800;
-  color: white;
+  background-color: var(--warning);
+  color: #000;
   font-size: 14px;
   font-weight: bold;
-  padding: 5px 10px;
-  border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition: opacity 0.3s ease;
+  padding: 6px 12px;
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
 }
 
 #status-bubble.completed {
-  background-color: #4CAF50; /* ✅ Green when done */
+  background-color: var(--success);
   color: white;
+}
+
+/* ------------------------------------------------
+   ZOOM CONTROLS
+------------------------------------------------- */
+.zoom-controls {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 50;
+}
+
+.zoom-controls button {
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  border-radius: 50%;
+  border: none;
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+}
+
+.zoom-controls button:hover {
+  background: var(--accent-light);
+}
+
+/* ------------------------------------------------
+   SCROLLBAR STYLING
+------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-surface-light);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* ------------------------------------------------
+   RESPONSIVE DESIGN
+------------------------------------------------- */
+@media (max-width: 768px) {
+  .toolbar {
+    flex-direction: column;
+    padding: 8px;
+  }
+  
+  .toolbar button {
+    width: 100%;
+  }
+  
+  .flow-name-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .flow-name-container label {
+    margin-bottom: 8px;
+  }
+  
+  .drawflow .drawflow-node {
+    min-width: 160px;
+  }
+  
+  .block-output {
+    width: 300px !important;
+  }
+  
+  .modal, #prompt-modal, #load-modal {
+    width: 90%;
+    padding: 16px;
+  }
 }

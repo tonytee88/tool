@@ -98,7 +98,7 @@ const finalOutput = compileFinalOutputs(structuredFlow);
 console.log(`🔄 Final output compiled, length: ${finalOutput.length}`);
 
 // Check if Slack notification is required
-if (requestType !== "browser" || requestType.excludes("browser")) {
+if (requestType !== "browser") {
   if (!channelId) {
     console.error("❌ No Slack channel ID provided in environment variables");
   } else if (!finalOutput || finalOutput.trim() === "") {

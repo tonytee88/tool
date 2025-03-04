@@ -2,82 +2,128 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Simple LLM Flow Editor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern LLM Flow Editor</title>
 
+  <!-- Google Fonts - Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
   <!-- Drawflow CSS (via CDN) -->
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/drawflow/dist/drawflow.min.css"
-  />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/drawflow/dist/drawflow.min.css" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <!-- New Flow Name Section -->
-    <div class="flow-name-container">
-        <label for="flow-name">Flow Name:</label>
-        <input type="text" id="flow-name" value="New Flow 01">
-      </div>
+  <!-- Flow Name Section -->
+  <div class="flow-name-container">
+    <label for="flow-name">Flow Name</label>
+    <input type="text" id="flow-name" value="New Flow 01">
+  </div>
 
-    <!-- ------------------------------------------------
-         TOOLBAR!
-    ------------------------------------------------- -->
-    <div class="toolbar">
-        <button id="btn-add-start">+ Start</button>
-        <button id="btn-add-prompt">+ Prompt</button>
-        <button id="btn-add-llm">+ LLM Call</button>
-        <button id="btn-add-output">+ Output</button>
-        <button id="btn-save">Save Flow</button>
-        <button id="btn-load">Load Flow</button>
-        <button id="btn-start-flow">Play Flow</button>
-        <button id="btn-zoom-in">➕ Zoom In</button>
-        <button id="btn-zoom-out">➖ Zoom Out</button>
-        <button id="btn-reset-zoom">🔄 Reset Zoom</button>
-        <div id="status-bubble" class="status-badge">0/0</div>
-
-      </div>
-    
-      <!-- Load Flow Modal -->
-      <div id="load-modal" class="modal">
-        <h3>Load Existing Flow</h3>
-        <select id="flow-list"></select>
-        <div class="modal-buttons">
-          <button id="load-confirm">Load</button>
-          <button id="load-cancel">Cancel</button>
-        </div>
-      </div>
-    <!-- ------------------------------------------------
-         DRAWFLOW CONTAINER
-    ------------------------------------------------- -->
-    <div id="drawflow"></div>
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <button id="btn-add-start">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Start
+    </button>
+    <button id="btn-add-prompt">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Prompt
+    </button>
+    <button id="btn-add-llm">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      LLM Call
+    </button>
+    <button id="btn-add-output">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Output
+    </button>
+    <button id="btn-save">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M19 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3H16.1716C16.702 3 17.2107 3.21071 17.5858 3.58579L20.4142 6.41421C20.7893 6.78929 21 7.29799 21 7.82843V19C21 20.1046 20.1046 21 19 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M17 21V13H7V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M7 3V7H15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Save
+    </button>
+    <button id="btn-load">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 16.5L12 7.5L21 16.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Load
+    </button>
+    <button id="btn-start-flow">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5 3L19 12L5 21V3Z" fill="currentColor"/>
+      </svg>
+      Run Flow
+    </button>
+    <button id="btn-zoom-in">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button id="btn-zoom-out">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button id="btn-reset-zoom">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M12 9L12 12L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div id="status-bubble" class="status-badge">0/0</div>
+  </div>
   
-    <!-- ------------------------------------------------
-         MODAL OVERLAY & POPUP
-    ------------------------------------------------- -->
-    <div id="modal-overlay"></div>
-    <div id="prompt-modal">
-      <h2>Edit Prompt</h2>
-      <label for="prompt-modal-name" style="display: block; margin-bottom: 5px;">Prompt Name</label>
-      <input
-        type="text"
-        id="prompt-modal-name"
-        class="prompt-modal-name"
-        placeholder="Enter Prompt Name"
-      />
-      <label for="prompt-modal-textarea" style="display: block; margin: 15px 0 5px;">Prompt Text</label>
-      <textarea
-        id="prompt-modal-textarea"
-        class="prompt-modal-textarea"
-        placeholder="Enter Prompt Text"
-      ></textarea>
-      <div class="modal-buttons">
-        <button class="save-button" onclick="closePromptModal(true)">Save</button>
-        <button class="cancel-button" onclick="closePromptModal(false)">Cancel</button>
-      </div>
-    </div>  
+  <!-- Load Flow Modal -->
+  <div id="load-modal" class="modal">
+    <h3>Load Existing Flow</h3>
+    <select id="flow-list"></select>
+    <div class="modal-buttons">
+      <button id="load-confirm">Load</button>
+      <button id="load-cancel">Cancel</button>
     </div>
+  </div>
+  
+  <!-- Drawflow Container -->
+  <div id="drawflow"></div>
+  
+  <!-- Modal Overlay & Popup -->
+  <div id="modal-overlay">aaaaa</div>
+  <div id="prompt-modal">
+    <h2>Edit Prompt</h2>
+    <label for="prompt-modal-name">Prompt Name</label>
+    <input
+      type="text"
+      id="prompt-modal-name"
+      class="prompt-modal-name"
+      placeholder="Enter Prompt Name"
+    />
+    <label for="prompt-modal-textarea">Prompt Text</label>
+    <textarea
+      id="prompt-modal-textarea"
+      class="prompt-modal-textarea"
+      placeholder="Enter Prompt Text"
+    ></textarea>
+    <div class="modal-buttons">
+      <button class="save-button" onclick="closePromptModal(true)">Save</button>
+      <button class="cancel-button" onclick="closePromptModal(false)">Cancel</button>
+    </div>
+  </div>
 
-    <!-- Drawflow JS (via CDN) -->
-    <script src="https://cdn.jsdelivr.net/npm/drawflow/dist/drawflow.min.js"></script> 
+  <!-- Drawflow JS (via CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/drawflow/dist/drawflow.min.js"></script>
   <!-- Your custom script -->
   <script src="script.js"></script>
 </body>

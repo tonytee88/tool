@@ -22,7 +22,7 @@ editor.moveNodeToPosition = function(nodeId, x, y) {
 
 // Track which node is being edited in the modal
 let currentEditNodeId = null;
-let currentZoom = .2; 
+let currentZoom = 1; // Start at 100% zoom instead of 20%
 let delayPerNode = 8000;
 let delayBetweenPoll = 8000;
 
@@ -49,26 +49,31 @@ const modalCancelButton = document.querySelector('#prompt-modal button[onclick^=
 
 modalSaveButton.addEventListener('click', () => closePromptModal(true));
 modalCancelButton.addEventListener('click', () => closePromptModal(false));
-modalOverlay.addEventListener('click', () => closePromptModal(false));
+document.getElementById('modal-overlay').addEventListener('click', (e) => {
+  if (e.target.id === 'modal-overlay') {
+    closePromptModal(false);
+    closeLoadFlowModal();
+  }
+});
 
 //zoom
 document.getElementById('btn-zoom-in').addEventListener('click', () => {
-  if (currentZoom < 2) { // Limit max zoom to 2x
+  if (currentZoom < 1.5) { // Limit max zoom to 150% (was 2)
     currentZoom += 0.1;
-    editor.zoom_in(currentZoom);
+    editor.zoom_in();
   }
 });
 
 document.getElementById('btn-zoom-out').addEventListener('click', () => {
-  if (currentZoom > 0.2) { // Prevent zooming out too much
+  if (currentZoom > 0.5) { // Don't allow below 50% (was 0.2)
     currentZoom -= 0.1;
-    editor.zoom_out(currentZoom);
+    editor.zoom_out();
   }
 });
 
 document.getElementById('btn-reset-zoom').addEventListener('click', () => {
   currentZoom = 1;
-  editor.zoom_reset(currentZoom);
+  editor.zoom_reset();
 });
 
 // Add a node of given type
@@ -198,7 +203,8 @@ async function openLoadFlowModal() {
     });
 
     document.getElementById('load-modal').style.display = 'block';
-    document.getElementById('modal-overlay').style.display = 'block';
+    const modalOverlay = document.getElementById('modal-overlay');
+    modalOverlay.style.display = 'block';
   } catch (error) {
     console.error('Error listing flows:', error);
     alert('Failed to load flows');
@@ -209,10 +215,11 @@ async function openLoadFlowModal() {
 // Function to close the load flow modal
 function closeLoadFlowModal(selectedFlowId) {
   document.getElementById('load-modal').style.display = 'none';
-  document.getElementById('modal-overlay').style.display = 'none';
-  document.getElementById('flow-name').value = selectedFlowId
-
-
+  const modalOverlay = document.getElementById('modal-overlay');
+  modalOverlay.style.display = 'none';
+  if (selectedFlowId) {
+    document.getElementById('flow-name').value = selectedFlowId;
+  }
 }
 
 function toDrawflowFormat(apiResponse) {
@@ -380,7 +387,8 @@ function openPromptModal(nodeId) {
   promptModalTextarea.value = promptTextDiv ? promptTextDiv.textContent.trim() : '';
 
   // Show the modal and overlay
-  document.getElementById('modal-overlay').style.display = 'block';
+  const modalOverlay = document.getElementById('modal-overlay');
+  modalOverlay.style.display = 'block';
   document.getElementById('prompt-modal').style.display = 'block';
 }
 
@@ -427,8 +435,8 @@ function createLLMNode(x, y) {
 function createOutputNode(x, y) {
   nodeId = editor.addNode(
     'Output',
-    1, // Inputs
-    1, // 1 Output now correctly placed
+    2, // Inputs
+    2, // 1 Output now correctly placed
     x,
     y,
     'output',
@@ -565,8 +573,9 @@ function closePromptModal(doSave) {
     }
   }
 
-  // Hide the modal and overlay
-  document.getElementById('modal-overlay').style.display = 'none';
+  // Hide both the modal and overlay
+  const modalOverlay = document.getElementById('modal-overlay');
+  modalOverlay.style.display = 'none';
   document.getElementById('prompt-modal').style.display = 'none';
   currentEditNodeId = null;
 }
