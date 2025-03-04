@@ -112,24 +112,35 @@ async function saveFlow() {
   // ✅ Get the current flow data
   const updatedFlowData = editor.export();
 
-  // ✅ Ensure all LLM Call nodes have the latest selected model
+  // ✅ Ensure all nodes have their latest data before saving
   Object.values(updatedFlowData.drawflow.Home.data).forEach(node => {
+    // Handle LLM Call nodes
     if (node.name === "LLM Call") {
       const dropdown = document.getElementById(`model-dropdown-${node.id}`);
       if (dropdown) {
-        node.data.selectedModel = dropdown.value; // ✅ Store selected model
+        node.data.selectedModel = dropdown.value;
         console.log(`📥 Saved model selection for Node ${node.id}:`, dropdown.value);
       }
     }
 
-    // ✅ Ensure all Prompt nodes save the latest prompt text
+    // Handle Prompt nodes
     if (node.name === "Prompt") {
       const nodeElement = document.getElementById(`node-${node.id}`);
       if (nodeElement) {
+        const promptNameElement = nodeElement.querySelector('.prompt-name-display');
         const promptTextElement = nodeElement.querySelector('.prompt-text-display');
-        if (promptTextElement) {
-          node.data.promptText = promptTextElement.textContent.trim(); // ✅ Store updated prompt text
-          //console.log(`📥 Saved prompt text for Node ${node.id}:`, node.data.promptText);
+        
+        if (promptNameElement && promptTextElement) {
+          // Save both name and text
+          node.data = {
+            ...node.data,
+            name: promptNameElement.textContent.trim(),
+            promptText: promptTextElement.textContent.trim()
+          };
+          console.log(`📥 Saved prompt data for Node ${node.id}:`, {
+            name: node.data.name,
+            promptText: node.data.promptText.substring(0, 50) + '...'
+          });
         }
       }
     }
@@ -261,7 +272,7 @@ async function loadSelectedFlow() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        operation: 'get_flow', // 🌟 Fetch a specific flow
+        operation: 'get_flow',
         flowId: selectedFlowId,
       }),
     });
@@ -272,7 +283,7 @@ async function loadSelectedFlow() {
 
     const apiResponse = await response.json();
     if (!apiResponse) throw new Error('Empty response from API');
-    //console.log("response: " + JSON.stringify(apiResponse))
+    
     const drawflowData = toDrawflowFormat(apiResponse);
     editor.clear();
     editor.import(drawflowData);
@@ -287,29 +298,38 @@ async function loadSelectedFlow() {
     setTimeout(() => {
       Object.values(drawflowData.drawflow.Home.data).forEach(node => {
         editor.moveNodeToPosition(node.id, node.pos_x + 1, node.pos_y + 1);
-        fixInputOutputNodes(node.id)
+        
+        // Update prompt nodes
+        if (node.name === "Prompt") {
+          const nodeElement = document.getElementById(`node-${node.id}`);
+          if (nodeElement) {
+            const nameDisplay = nodeElement.querySelector('.prompt-name-display');
+            const textDisplay = nodeElement.querySelector('.prompt-text-display');
+            
+            if (nameDisplay) nameDisplay.textContent = node.data?.name || 'New Prompt';
+            if (textDisplay) textDisplay.textContent = node.data?.promptText || '';
+          }
+        }
+        
+        // Update LLM nodes
+        if (node.name === "LLM Call") {
+          const dropdown = document.getElementById(`model-dropdown-${node.id}`);
+          if (dropdown) {
+            dropdown.value = node.data?.selectedModel || 'openai/gpt-4o-mini';
+          }
+        }
+
+        fixInputOutputNodes(node.id);
       });
     }, 100);
 
-    // Move the nodes back to their original positions
+    // Move nodes back to original positions
     setTimeout(() => {
       Object.entries(originalPositions).forEach(([nodeId, { x, y }]) => {
         editor.moveNodeToPosition(nodeId, x, y);
       });
     }, 200);
 
-    // Restore the selected model for each LLM Call node
-    setTimeout(() => {
-      Object.values(drawflowData.drawflow.Home.data).forEach(node => {
-        if (node.name === "LLM Call") {
-          const dropdown = document.getElementById(`model-dropdown-${node.id}`);
-          if (dropdown) {
-            dropdown.value = node.data.selectedModel || 'openai/gpt-4o-mini'; // Default if missing
-            console.log(`📥 Restored model selection for Node ${node.id}:`, dropdown.value);
-          }
-        }
-      });
-      }, 40);
     reattachAllListeners();
     closeLoadFlowModal(selectedFlowId);
   } catch (error) {
@@ -341,16 +361,20 @@ function createPromptNode(x, y) {
     x,
     y,
     'prompt', // CSS class/type
-    { name: 'Prompt Name', promptText: 'Prompt Text' }, // Default data
+    { 
+      name: 'New Prompt',      // Default name
+      promptText: '',          // Empty default text
+      originalPromptText: ''   // For storing original text when using Slack prompts
+    },
     `
       <div class="df-node-content block-prompt">
-        <div class="prompt-name-display" style="color: white; font-size: 14px; font-weight: bold;">Prompt Name</div>
-        <div class="prompt-text-display" style="color: white; font-size: 12px; margin-top: 5px;">Prompt Text</div>
+        <div class="prompt-name-display" style="color: white; font-size: 14px; font-weight: bold;">New Prompt</div>
+        <div class="prompt-text-display" style="color: white; font-size: 12px; margin-top: 5px;">Click Edit to add prompt text</div>
         <button class="prompt-edit-btn" style="margin-top: 10px;">Edit</button>
       </div>
     `
   );
-  fixInputOutputNodes(nodeId)
+  fixInputOutputNodes(nodeId);
   // Attach listeners after the node is created
   setTimeout(() => attachPromptListeners(nodeId), 0);
 }
@@ -371,20 +395,16 @@ function attachPromptListeners(nodeId) {
 
 function openPromptModal(nodeId) {
   currentEditNodeId = nodeId;
-  const nodeElement = document.getElementById(`node-${nodeId}`);
-  if (!nodeElement) return;
+  const node = editor.getNodeFromId(nodeId);
+  if (!node) return;
 
   // Get modal input elements
   const promptModalNameInput = document.getElementById('prompt-modal-name');
   const promptModalTextarea = document.getElementById('prompt-modal-textarea');
 
-  // Get text from the correct node block
-  const promptNameDiv = nodeElement.querySelector('.prompt-name-display');
-  const promptTextDiv = nodeElement.querySelector('.prompt-text-display');
-
-  // Assign values correctly
-  promptModalNameInput.value = promptNameDiv ? promptNameDiv.textContent.trim() : '';
-  promptModalTextarea.value = promptTextDiv ? promptTextDiv.textContent.trim() : '';
+  // Load values from the node's data
+  promptModalNameInput.value = node.data?.name || 'New Prompt';
+  promptModalTextarea.value = node.data?.promptText || '';
 
   // Show the modal and overlay
   const modalOverlay = document.getElementById('modal-overlay');
@@ -558,18 +578,27 @@ function closePromptModal(doSave) {
       const promptModalNameInput = document.getElementById('prompt-modal-name');
       const promptModalTextarea = document.getElementById('prompt-modal-textarea');
 
-      // Save full input and name to the node
-      node.data.name = promptModalNameInput.value;
-      node.data.promptText = promptModalTextarea.value; // Store full text
+      // Save both name and text to the node's data
+      node.data = {
+        ...node.data,
+        name: promptModalNameInput.value.trim(),
+        promptText: promptModalTextarea.value.trim()
+      };
 
       // Update the node display
       const nodeElement = document.querySelector(`#node-${currentEditNodeId} .df-node-content.block-prompt`);
-      const nameDisplay = nodeElement.querySelector('.prompt-name-display');
-      const textDisplay = nodeElement.querySelector('.prompt-text-display');
+      if (nodeElement) {
+        const nameDisplay = nodeElement.querySelector('.prompt-name-display');
+        const textDisplay = nodeElement.querySelector('.prompt-text-display');
 
-      // Update block displays
-      nameDisplay.textContent = node.data.name;
-      textDisplay.textContent = node.data.promptText
+        if (nameDisplay) nameDisplay.textContent = node.data.name;
+        if (textDisplay) textDisplay.textContent = node.data.promptText;
+      }
+
+      console.log(`✅ Updated prompt node ${currentEditNodeId}:`, {
+        name: node.data.name,
+        promptText: node.data.promptText.substring(0, 50) + '...'
+      });
     }
   }
 
