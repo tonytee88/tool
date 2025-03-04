@@ -455,8 +455,8 @@ function createLLMNode(x, y) {
 function createOutputNode(x, y) {
   nodeId = editor.addNode(
     'Output',
-    2, // Inputs
-    2, // 1 Output now correctly placed
+    1, // Inputs
+    1, // 1 Output now correctly placed
     x,
     y,
     'output',

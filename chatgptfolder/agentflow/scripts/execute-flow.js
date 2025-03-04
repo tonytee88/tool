@@ -5,7 +5,6 @@ const { injectSlackPrompt } = require('./features/slack-prompt-handler');
 
 const channelId = process.env.SLACK_CHANNEL_ID || "x"; // Capture dynamically
 const flowId = process.env.FLOW_ID || "y";
-const promptText = process.env.PROMPT_TEXT || "z";
 
 async function executeLLMFlow(flowData, requestType, executionId) {
     console.log("🚀 Starting Flow Execution...");
@@ -52,9 +51,9 @@ async function executeFlowLogic(structuredFlow, requestType, executionId) {
       if (currentNode.name === 'LLM Call') {
         console.log(`🚀 Processing LLM Call Node: ${nodeId}`);
   
-        if (storedResponses[nodeId]) {
-          currentNode.data.output = storedResponses[nodeId];
-        } else {
+        //if (storedResponses[nodeId]) { //
+        //  currentNode.data.output = storedResponses[nodeId]; //
+        //} else { //
           await waitForInputs(nodeId, structuredFlow);
   
           const combinedInputs = getSortedInputs(nodeId, structuredFlow)
@@ -94,7 +93,7 @@ async function executeFlowLogic(structuredFlow, requestType, executionId) {
             console.error(`❌ LLM Call Node (${nodeId}) Error:`, error);
             markNodeAsError(nodeId, error.message);
           }
-        }
+        //}
       } else if (currentNode.name === 'Output') {
         console.log(`📤 Processing Output Node: ${nodeId}`);
       
