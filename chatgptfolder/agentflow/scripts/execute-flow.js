@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
+const { injectSlackPrompt } = require('./features/slack-prompt-handler');
 
 const channelId = process.env.SLACK_CHANNEL_ID || "x"; // Capture dynamically
 const flowId = process.env.FLOW_ID || "y";
@@ -8,7 +9,6 @@ const promptText = process.env.PROMPT_TEXT || "z";
 
 async function executeLLMFlow(flowData, requestType, executionId) {
     console.log("🚀 Starting Flow Execution...");
-    console.log("🚀 Starting Flow Execution..." + promptText);
     if (!flowData || !flowData.length) {
       console.error("❌ No valid flowData received.");
       return;
@@ -22,6 +22,25 @@ async function executeLLMFlow(flowData, requestType, executionId) {
     
     console.log("🔄 Using this executionId in execute-flowjs:", executionId); 
 
+    // Get the Slack prompt from environment variable
+    const slackPrompt = process.env.PROMPT_TEXT;
+    
+    if (slackPrompt) {
+        console.log("📨 Received Slack prompt:", slackPrompt.substring(0, 50) + "...");
+        
+        // Inject Slack prompt into appropriate blocks
+        const modifiedFlow = injectSlackPrompt(structuredFlow, slackPrompt);
+        
+        // Continue with execution using the modified flow
+        await executeFlowLogic(modifiedFlow, requestType, executionId);
+    } else {
+        // Continue with normal execution
+        await executeFlowLogic(structuredFlow, requestType, executionId);
+    }
+}
+
+// Separate the main execution logic
+async function executeFlowLogic(structuredFlow, requestType, executionId) {
     const executionOrder = determineExecutionOrder(structuredFlow);
     const storedResponses = {}; 
   
