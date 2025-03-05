@@ -22,7 +22,7 @@ editor.moveNodeToPosition = function(nodeId, x, y) {
 
 // Track which node is being edited in the modal
 let currentEditNodeId = null;
-let currentZoom = 1; // Start at 100% zoom instead of 20%
+let currentZoom = .3; // Start at 100% zoom instead of 20%
 let delayPerNode = 8000;
 let delayBetweenPoll = 8000;
 
@@ -330,6 +330,13 @@ async function loadSelectedFlow() {
       });
     }, 200);
 
+    // When reattaching listeners to output nodes
+    Object.values(drawflowData.drawflow.Home.data).forEach(node => {
+      if (node.name === 'Output') {
+        attachOutputListeners(node.id);
+      }
+    });
+
     reattachAllListeners();
     closeLoadFlowModal(selectedFlowId);
   } catch (error) {
@@ -393,18 +400,41 @@ function attachPromptListeners(nodeId) {
   }
 }
 
+let currentNodeTextValue = '';
+
 function openPromptModal(nodeId) {
   currentEditNodeId = nodeId;
-  const node = editor.getNodeFromId(nodeId);
+  const flowData = editor.export(); // Get fresh flow data
+  
+  const node = flowData.drawflow.Home.data[nodeId]; // Get node from exported data instead of editor
   if (!node) return;
 
   // Get modal input elements
   const promptModalNameInput = document.getElementById('prompt-modal-name');
   const promptModalTextarea = document.getElementById('prompt-modal-textarea');
 
-  // Load values from the node's data
-  promptModalNameInput.value = node.data?.name || 'New Prompt';
-  promptModalTextarea.value = node.data?.promptText || '';
+  // First try to get values from the current DOM state
+  const nodeElement = document.querySelector(`#node-${nodeId}`);
+  let currentName = '';
+  let currentText = '';
+  
+  if (nodeElement) {
+    const nameDisplay = nodeElement.querySelector('.prompt-name-display');
+    const textDisplay = nodeElement.querySelector('.prompt-text-display');
+    if (nameDisplay) currentName = nameDisplay.textContent.trim();
+    if (textDisplay) currentText = textDisplay.textContent.trim();
+  }
+
+  // Use DOM values if they exist, otherwise fall back to exported flow data
+  promptModalNameInput.value = currentName || node.data?.name || 'New Prompt';
+  promptModalTextarea.value = currentText || node.data?.promptText || '';
+
+  console.log(`📝 Opening modal for Node ${nodeId} with latest data:`, {
+    name: promptModalNameInput.value,
+    promptText: promptModalTextarea.value,
+    fromDOM: !!currentName, // Log whether we used DOM values
+    fromData: !!node.data?.name // Log whether we used flow data
+  });
 
   // Show the modal and overlay
   const modalOverlay = document.getElementById('modal-overlay');
@@ -453,10 +483,12 @@ function createLLMNode(x, y) {
 
 // --- OUTPUT NODE ---
 function createOutputNode(x, y) {
-  nodeId = editor.addNode(
+  console.log(`🎯 Creating output node at position (${x}, ${y})`);
+  
+  const nodeId = editor.addNode(
     'Output',
-    1, // Inputs
-    1, // 1 Output now correctly placed
+    1,
+    1,
     x,
     y,
     'output',
@@ -483,7 +515,11 @@ function createOutputNode(x, y) {
       </div>
     `
   );
-  fixInputOutputNodes(nodeId)
+  
+  fixInputOutputNodes(nodeId);
+  attachOutputListeners(nodeId);
+  
+  return nodeId;
 }
 
   //fixing node positionning
@@ -515,15 +551,24 @@ function createOutputNode(x, y) {
   }
   
 function attachOutputListeners(nodeId) {
-  setTimeout(() => { // Add slight delay to ensure elements exist
+  
+  setTimeout(() => {
+    const nodeElement = document.querySelector(`#node-${nodeId}`);
+    
+    const copyButton = nodeElement?.querySelector(".copy-output-btn");
+    const outputDiv = nodeElement?.querySelector(".output-response");
+    
     document.addEventListener("click", function (event) {
       if (event.target.classList.contains("copy-output-btn")) {
-        const nodeElement = event.target.closest(".df-node-content"); // Find the parent node
+        
+        const nodeElement = event.target.closest(".df-node-content");
+        
         if (!nodeElement) return;
     
         const outputDiv = nodeElement.querySelector(".output-response");
+    
         if (!outputDiv) {
-          console.error("Output div not found!");
+          console.error("❌ Output div not found!");
           return;
         }
     
@@ -531,8 +576,9 @@ function attachOutputListeners(nodeId) {
           .then(() => console.log("✅ Output copied to clipboard!"))
           .catch(err => console.error("❌ Failed to copy text: ", err));
       }
-    })
-})};
+    });
+  }, 0);
+}
 
 
 function reattachAllListeners() {
@@ -599,6 +645,7 @@ function closePromptModal(doSave) {
         name: node.data.name,
         promptText: node.data.promptText.substring(0, 50) + '...'
       });
+      updateFlowData();
     }
   }
 
