@@ -150,6 +150,32 @@ async function saveFlow() {
         }
       }
     }
+
+    // Handle Facebook Marketing nodes
+    if (node.name === "Facebook Marketing") {
+      const nodeElement = document.getElementById(`node-${node.id}`);
+      if (nodeElement) {
+        const accountIdElement = nodeElement.querySelector('.account-id');
+        const timeframeElement = nodeElement.querySelector('.timeframe');
+        const levelElement = nodeElement.querySelector('.level');
+        const statusElement = nodeElement.querySelector('.status');
+
+        node.data = {
+          ...node.data,
+          accountId: accountIdElement?.textContent === 'Not set' ? '' : accountIdElement?.textContent.trim(),
+          timeframe: timeframeElement?.textContent.trim() || 'last_30d',
+          level: levelElement?.textContent.trim() || 'campaign',
+          status: statusElement?.textContent.trim() || 'Not run'
+        };
+
+        console.log(`📥 Saved Facebook Marketing data for Node ${node.id}:`, {
+          accountId: node.data.accountId || 'Not set',
+          timeframe: node.data.timeframe,
+          level: node.data.level,
+          status: node.data.status
+        });
+      }
+    }
   });
 
   // ✅ Call the API to save the updated flow

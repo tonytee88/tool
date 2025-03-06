@@ -13,8 +13,8 @@ async function testFacebookMarketing() {
   const testParams = {
     accountId: '366302820479058', // From your example
     timeframe: 'last_30d',
-    level: 'account',
-    includeAudienceData: true, 
+    level: 'campaign',
+    //includeAudienceData: true, 
     accessToken: process.env.FACEBOOK_ACCESS_TOKEN // Store token in .env file
   };
 
