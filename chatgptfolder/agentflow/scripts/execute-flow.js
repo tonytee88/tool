@@ -51,49 +51,88 @@ async function executeFlowLogic(structuredFlow, requestType, executionId) {
       if (currentNode.name === 'LLM Call') {
         console.log(`🚀 Processing LLM Call Node: ${nodeId}`);
   
-        //if (storedResponses[nodeId]) { //
-        //  currentNode.data.output = storedResponses[nodeId]; //
-        //} else { //
-          await waitForInputs(nodeId, structuredFlow);
+        await waitForInputs(nodeId, structuredFlow);
   
-          const combinedInputs = getSortedInputs(nodeId, structuredFlow)
-          console.log("📝 Combined Inputs:", combinedInputs.substring(0, 20) + "...");
+        const combinedInputs = getSortedInputs(nodeId, structuredFlow)
+        console.log("📝 Combined Inputs:", combinedInputs.substring(0, 20) + "...");
   
-          const selectedModel = currentNode.data.selectedModel || 'openai/gpt-4o-mini';
-          //console.log(`📝 Model selected for Node ${nodeId}: ${selectedModel}`);
+        const selectedModel = currentNode.data.selectedModel || 'openai/gpt-4o-mini';
   
-          try {
-            const response = await callLLMAPI(combinedInputs, selectedModel);
-            const messageResponse = response.data?.completions?.[selectedModel]?.completion?.choices?.[0]?.message?.content || "⚠️ No valid response";
+        try {
+          const response = await callLLMAPI(combinedInputs, selectedModel);
+          const messageResponse = response.data?.completions?.[selectedModel]?.completion?.choices?.[0]?.message?.content || "⚠️ No valid response";
   
-            console.log(`✅ LLM Call Node (${nodeId}) works`);
+          console.log(`✅ LLM Call Node (${nodeId}) works`);
   
-            currentNode.data.output = messageResponse;
-            storedResponses[nodeId] = messageResponse;
+          currentNode.data.output = messageResponse;
+          storedResponses[nodeId] = messageResponse;
 
-            // 🌟 **Find the correct Output Node ID**
-            // Find all connected output nodes
-            const outputNodeIds = findConnectedOutputNodes(nodeId, structuredFlow);
-            console.log(`🔗 Found ${outputNodeIds.length} output nodes connected to LLM Node ${nodeId}`);
+          const outputNodeIds = findConnectedOutputNodes(nodeId, structuredFlow);
+          console.log(`🔗 Found ${outputNodeIds.length} output nodes connected to LLM Node ${nodeId}`);
 
-            // Save response for each connected output node
-            if (requestType === "browser") {
-              // Store for the LLM node itself
-              await saveExecutionResponse(executionId, nodeId, messageResponse);
-              
-              // Store for each connected output node
-              for (const outputId of outputNodeIds) {
-                console.log(`📤 Storing response for Output Node ${outputId}`);
-                await saveExecutionResponse(executionId, outputId, messageResponse);
-              }
+          if (requestType === "browser") {
+            await saveExecutionResponse(executionId, nodeId, messageResponse);
+            
+            for (const outputId of outputNodeIds) {
+              console.log(`📤 Storing response for Output Node ${outputId}`);
+              await saveExecutionResponse(executionId, outputId, messageResponse);
             }
-            updateOutputNodes(structuredFlow, nodeId, messageResponse);
+          }
+          updateOutputNodes(structuredFlow, nodeId, messageResponse);
 
+        } catch (error) {
+          console.error(`❌ LLM Call Node (${nodeId}) Error:`, error);
+          markNodeAsError(nodeId, error.message);
+        }
+      } else if (currentNode.name === 'Facebook Marketing') {
+        console.log(`🔄 Processing Facebook Marketing Node: ${nodeId}`);
+        
+        // Get accountId from node data or look in previous responses
+        let accountId = currentNode.data?.accountId;
+        if (!accountId) {
+          // Look for accountId in previous LLM or Output responses
+          for (const [prevNodeId, response] of Object.entries(storedResponses)) {
+            const match = response.match(/accountid:(\w+)/i);
+            if (match) {
+              accountId = match[1];
+              console.log(`📝 Found accountId in previous node ${prevNodeId}: ${accountId}`);
+              break;
+            }
+          }
+        }
+
+        if (accountId) {
+          try {
+            // Import the Facebook Marketing API module
+            const fbMarketing = require('./features/facebook_marketing.api.js');
+            
+            // Call the API with the executionId
+            const result = await fbMarketing.fetchAndStoreInsights({
+              accountId,
+              timeframe: currentNode.data?.timeframe || 'last_30d',
+              level: currentNode.data?.level || 'campaign',
+              accessToken: process.env.FACEBOOK_ACCESS_TOKEN,
+              executionId
+            });
+
+            console.log(`✅ Facebook Marketing API call successful for node ${nodeId}:`, result);
+            
+            // Store the result in responses for potential later use
+            storedResponses[nodeId] = JSON.stringify(result);
+            currentNode.data.output = JSON.stringify(result);
+            
+            // Save the response if in browser mode
+            if (requestType === "browser") {
+              await saveExecutionResponse(executionId, nodeId, JSON.stringify(result));
+            }
           } catch (error) {
-            console.error(`❌ LLM Call Node (${nodeId}) Error:`, error);
+            console.error(`❌ Error processing Facebook Marketing node ${nodeId}:`, error);
             markNodeAsError(nodeId, error.message);
           }
-        //}
+        } else {
+          console.warn(`⚠️ No accountId found for Facebook Marketing node ${nodeId}`);
+          markNodeAsError(nodeId, "No accountId found");
+        }
       } else if (currentNode.name === 'Output') {
         console.log(`📤 Processing Output Node: ${nodeId}`);
       
@@ -261,52 +300,62 @@ async function callLLMAPI(prompt, model) {
 // 🌟 Updated execution order logic to ensure dependencies are followed correctly
 function determineExecutionOrder(structuredFlow) {
   if (!structuredFlow) {
-      console.error("❌ Invalid flowData format from determineExecutionOrder function!");
-      return [];
+    console.error("❌ Invalid flowData format from determineExecutionOrder function!");
+    return [];
   }
 
   const executionOrder = [];
   const processedNodes = new Set();
 
   function traverseNode(nodeId) {
-      const nodeIdStr = String(nodeId); 
+    const nodeIdStr = String(nodeId);
 
-      if (processedNodes.has(nodeIdStr)) {
-          console.log(`⏭️ Node ${nodeIdStr} already processed.`);
-          return; 
-      }
+    if (processedNodes.has(nodeIdStr)) {
+      console.log(`⏭️ Node ${nodeIdStr} already processed.`);
+      return;
+    }
 
-      const node = structuredFlow[nodeIdStr];
-      if (!node) return;
+    const node = structuredFlow[nodeIdStr];
+    if (!node) return;
 
-      console.log(`🔍 Analyzing Node: ${nodeIdStr} (${node.name})`);
+    console.log(`🔍 Analyzing Node: ${nodeIdStr} (${node.name})`);
 
-      // 🌟 Now processing both input ports (top and left) before execution
-      const inputConnections = Object.values(node.inputs || {})
-          .flatMap(input => input.connections || [])
-          .map(conn => String(conn.node)) 
-          .filter(inputNodeId => !processedNodes.has(inputNodeId));
+    // Process input dependencies first
+    const inputConnections = Object.values(node.inputs || {})
+      .flatMap(input => input.connections || [])
+      .map(conn => String(conn.node))
+      .filter(inputNodeId => !processedNodes.has(inputNodeId));
 
-      inputConnections.forEach(traverseNode);
+    inputConnections.forEach(traverseNode);
 
-      if (!processedNodes.has(nodeIdStr)) {
-          executionOrder.push(nodeIdStr);
-          processedNodes.add(nodeIdStr);
-      }
+    if (!processedNodes.has(nodeIdStr)) {
+      executionOrder.push(nodeIdStr);
+      processedNodes.add(nodeIdStr);
+    }
 
-      const outputConnections = Object.values(node.outputs || {})
-          .flatMap(output => output.connections || [])
-          .map(conn => String(conn.node)) 
-          .filter(outputNodeId => !processedNodes.has(outputNodeId));
+    const outputConnections = Object.values(node.outputs || {})
+      .flatMap(output => output.connections || [])
+      .map(conn => String(conn.node))
+      .filter(outputNodeId => !processedNodes.has(outputNodeId));
 
-      outputConnections.forEach(traverseNode);
+    outputConnections.forEach(traverseNode);
   }
 
+  // First process LLM nodes
   const llmNodes = Object.values(structuredFlow)
-      .filter(node => node.name === 'LLM Call')
-      .sort((a, b) => (a.pos_y === b.pos_y ? a.pos_x - b.pos_x : a.pos_y - b.pos_y));
+    .filter(node => node.name === 'LLM Call')
+    .sort((a, b) => (a.pos_y === b.pos_y ? a.pos_x - b.pos_x : a.pos_y - b.pos_y));
 
   llmNodes.forEach(llmNode => traverseNode(llmNode.id));
+
+  // Then process Facebook Marketing nodes that haven't been processed yet
+  const fbNodes = Object.values(structuredFlow)
+    .filter(node => 
+      node.name === 'Facebook Marketing' && 
+      !processedNodes.has(String(node.id))
+    );
+
+  fbNodes.forEach(fbNode => traverseNode(fbNode.id));
 
   console.log("✅ Final executionOrder:", executionOrder);
   return executionOrder;
