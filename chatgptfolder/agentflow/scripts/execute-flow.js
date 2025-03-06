@@ -100,18 +100,22 @@ async function executeFlowLogic(structuredFlow, requestType, executionId) {
             }
           }
         }
-//
-        if (accountId) {
+
+        if (!accountId) {
+          console.warn(`⚠️ No accountId found for Facebook Marketing node ${nodeId}`);
+          markNodeAsError(nodeId, "No accountId found");
+        } else {
           try {
             // Import the Facebook Marketing API module
             const fbMarketing = require('./features/facebook_marketing.api.js');
             
-            // Call the API (access token is now handled via environment variable)
+            // Call the API with audience data included
             const result = await fbMarketing.fetchAndStoreInsights({
               accountId,
               timeframe: currentNode.data?.timeframe || 'last_30d',
               level: currentNode.data?.level || 'campaign',
-              executionId
+              executionId,
+              includeAudienceData: true // Include audience data in the API call
             });
 
             console.log(`✅ Facebook Marketing API call successful for node ${nodeId}:`, result);
@@ -128,9 +132,6 @@ async function executeFlowLogic(structuredFlow, requestType, executionId) {
             console.error(`❌ Error processing Facebook Marketing node ${nodeId}:`, error);
             markNodeAsError(nodeId, error.message);
           }
-        } else {
-          console.warn(`⚠️ No accountId found for Facebook Marketing node ${nodeId}`);
-          markNodeAsError(nodeId, "No accountId found");
         }
       } else if (currentNode.name === 'Output') {
         console.log(`📤 Processing Output Node: ${nodeId}`);

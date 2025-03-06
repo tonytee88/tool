@@ -14,8 +14,9 @@ async function testFacebookMarketing() {
     accountId: '366302820479058', // From your example
     timeframe: 'last_30d',
     level: 'campaign',
-    //includeAudienceData: true, 
-    accessToken: process.env.FACEBOOK_ACCESS_TOKEN // Store token in .env file
+    includeAudienceData: true, 
+    accessToken: process.env.FACEBOOK_ACCESS_TOKEN, // Store token in .env file
+    executionId: '1234567890'
   };
 
   try {
