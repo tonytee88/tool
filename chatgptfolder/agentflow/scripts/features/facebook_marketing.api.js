@@ -1,6 +1,14 @@
 const axios = require('axios');
 require('dotenv').config();
 
+// Add validation for required environment variable
+function validateEnvironment() {
+  if (!process.env.FACEBOOK_ACCESS_TOKEN) {
+    throw new Error('FACEBOOK_ACCESS_TOKEN environment variable is required');
+  }
+  return process.env.FACEBOOK_ACCESS_TOKEN;
+}
+
 /**
  * Calls the Facebook Marketing API to retrieve comprehensive insights data
  * @param {Object} params - Parameters for the API call
@@ -12,6 +20,7 @@ require('dotenv').config();
  */
 async function callFacebookInsightsAPI(params) {
   try {
+    const accessToken = validateEnvironment();
     console.log(`📊 Calling Facebook Insights API for account ${params.accountId} with timeframe ${params.timeframe}`);
     
     // All metrics we want to collect based on Facebook API field names
@@ -52,14 +61,14 @@ async function callFacebookInsightsAPI(params) {
     // Construct the API URL
     const url = `https://graph.facebook.com/v17.0/act_${params.accountId}/insights`;
     
-    // Make the API request
+    // Make the API request using the environment variable token
     const response = await axios.get(url, {
       params: {
         fields: fields,
-        level: params.level || 'account', // Default to account level
+        level: params.level || 'account',
         date_preset: params.timeframe,
-        access_token: params.accessToken,
-        limit: 100 // Get more results
+        access_token: accessToken,
+        limit: 100
       }
     });
     
@@ -81,8 +90,9 @@ async function callFacebookInsightsAPI(params) {
  * @param {string} accessToken - Facebook API access token
  * @returns {Promise<Object>} - Audience data
  */
-async function getAudienceData(accountId, accessToken) {
+async function getAudienceData(accountId) {
   try {
+    const accessToken = validateEnvironment();
     console.log(`👥 Fetching audience data for account ${accountId}`);
     
     // Get audience data from the ad account's saved audiences
@@ -268,28 +278,34 @@ async function getStoredInsightsData(query = {}) {
  */
 async function fetchAndStoreInsights(options) {
   try {
-    console.log(`🚀 Starting Facebook insights retrieval for account ${options.accountId}`);
+    if (!options.executionId) {
+      throw new Error('executionId is required for Facebook insights processing');
+    }
+
+    console.log(`🚀 Starting Facebook insights retrieval for account ${options.accountId} (executionId: ${options.executionId})`);
     
-    // Step 1: Call the Facebook Insights API
+    // Step 1: Call the Facebook Insights API (no longer passing access token)
     const insightsData = await callFacebookInsightsAPI({
       accountId: options.accountId,
       timeframe: options.timeframe,
-      level: options.level || 'account',
-      accessToken: options.accessToken
+      level: options.level || 'account'
     });
     
-    // Step 2: Get audience data if requested
+    // Step 2: Get audience data if requested (no longer passing access token)
     let audienceData = null;
     if (options.includeAudienceData) {
-      audienceData = await getAudienceData(options.accountId, options.accessToken);
+      audienceData = await getAudienceData(options.accountId);
     }
     
     // Step 3: Format and enrich the data
     const formattedData = formatInsightsData(insightsData, audienceData, {
       accountId: options.accountId,
       timeframe: options.timeframe,
-      level: options.level || 'account'
+      level: options.level || 'account',
+      executionId: options.executionId
     });
+    
+    formattedData.executionId = options.executionId;
     
     // Step 4: Store the data in MongoDB
     const storageResult = await storeInsightsData(formattedData);
@@ -297,7 +313,7 @@ async function fetchAndStoreInsights(options) {
     return {
       success: true,
       message: 'Facebook insights retrieved and stored successfully',
-      insightId: storageResult.insightId,
+      executionId: options.executionId,
       metrics: formattedData.calculatedMetrics,
       dataPoints: insightsData.data?.length || 0
     };
@@ -305,7 +321,8 @@ async function fetchAndStoreInsights(options) {
     console.error(`❌ Error in Facebook insights processing: ${error.message}`);
     return {
       success: false,
-      error: error.message
+      error: error.message,
+      executionId: options.executionId
     };
   }
 }

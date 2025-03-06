@@ -105,14 +105,12 @@ async function executeFlowLogic(structuredFlow, requestType, executionId) {
           try {
             // Import the Facebook Marketing API module
             const fbMarketing = require('./features/facebook_marketing.api.js');
-            let testchacha = process.env.FACEBOOK_ACCESS_TOKEN;
-            console.log("testchacha:" + testchacha);
-            // Call the API with the executionId
+            
+            // Call the API (access token is now handled via environment variable)
             const result = await fbMarketing.fetchAndStoreInsights({
               accountId,
               timeframe: currentNode.data?.timeframe || 'last_30d',
               level: currentNode.data?.level || 'campaign',
-              accessToken: process.env.FACEBOOK_ACCESS_TOKEN,
               executionId
             });
 
