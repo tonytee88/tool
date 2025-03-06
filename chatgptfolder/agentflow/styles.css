@@ -73,6 +73,64 @@ body {
   background: var(--accent-light);
 }
 
+/* Tools Dropdown Styles */
+.tools-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-trigger {
+  padding: 10px 16px;
+  background: var(--bg-surface-light);
+  color: var(--text-primary);
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dropdown-trigger:hover {
+  background: var(--bg-surface-hover);
+  transform: translateY(-1px);
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--bg-surface);
+  min-width: 200px;
+  box-shadow: var(--shadow);
+  border-radius: var(--border-radius);
+  z-index: 1000;
+  padding: 8px 0;
+}
+
+.tools-dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown-content button {
+  display: block;
+  width: 100%;
+  padding: 8px 16px;
+  text-align: left;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.dropdown-content button:hover {
+  background: var(--bg-surface-hover);
+}
+
 #btn-save, #btn-load {
   background: var(--bg-surface-light);
   border-left: 3px solid var(--accent);
@@ -525,4 +583,56 @@ body {
     width: 90%;
     padding: 16px;
   }
+}
+
+/* Facebook Marketing Node Styles */
+.block-facebook-marketing {
+  min-width: 300px;
+  padding: 15px;
+  background: var(--bg-surface);
+  border-radius: var(--border-radius);
+}
+
+.block-facebook-marketing strong {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--accent);
+}
+
+.block-facebook-marketing .config-section {
+  margin: 10px 0;
+  padding: 10px;
+  background: var(--bg-surface-light);
+  border-radius: var(--border-radius);
+}
+
+.block-facebook-marketing .config-item {
+  margin: 5px 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.block-facebook-marketing .config-item span {
+  color: var(--text-primary);
+  margin-left: 5px;
+}
+
+.block-facebook-marketing .fb-config-btn {
+  width: 100%;
+  padding: 8px;
+  margin-top: 10px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.block-facebook-marketing .fb-config-btn:hover {
+  background: var(--accent-light);
+}
+
+.block-facebook-marketing .status {
+  font-weight: bold;
 }

@@ -47,6 +47,17 @@
       </svg>
       Output
     </button>
+    <div class="tools-dropdown">
+      <button id="btn-add-tools" class="dropdown-trigger">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Tools
+      </button>
+      <div class="dropdown-content">
+        <button id="btn-add-facebook-marketing">Facebook Marketing API</button>
+      </div>
+    </div>
     <button id="btn-save">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M19 21H5C3.89543 21 3 20.1046 3 19V5C3 3.89543 3.89543 3 5 3H16.1716C16.702 3 17.2107 3.21071 17.5858 3.58579L20.4142 6.41421C20.7893 6.78929 21 7.29799 21 7.82843V19C21 20.1046 20.1046 21 19 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -119,6 +130,38 @@
     <div class="modal-buttons">
       <button class="save-button" onclick="closePromptModal(true)">Save</button>
       <button class="cancel-button" onclick="closePromptModal(false)">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Tool Modal -->
+  <div id="tool-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Configure Tool</h2>
+        <span class="close" onclick="closeToolModal()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="tool-modal-node-id">
+        
+        <div class="modal-field">
+          <label for="tool-type-select">Tool Type</label>
+          <select id="tool-type-select" onchange="updateToolParamFields(this.value)">
+            <option value="Function">Function</option>
+            <option value="WebSearch">Web Search</option>
+            <option value="APICall">API Call</option>
+            <option value="DatabaseQuery">Database Query</option>
+            <option value="Calculator">Calculator</option>
+          </select>
+        </div>
+        
+        <div id="tool-params-container">
+          <!-- Parameter fields will be dynamically added here -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button onclick="closeToolModal()">Cancel</button>
+        <button onclick="saveToolConfig()">Save</button>
+      </div>
     </div>
   </div>
 

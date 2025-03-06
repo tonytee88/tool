@@ -1223,3 +1223,344 @@ async function callLLMAPI(prompt, model) {
   }
 }
 
+// Create a Tool node
+function createToolNode(id, name, positionX, positionY, toolType) {
+  const toolNode = document.createElement("div");
+  toolNode.classList.add("drawflow-node", "tool-node");
+  toolNode.innerHTML = `
+    <div class="node-header">
+      <div class="node-title">Tool: ${toolType || "Function"}</div>
+      <div class="node-actions">
+        <button class="config-button"><i class="fas fa-cog"></i></button>
+        <button class="delete-button"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>
+    <div class="node-content">
+      <div class="tool-config">
+        <div class="tool-type">${toolType || "Function"}</div>
+        <div class="tool-params">Click to configure</div>
+      </div>
+    </div>
+    <div class="drawflow_content_node">
+      <div class="input-container">
+        <div class="input-title">Input</div>
+        <div class="input-socket" draggable="true"></div>
+      </div>
+      <div class="output-container">
+        <div class="output-title">Output</div>
+        <div class="output-socket" draggable="true"></div>
+      </div>
+    </div>
+  `;
+
+  editor.addNode(
+    name,
+    1, // Inputs
+    1, // Outputs
+    positionX,
+    positionY,
+    "tool-node", // Class
+    { id, toolType: toolType || "Function", params: {} }, // Data
+    id
+  );
+
+  return toolNode;
+}
+
+// Tool Modal Functions
+function openToolModal(nodeId) {
+  const node = editor.getNodeFromId(nodeId);
+  const nodeData = node.data;
+  
+  document.getElementById('tool-modal-node-id').value = nodeId;
+  
+  // Set the tool type dropdown
+  const toolTypeSelect = document.getElementById('tool-type-select');
+  if (nodeData.toolType) {
+    toolTypeSelect.value = nodeData.toolType;
+  } else {
+    toolTypeSelect.value = 'Function';
+  }
+  
+  // Update parameter fields based on tool type
+  updateToolParamFields(nodeData.toolType, nodeData.params);
+  
+  // Show the modal
+  document.getElementById('tool-modal').style.display = 'block';
+  document.getElementById('modal-overlay').style.display = 'block';
+}
+
+function closeToolModal() {
+  document.getElementById('tool-modal').style.display = 'none';
+  document.getElementById('modal-overlay').style.display = 'none';
+}
+
+function saveToolConfig() {
+  const nodeId = document.getElementById('tool-modal-node-id').value;
+  const toolType = document.getElementById('tool-type-select').value;
+  
+  // Get parameters based on tool type
+  const params = getToolParams(toolType);
+  
+  // Update node data
+  const node = editor.getNodeFromId(nodeId);
+  node.data.toolType = toolType;
+  node.data.params = params;
+  
+  // Update node UI
+  const nodeElement = document.getElementById(`node-${nodeId}`);
+  if (nodeElement) {
+    const titleElement = nodeElement.querySelector('.node-title');
+    if (titleElement) {
+      titleElement.textContent = `Tool: ${toolType}`;
+    }
+    
+    const toolTypeElement = nodeElement.querySelector('.tool-type');
+    if (toolTypeElement) {
+      toolTypeElement.textContent = toolType;
+    }
+    
+    const paramsElement = nodeElement.querySelector('.tool-params');
+    if (paramsElement) {
+      // Display a summary of the parameters
+      const paramSummary = Object.keys(params).length > 0 
+        ? Object.keys(params).join(', ') 
+        : 'No parameters';
+      paramsElement.textContent = paramSummary;
+    }
+  }
+  
+  closeToolModal();
+}
+
+function updateToolParamFields(toolType, existingParams = {}) {
+  const paramContainer = document.getElementById('tool-params-container');
+  paramContainer.innerHTML = '';
+  
+  // Define parameters for each tool type
+  const paramFields = getToolParamFields(toolType);
+  
+  paramFields.forEach(param => {
+    const fieldDiv = document.createElement('div');
+    fieldDiv.classList.add('modal-field');
+    
+    const label = document.createElement('label');
+    label.textContent = param.label;
+    label.setAttribute('for', `tool-param-${param.name}`);
+    
+    const input = document.createElement('input');
+    input.type = param.type || 'text';
+    input.id = `tool-param-${param.name}`;
+    input.name = param.name;
+    input.value = existingParams[param.name] || '';
+    
+    fieldDiv.appendChild(label);
+    fieldDiv.appendChild(input);
+    paramContainer.appendChild(fieldDiv);
+  });
+}
+
+function getToolParamFields(toolType) {
+  // Define parameters for each tool type
+  switch (toolType) {
+    case 'WebSearch':
+      return [
+        { name: 'searchEngine', label: 'Search Engine', type: 'text' },
+        { name: 'maxResults', label: 'Max Results', type: 'number' }
+      ];
+    case 'APICall':
+      return [
+        { name: 'endpoint', label: 'API Endpoint', type: 'text' },
+        { name: 'method', label: 'HTTP Method', type: 'text' },
+        { name: 'headers', label: 'Headers (JSON)', type: 'text' }
+      ];
+    case 'DatabaseQuery':
+      return [
+        { name: 'connectionString', label: 'Connection String', type: 'text' },
+        { name: 'query', label: 'Query Template', type: 'text' }
+      ];
+    case 'Calculator':
+      return []; // No parameters needed
+    case 'Function':
+    default:
+      return [
+        { name: 'functionName', label: 'Function Name', type: 'text' },
+        { name: 'description', label: 'Description', type: 'text' }
+      ];
+  }
+}
+
+function getToolParams(toolType) {
+  const params = {};
+  const paramFields = getToolParamFields(toolType);
+  
+  paramFields.forEach(param => {
+    const input = document.getElementById(`tool-param-${param.name}`);
+    if (input) {
+      params[param.name] = input.value;
+    }
+  });
+  
+  return params;
+}
+
+// --- FACEBOOK MARKETING NODE ---
+function createFacebookMarketingNode(x, y) {
+  const nodeId = editor.addNode(
+    'Facebook Marketing',
+    1, // inputs
+    1, // outputs
+    x,
+    y,
+    'facebook-marketing',
+    {
+      accountId: '',
+      timeframe: 'last_30d',
+      level: 'campaign',
+      status: 'Not run'
+    },
+    `
+      <div class="df-node-content block-facebook-marketing">
+        <strong>Facebook Marketing API</strong>
+        <div class="config-section">
+          <div class="config-item">Account ID: <span class="account-id">Not set</span></div>
+          <div class="config-item">Timeframe: <span class="timeframe">last_30d</span></div>
+          <div class="config-item">Level: <span class="level">campaign</span></div>
+          <div class="config-item">Status: <span class="status">Not run</span></div>
+        </div>
+        <button class="fb-config-btn">Configure</button>
+      </div>
+    `
+  );
+  
+  fixInputOutputNodes(nodeId);
+  setTimeout(() => attachFacebookMarketingListeners(nodeId), 0);
+  return nodeId;
+}
+
+function attachFacebookMarketingListeners(nodeId) {
+  const nodeElement = document.querySelector(`#node-${nodeId} .df-node-content.block-facebook-marketing`);
+  if (!nodeElement) return;
+
+  const configButton = nodeElement.querySelector('.fb-config-btn');
+  if (configButton) {
+    configButton.onclick = () => openFacebookMarketingModal(nodeId);
+  }
+}
+
+function openFacebookMarketingModal(nodeId) {
+  const node = editor.getNodeFromId(nodeId);
+  if (!node) return;
+
+  const modalContent = `
+    <div class="modal-content">
+      <h2>Configure Facebook Marketing API</h2>
+      <div class="modal-field">
+        <label for="fb-account-id">Account ID</label>
+        <input type="text" id="fb-account-id" value="${node.data.accountId || ''}" placeholder="Enter Account ID">
+      </div>
+      <div class="modal-field">
+        <label for="fb-timeframe">Timeframe</label>
+        <select id="fb-timeframe">
+          <option value="last_7d" ${node.data.timeframe === 'last_7d' ? 'selected' : ''}>Last 7 days</option>
+          <option value="last_30d" ${node.data.timeframe === 'last_30d' ? 'selected' : ''}>Last 30 days</option>
+          <option value="last_90d" ${node.data.timeframe === 'last_90d' ? 'selected' : ''}>Last 90 days</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label for="fb-level">Level</label>
+        <select id="fb-level">
+          <option value="account" ${node.data.level === 'account' ? 'selected' : ''}>Account</option>
+          <option value="campaign" ${node.data.level === 'campaign' ? 'selected' : ''}>Campaign</option>
+          <option value="adset" ${node.data.level === 'adset' ? 'selected' : ''}>Ad Set</option>
+          <option value="ad" ${node.data.level === 'ad' ? 'selected' : ''}>Ad</option>
+        </select>
+      </div>
+      <div class="modal-buttons">
+        <button onclick="closeFacebookMarketingModal(false)">Cancel</button>
+        <button onclick="closeFacebookMarketingModal(true)">Save</button>
+      </div>
+    </div>
+  `;
+
+  const modalOverlay = document.getElementById('modal-overlay');
+  modalOverlay.innerHTML = modalContent;
+  modalOverlay.style.display = 'block';
+  currentEditNodeId = nodeId;
+}
+
+function closeFacebookMarketingModal(save) {
+  if (save && currentEditNodeId) {
+    const node = editor.getNodeFromId(currentEditNodeId);
+    if (node) {
+      // Update node data
+      node.data.accountId = document.getElementById('fb-account-id').value;
+      node.data.timeframe = document.getElementById('fb-timeframe').value;
+      node.data.level = document.getElementById('fb-level').value;
+
+      // Update node display
+      const nodeElement = document.querySelector(`#node-${currentEditNodeId}`);
+      if (nodeElement) {
+        nodeElement.querySelector('.account-id').textContent = node.data.accountId || 'Not set';
+        nodeElement.querySelector('.timeframe').textContent = node.data.timeframe;
+        nodeElement.querySelector('.level').textContent = node.data.level;
+      }
+    }
+  }
+  
+  document.getElementById('modal-overlay').style.display = 'none';
+  currentEditNodeId = null;
+}
+
+async function processFacebookMarketingNode(nodeId, inputData) {
+  const node = editor.getNodeFromId(nodeId);
+  if (!node) return null;
+
+  try {
+    // Update status to running
+    updateNodeStatus(nodeId, 'Running...');
+
+    const response = await fetch('/api/facebook-marketing', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        accountId: node.data.accountId,
+        timeframe: node.data.timeframe,
+        level: node.data.level,
+        input: inputData
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`API request failed: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    updateNodeStatus(nodeId, 'Completed');
+    return result;
+  } catch (error) {
+    console.error('Facebook Marketing API Error:', error);
+    updateNodeStatus(nodeId, 'Error');
+    throw error;
+  }
+}
+
+function updateNodeStatus(nodeId, status) {
+  const node = editor.getNodeFromId(nodeId);
+  if (node) {
+    node.data.status = status;
+    const statusElement = document.querySelector(`#node-${nodeId} .status`);
+    if (statusElement) {
+      statusElement.textContent = status;
+    }
+  }
+}
+
+// Add event listener for the Facebook Marketing button
+document.getElementById('btn-add-facebook-marketing').addEventListener('click', () => {
+  const { x, y } = editor.mouse_position || { x: 100, y: 100 };
+  createFacebookMarketingNode(x, y);
+});
+
