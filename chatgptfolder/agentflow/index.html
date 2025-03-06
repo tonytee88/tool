@@ -102,8 +102,8 @@
     <h3>Load Existing Flow</h3>
     <select id="flow-list"></select>
     <div class="modal-buttons">
-      <button id="load-confirm">Load</button>
       <button id="load-cancel">Cancel</button>
+      <button id="load-confirm">Load</button>
     </div>
   </div>
   
@@ -111,7 +111,7 @@
   <div id="drawflow"></div>
   
   <!-- Modal Overlay & Popup -->
-  <div id="modal-overlay">aaaaa</div>
+  <div id="modal-overlay"></div>
   <div id="prompt-modal">
     <h2>Edit Prompt</h2>
     <label for="prompt-modal-name">Prompt Name</label>
@@ -128,46 +128,44 @@
       placeholder="Enter Prompt Text"
     ></textarea>
     <div class="modal-buttons">
-      <button class="save-button" onclick="closePromptModal(true)">Save</button>
       <button class="cancel-button" onclick="closePromptModal(false)">Cancel</button>
+      <button class="save-button" onclick="closePromptModal(true)">Save</button>
     </div>
   </div>
 
-  <!-- Tool Modal -->
-  <div id="tool-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Configure Tool</h2>
-        <span class="close" onclick="closeToolModal()">&times;</span>
-      </div>
-      <div class="modal-body">
-        <input type="hidden" id="tool-modal-node-id">
-        
-        <div class="modal-field">
-          <label for="tool-type-select">Tool Type</label>
-          <select id="tool-type-select" onchange="updateToolParamFields(this.value)">
-            <option value="Function">Function</option>
-            <option value="WebSearch">Web Search</option>
-            <option value="APICall">API Call</option>
-            <option value="DatabaseQuery">Database Query</option>
-            <option value="Calculator">Calculator</option>
-          </select>
-        </div>
-        
-        <div id="tool-params-container">
-          <!-- Parameter fields will be dynamically added here -->
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button onclick="closeToolModal()">Cancel</button>
-        <button onclick="saveToolConfig()">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Drawflow JS (via CDN) -->
+    <!-- Drawflow JS (via CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/drawflow/dist/drawflow.min.js"></script>
   <!-- Your custom script -->
   <script src="script.js"></script>
+
+  <!-- Add this before the closing body tag, alongside other modals -->
+  <div id="facebook-marketing-modal" class="modal" style="display: none;">
+    <h2>Configure Facebook Marketing API</h2>
+    <div class="modal-field">
+      <label for="fb-account-id">Account ID</label>
+      <input type="text" id="fb-account-id" placeholder="Enter Account ID">
+    </div>
+    <div class="modal-field">
+      <label for="fb-timeframe">Timeframe</label>
+      <select id="fb-timeframe">
+        <option value="last_7d">Last 7 days</option>
+        <option value="last_30d">Last 30 days</option>
+        <option value="last_90d">Last 90 days</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label for="fb-level">Level</label>
+      <select id="fb-level">
+        <option value="account">Account</option>
+        <option value="campaign">Campaign</option>
+        <option value="adset">Ad Set</option>
+        <option value="ad">Ad</option>
+      </select>
+    </div>
+    <div class="modal-buttons">
+      <button onclick="closeFacebookMarketingModal(false)">Cancel</button>
+      <button onclick="closeFacebookMarketingModal(true)">Save</button>
+    </div>
+  </div>
 </body>
 </html>

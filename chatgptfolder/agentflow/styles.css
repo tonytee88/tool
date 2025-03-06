@@ -342,7 +342,7 @@ body {
   pointer-events: auto;
 }
 
-.modal, #prompt-modal, #load-modal {
+.modal, #prompt-modal, #load-modal, #facebook-marketing-modal { 
   position: fixed;
   top: 50%;
   left: 50%;
@@ -355,15 +355,58 @@ body {
     0 0 0 1px var(--bg-surface-light),
     0 4px 20px rgba(0, 0, 0, 0.4),
     0 0 15px rgba(0, 184, 169, 0.1);
-  display: none;
   width: 450px;
   max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
   z-index: 1000;
   color: var(--text-primary);
 }
 
+.modal-content, .prompt-modal, #prompt-modal, #modal, #load-modal {
+  display: none;
+}
+
+.modal-content h2 {
+  margin: 0 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--accent);
+  color: var(--text-primary);
+  font-size: 20px;
+  text-align: center;
+}
+
+.modal-content .modal-field {
+  margin-bottom: 20px;
+}
+
+.modal-content .modal-buttons {
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid var(--bg-surface-light);
+}
+
+/* Ensure modal scrollbar matches theme */
+.modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+  border-radius: var(--border-radius);
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: var(--bg-surface-light);
+  border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
 /* Enhanced modal header */
-.modal h3, #prompt-modal h2 {
+.modal h3, #prompt-modal h2, #modal-overlay .modal-content h2 {
   margin-top: 0;
   color: var(--text-primary);
   font-size: 20px;
@@ -373,8 +416,13 @@ body {
   margin-bottom: 20px;
 }
 
+.prompt-text-display {
+  display: none;
+}
+
 /* Form elements in modals */
-.prompt-modal-name, .prompt-modal-textarea, #flow-name, #flow-list {
+.prompt-modal-name, .prompt-modal-textarea, #flow-name, #flow-list,
+.modal-field input, .modal-field select {
   width: 97%;
   padding: 12px;
   background: var(--bg-dark);
@@ -386,20 +434,25 @@ body {
   transition: var(--transition);
 }
 
-.prompt-modal-name:focus, .prompt-modal-textarea:focus, #flow-name:focus, #flow-list:focus {
+.prompt-modal {
+  display:none;
+}
+
+.modal-field {
+  margin-bottom: 16px;
+}
+
+.modal-field label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.modal-field input:focus, .modal-field select:focus {
   border-color: var(--accent);
   outline: none;
   box-shadow: 0 0 0 2px rgba(0, 184, 169, 0.2);
-}
-
-.prompt-modal-textarea {
-  height: 150px;
-  resize: none;
-  line-height: 1.5;
-}
-
-.prompt-text-display {
-  display:none;
 }
 
 /* Modal buttons */
@@ -410,7 +463,7 @@ body {
   gap: 12px;
 }
 
-.save-button, .cancel-button, #load-confirm, #load-cancel {
+.modal-buttons button {
   padding: 10px 18px;
   font-size: 14px;
   border: none;
@@ -420,21 +473,21 @@ body {
   font-weight: 500;
 }
 
-.save-button, #load-confirm {
+.modal-buttons button:last-child {
   background: var(--accent);
   color: white;
 }
 
-.save-button:hover, #load-confirm:hover {
+.modal-buttons button:last-child:hover {
   background: var(--accent-light);
 }
 
-.cancel-button, #load-cancel {
+.modal-buttons button:first-child {
   background: var(--bg-surface-light);
   color: var(--text-primary);
 }
 
-.cancel-button:hover, #load-cancel:hover {
+.modal-buttons button:first-child:hover {
   background: var(--bg-surface-hover);
 }
 
@@ -582,7 +635,7 @@ body {
   .modal, #prompt-modal, #load-modal {
     width: 90%;
     padding: 16px;
-  }
+      }
 }
 
 /* Facebook Marketing Node Styles */
@@ -635,4 +688,41 @@ body {
 
 .block-facebook-marketing .status {
   font-weight: bold;
+}
+
+.tools-dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 200px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1000;
+  border-radius: 4px;
+  top: 100%;
+  right: 0;
+}
+
+.tools-dropdown-content.show {
+  display: block;
+}
+
+.tool-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tool-item:hover {
+  background-color: #f1f1f1;
+}
+
+.tool-icon {
+  font-size: 1.2em;
+}
+
+.dropdown-arrow {
+  margin-left: 4px;
+  font-size: 0.8em;
 }

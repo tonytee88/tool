@@ -42,6 +42,10 @@ document.getElementById('btn-load').addEventListener('click', openLoadFlowModal)
 document.getElementById('load-confirm').addEventListener('click', loadSelectedFlow);
 document.getElementById('load-cancel').addEventListener('click', closeLoadFlowModal);
 document.getElementById('btn-start-flow').addEventListener('click', startFlowExecution);
+document.getElementById('btn-add-facebook-marketing').addEventListener('click', () => {
+  const { x, y } = editor.mouse_position || { x: 100, y: 100 };
+  createFacebookMarketingNode(x, y);
+});
 
 // BIND THE MODAL EVENTS
 const modalSaveButton = document.querySelector('#prompt-modal button[onclick^="closePromptModal(true)"]');
@@ -84,9 +88,11 @@ function addNode(type) {
     case 'prompt': createPromptNode(x, y); break;
     case 'llm': createLLMNode(x, y); break;
     case 'output': createOutputNode(x, y); break;
+    case 'facebook-marketing': createFacebookMarketingNode(x, y); break;
     default: console.error("Unknown node type:", type);
   }
 }
+
 function updateFlowData() {
   // Export the current flow data to get the list of nodes
   const flowData = editor.export();
@@ -334,6 +340,9 @@ async function loadSelectedFlow() {
     Object.values(drawflowData.drawflow.Home.data).forEach(node => {
       if (node.name === 'Output') {
         attachOutputListeners(node.id);
+      }
+      if (node.name === 'Facebook Marketing') {
+        attachFacebookMarketingListeners(node.id);
       }
     });
 
@@ -647,7 +656,7 @@ function closePromptModal(doSave) {
       });
       updateFlowData();
     }
-  }
+ }
 
   // Hide both the modal and overlay
   const modalOverlay = document.getElementById('modal-overlay');
@@ -909,486 +918,319 @@ function updateStatusBubble(received, total) {
 
 
 
-function determineExecutionOrder(flowData) {
-  const allNodes = flowData.drawflow.Home.data;
-  const executionOrder = [];
-  const processedNodes = new Set();
+// function determineExecutionOrder(flowData) {
+//   const allNodes = flowData.drawflow.Home.data;
+//   const executionOrder = [];
+//   const processedNodes = new Set();
 
-  function traverseNode(nodeId) {
-    const nodeIdStr = String(nodeId); // Ensure consistent ID format
+//   function traverseNode(nodeId) {
+//     const nodeIdStr = String(nodeId); // Ensure consistent ID format
 
-    if (processedNodes.has(nodeIdStr)) {
-      console.log("detected node was already processed: " + nodeIdStr)
-    return; // ✅ Prevent duplicate visits
-    }
+//     if (processedNodes.has(nodeIdStr)) {
+//       console.log("detected node was already processed: " + nodeIdStr)
+//     return; // ✅ Prevent duplicate visits
+//     }
 
-    const node = allNodes[nodeIdStr];
-    if (!node) return;
+//     const node = allNodes[nodeIdStr];
+//     if (!node) return;
 
-    console.log(`🔍 Analyzing Node: ${nodeIdStr} (${node.name})`);
+//     console.log(`🔍 Analyzing Node: ${nodeIdStr} (${node.name})`);
 
-    // Step 1: Process dependencies first (make sure inputs are processed before this node)
-    const inputConnections = Object.values(node.inputs)
-      .flatMap(input => input.connections)
-      .map(conn => String(conn.node)) // Ensure consistency
-      .filter(inputNodeId => !processedNodes.has(inputNodeId));
+//     // Step 1: Process dependencies first (make sure inputs are processed before this node)
+//     const inputConnections = Object.values(node.inputs)
+//       .flatMap(input => input.connections)
+//       .map(conn => String(conn.node)) // Ensure consistency
+//       .filter(inputNodeId => !processedNodes.has(inputNodeId));
 
-    inputConnections.forEach(traverseNode);
-
-    // ✅ Only add the node once all inputs have been processed
-    if (!processedNodes.has(nodeIdStr)) {
-      executionOrder.push(nodeIdStr);
-      processedNodes.add(nodeIdStr);
-    }
-
-    // Step 2: Process connected outputs (ensuring unique visits)
-    const outputConnections = Object.values(node.outputs)
-      .flatMap(output => output.connections)
-      .map(conn => String(conn.node)) // Ensure consistency
-      .filter(outputNodeId => !processedNodes.has(outputNodeId));
-
-    outputConnections.forEach(traverseNode);
-  }
-
-  // Get all LLM Call nodes, sort by position, and process them **before** outputs
-  const llmNodes = Object.values(allNodes)
-    .filter(node => node.name === 'LLM Call')
-    .sort((a, b) => a.pos_y === b.pos_y ? a.pos_x - b.pos_x : a.pos_y - b.pos_y);
-
-  llmNodes.forEach(llmNode => traverseNode(llmNode.id));
-
-  console.log("✅ Final executionOrder:", executionOrder);
-  return executionOrder;
-}
-
-
-
-async function executeLLMFlow(flowData) {
-  const executionOrder = determineExecutionOrder(flowData);
-  const storedResponses = {}; // Store responses to avoid redundant API calls
-
-  for (const nodeId of executionOrder) {
-    const currentNode = flowData.drawflow.Home.data[nodeId];
+//     inputConnections.forEach(traverseNode);
+
+//     // ✅ Only add the node once all inputs have been processed
+//     if (!processedNodes.has(nodeIdStr)) {
+//       executionOrder.push(nodeIdStr);
+//       processedNodes.add(nodeIdStr);
+//     }
+
+//     // Step 2: Process connected outputs (ensuring unique visits)
+//     const outputConnections = Object.values(node.outputs)
+//       .flatMap(output => output.connections)
+//       .map(conn => String(conn.node)) // Ensure consistency
+//       .filter(outputNodeId => !processedNodes.has(outputNodeId));
+
+//     outputConnections.forEach(traverseNode);
+//   }
+
+//   // Get all LLM Call nodes, sort by position, and process them **before** outputs
+//   const llmNodes = Object.values(allNodes)
+//     .filter(node => node.name === 'LLM Call')
+//     .sort((a, b) => a.pos_y === b.pos_y ? a.pos_x - b.pos_x : a.pos_y - b.pos_y);
+
+//   llmNodes.forEach(llmNode => traverseNode(llmNode.id));
+
+//   console.log("✅ Final executionOrder:", executionOrder);
+//   return executionOrder;
+// }
+
+
+
+// async function executeLLMFlow(flowData) {
+//   const executionOrder = determineExecutionOrder(flowData);
+//   const storedResponses = {}; // Store responses to avoid redundant API calls
+
+//   for (const nodeId of executionOrder) {
+//     const currentNode = flowData.drawflow.Home.data[nodeId];
 
-    if (currentNode.name === 'LLM Call') {
-      console.log(`🚀 Processing LLM Call Node: ${nodeId}`);
+//     if (currentNode.name === 'LLM Call') {
+//       console.log(`🚀 Processing LLM Call Node: ${nodeId}`);
 
-      if (storedResponses[nodeId]) {
-        console.log(`✅ Using cached response for Node ${nodeId}`);
-        currentNode.data.output = storedResponses[nodeId];
-      } else {
-        const combinedInputs = getSortedInputs(nodeId, flowData);
-        console.log("📝 combinedInputs: " + combinedInputs);
-
-        // ✅ Get latest model selection from UI
-        const nodeElement = document.getElementById(`node-${nodeId}`);
-        const modelDropdown = nodeElement?.querySelector('.model-dropdown');
-        const selectedModel = modelDropdown?.value || currentNode.data.selectedModel || 'openai/gpt-4o-mini';
-
-        // ✅ Ensure the model selection is stored correctly in node data
-        currentNode.data.selectedModel = selectedModel;
-        console.log(`📝 Model selected for Node ${nodeId}: ${selectedModel}`);
-
-        try {
-          const response = await callLLMAPI(combinedInputs, selectedModel);
-          const messageResponse = response.data.completions[selectedModel].completion.choices[0].message.content;
-
-          console.log(`✅ LLM Call Node (${nodeId}) Response: ${messageResponse}`);
-
-          // ✅ Store and update node output
-          currentNode.data.output = messageResponse;
-          storedResponses[nodeId] = messageResponse;
-
-          // ✅ Update the UI in real-time
-          updateOutputNodes(flowData, nodeId, messageResponse);
-
-        } catch (error) {
-          console.error(`❌ LLM Call Node (${nodeId}) Error:`, error);
-          markNodeAsError(nodeId, error.message);
-        }
-      }
-    } else if (currentNode.name === 'Output') {
-      console.log(`📤 Processing Output Node: ${nodeId}`);
-
-      const inputConnections = currentNode.inputs.input_1.connections.map(conn => conn.node);
-      const linkedLLMNode = inputConnections.find(id => storedResponses[id]);
-
-      if (linkedLLMNode) {
-        const formattedResponse = formatTextAsHTML(storedResponses[linkedLLMNode]);
-        currentNode.data.output = formattedResponse;
-
-        console.log(`✅ Output Node (${nodeId}) Displaying:`, formattedResponse);
-
-        // ✅ Immediately update the UI using the formatted response
-        updateOutputNodes(flowData, nodeId, formattedResponse);
-
-        setTimeout(() => {
-          const nodeElement = document.getElementById(`node-${nodeId}`);
-          if (nodeElement) {
-            const outputDiv = nodeElement.querySelector('.output-response');
-            if (outputDiv) {
-              outputDiv.innerHTML = formattedResponse;
-            }
-
-            // ✅ Attach listener here after rendering
-            attachOutputListeners(nodeId);
-          }
-        }, 100);
-      } else {
-        console.warn(`⚠️ Output Node (${nodeId}) has no valid LLM input.`);
-      }
-    }
-  }
-}
-
-
-function updateOutputNodes(flowData, nodeId, responseText) {
-  const nodeElement = document.getElementById(`node-${nodeId}`);
-
-  if (nodeElement) {
-    const outputDiv = nodeElement.querySelector('.output-response');
-    if (outputDiv) {
-      outputDiv.innerHTML = formatTextAsHTML(responseText); // ✅ Apply structured formatting
-    }
-  }
-
-  // ✅ Also update the stored flow data
-  flowData.drawflow.Home.data[nodeId].data.output = responseText;
-}
-
-function formatTextAsHTML(text) {
-  if (!text) return ""; // Prevent errors with empty text
-
-  // ✅ Preserve line breaks
-  let formattedText = text.replace(/\n/g, "<br>");
-
-  // ✅ Convert markdown-like bold text (**bold**) to HTML <strong>
-  formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-
-  // ✅ Convert markdown-style headings (### Title) into <h3>
-  formattedText = formattedText.replace(/### (.*?)<br>/g, "<h3>$1</h3>");
-
-  // ✅ Convert horizontal separators (---) into <hr>
-  formattedText = formattedText.replace(/---/g, "<hr>");
-
-  return formattedText;
-}
-
-async function waitForInputs(nodeId, flowData) {
-  return new Promise(resolve => {
-    const checkInputs = () => {
-      if (areInputsReady(nodeId, flowData)) {
-        console.log(`✅ Inputs for Node ${nodeId} are now ready!`);
-        resolve(); // Continue execution
-      } else {
-        console.log(`⏳ Waiting for inputs for Node ${nodeId}...`);
-        setTimeout(checkInputs, 2000); // Recheck after 2 seconds
-      }
-    };
-
-    checkInputs(); // Initial check
-  });
-}
-
-function getSortedInputs(nodeId, flowData) {
-  const node = flowData.drawflow.Home.data[nodeId];
-  console.log("Processing Node ID:", nodeId);
-
-  const inputConnections = node.inputs.input_1.connections || [];
-
-  if (inputConnections.length === 0) {
-    const currentNodeElement = document.getElementById(`node-${nodeId}`);
-    const currentPromptTextElement = currentNodeElement?.querySelector('.prompt-text-display');
-    return currentPromptTextElement ? currentPromptTextElement.textContent.trim() : '';
-  }
-
-  // Gather all connected input nodes
-  const connectedNodes = inputConnections.map(conn => {
-    const connectedNodeId = conn.node;
-    const connectedNode = flowData.drawflow.Home.data[connectedNodeId];
-
-    if (!connectedNode) return null;
-
-    const connectedNodeElement = document.getElementById(`node-${connectedNodeId}`);
-    let connectedText = '';
-
-    if (connectedNode.name === 'Prompt' || connectedNode.name === 'Output') {
-      const promptTextElement = connectedNodeElement?.querySelector('.prompt-text-display') ||
-                                connectedNodeElement?.querySelector('.output-response');
-      connectedText = promptTextElement ? promptTextElement.textContent.trim() : '';
-    } else if (connectedNode.name === 'LLM Call') {
-      connectedText = connectedNode.data.output || ''; // Use stored LLM response if available
-      updateFlowData();
-    }
-
-    return {
-      id: connectedNodeId,
-      x: connectedNode.pos_x,
-      y: connectedNode.pos_y,
-      text: connectedText,
-    };
-  }).filter(Boolean);
-
-  // Sort inputs left to right, top to bottom
-  connectedNodes.sort((a, b) => a.y === b.y ? a.x - b.x : a.y - b.y);
-
-  // Combine all inputs into one string
-  return connectedNodes.map(node => node.text).join(' and ');
-}
-
-function areInputsReady(nodeId, flowData) {
-  const node = flowData.drawflow.Home.data[nodeId];
-
-  const inputConnections = Object.values(node.inputs)
-    .flatMap(input => input.connections)
-    .map(conn => conn.node);
-
-  for (const inputNodeId of inputConnections) {
-    const inputNode = flowData.drawflow.Home.data[inputNodeId];
-
-    if (!inputNode) {
-      console.error(`❌ Node ${inputNodeId} is missing in flowData!`);
-      return false;
-    }
-
-    let promptData = "";
-    const nodeElement = document.getElementById(`node-${inputNodeId}`);
-    if (nodeElement) {
-      const promptTextElement = nodeElement.querySelector('.prompt-text-display');
-      promptData = promptTextElement ? promptTextElement.innerText.trim() : "";
-    }
-
-    // Fallback to stored data if HTML method fails
-    if (!promptData) {
-      promptData = inputNode.data?.promptText?.trim() || "";
-    }
-
-    let outputData = inputNode.data?.output?.trim() || "";
-
-    console.log(`🔍 Checking inputs for Node ${inputNodeId}:`);
-    console.log("✅ Output Data:", outputData);
-    console.log("✅ Prompt Data:", promptData);
-
-    // 🚨 Check each input node type 🚨
-    if (inputNode.name === "Prompt") {
-      // ✅ Prompt nodes are always valid inputs
-      console.log(`✅ Node ${inputNodeId} is a Prompt. Accepting.`);
-      continue;
-    } else if (inputNode.name === "LLM Call" || inputNode.name === "Output") {
-      // ❌ LLM and Output nodes must have a valid output
-      if (!outputData || outputData === "Waiting for response...") {
-        console.log(`❌ Node ${nodeId} is waiting for LLM/Output from Node ${inputNodeId}`);
-        return false;
-      }
-    }
-  }
-
-  console.log(`✅ Node ${nodeId} is ready for execution.`);
-  return true;
-}
-
-
-
-function markNodeAsError(nodeId, errorMessage) {
-const nodeElement = document.getElementById(`node-${nodeId}`);
-  if (!nodeElement) return;
-
-  // Add error indicator
-  const errorIndicator = document.createElement('div');
-  errorIndicator.className = 'error-indicator';
-  errorIndicator.title = errorMessage; // Tooltip with the error message
-  errorIndicator.innerHTML = '⚠️'; // Warning icon
-  nodeElement.appendChild(errorIndicator);
-}
-
-// Helper function to call the LLM API
-async function callLLMAPI(prompt, model) {
-  console.log(model);
-  try {
-    const response = await fetch('https://j7-magic-tool.vercel.app/api/agentFlowStraicoCall', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ message: prompt, models: model }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to call LLM API: ${response.statusText}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    throw new Error(`Error calling LLM API: ${error.message}`);
-  }
-}
-
-// Create a Tool node
-function createToolNode(id, name, positionX, positionY, toolType) {
-  const toolNode = document.createElement("div");
-  toolNode.classList.add("drawflow-node", "tool-node");
-  toolNode.innerHTML = `
-    <div class="node-header">
-      <div class="node-title">Tool: ${toolType || "Function"}</div>
-      <div class="node-actions">
-        <button class="config-button"><i class="fas fa-cog"></i></button>
-        <button class="delete-button"><i class="fas fa-trash"></i></button>
-      </div>
-    </div>
-    <div class="node-content">
-      <div class="tool-config">
-        <div class="tool-type">${toolType || "Function"}</div>
-        <div class="tool-params">Click to configure</div>
-      </div>
-    </div>
-    <div class="drawflow_content_node">
-      <div class="input-container">
-        <div class="input-title">Input</div>
-        <div class="input-socket" draggable="true"></div>
-      </div>
-      <div class="output-container">
-        <div class="output-title">Output</div>
-        <div class="output-socket" draggable="true"></div>
-      </div>
-    </div>
-  `;
-
-  editor.addNode(
-    name,
-    1, // Inputs
-    1, // Outputs
-    positionX,
-    positionY,
-    "tool-node", // Class
-    { id, toolType: toolType || "Function", params: {} }, // Data
-    id
-  );
-
-  return toolNode;
-}
-
-// Tool Modal Functions
-function openToolModal(nodeId) {
-  const node = editor.getNodeFromId(nodeId);
-  const nodeData = node.data;
-  
-  document.getElementById('tool-modal-node-id').value = nodeId;
-  
-  // Set the tool type dropdown
-  const toolTypeSelect = document.getElementById('tool-type-select');
-  if (nodeData.toolType) {
-    toolTypeSelect.value = nodeData.toolType;
-  } else {
-    toolTypeSelect.value = 'Function';
-  }
-  
-  // Update parameter fields based on tool type
-  updateToolParamFields(nodeData.toolType, nodeData.params);
-  
-  // Show the modal
-  document.getElementById('tool-modal').style.display = 'block';
-  document.getElementById('modal-overlay').style.display = 'block';
-}
-
-function closeToolModal() {
-  document.getElementById('tool-modal').style.display = 'none';
-  document.getElementById('modal-overlay').style.display = 'none';
-}
-
-function saveToolConfig() {
-  const nodeId = document.getElementById('tool-modal-node-id').value;
-  const toolType = document.getElementById('tool-type-select').value;
-  
-  // Get parameters based on tool type
-  const params = getToolParams(toolType);
-  
-  // Update node data
-  const node = editor.getNodeFromId(nodeId);
-  node.data.toolType = toolType;
-  node.data.params = params;
-  
-  // Update node UI
-  const nodeElement = document.getElementById(`node-${nodeId}`);
-  if (nodeElement) {
-    const titleElement = nodeElement.querySelector('.node-title');
-    if (titleElement) {
-      titleElement.textContent = `Tool: ${toolType}`;
-    }
-    
-    const toolTypeElement = nodeElement.querySelector('.tool-type');
-    if (toolTypeElement) {
-      toolTypeElement.textContent = toolType;
-    }
-    
-    const paramsElement = nodeElement.querySelector('.tool-params');
-    if (paramsElement) {
-      // Display a summary of the parameters
-      const paramSummary = Object.keys(params).length > 0 
-        ? Object.keys(params).join(', ') 
-        : 'No parameters';
-      paramsElement.textContent = paramSummary;
-    }
-  }
-  
-  closeToolModal();
-}
-
-function updateToolParamFields(toolType, existingParams = {}) {
-  const paramContainer = document.getElementById('tool-params-container');
-  paramContainer.innerHTML = '';
-  
-  // Define parameters for each tool type
-  const paramFields = getToolParamFields(toolType);
-  
-  paramFields.forEach(param => {
-    const fieldDiv = document.createElement('div');
-    fieldDiv.classList.add('modal-field');
-    
-    const label = document.createElement('label');
-    label.textContent = param.label;
-    label.setAttribute('for', `tool-param-${param.name}`);
-    
-    const input = document.createElement('input');
-    input.type = param.type || 'text';
-    input.id = `tool-param-${param.name}`;
-    input.name = param.name;
-    input.value = existingParams[param.name] || '';
-    
-    fieldDiv.appendChild(label);
-    fieldDiv.appendChild(input);
-    paramContainer.appendChild(fieldDiv);
-  });
-}
-
-function getToolParamFields(toolType) {
-  // Define parameters for each tool type
-  switch (toolType) {
-    case 'WebSearch':
-      return [
-        { name: 'searchEngine', label: 'Search Engine', type: 'text' },
-        { name: 'maxResults', label: 'Max Results', type: 'number' }
-      ];
-    case 'APICall':
-      return [
-        { name: 'endpoint', label: 'API Endpoint', type: 'text' },
-        { name: 'method', label: 'HTTP Method', type: 'text' },
-        { name: 'headers', label: 'Headers (JSON)', type: 'text' }
-      ];
-    case 'DatabaseQuery':
-      return [
-        { name: 'connectionString', label: 'Connection String', type: 'text' },
-        { name: 'query', label: 'Query Template', type: 'text' }
-      ];
-    case 'Calculator':
-      return []; // No parameters needed
-    case 'Function':
-    default:
-      return [
-        { name: 'functionName', label: 'Function Name', type: 'text' },
-        { name: 'description', label: 'Description', type: 'text' }
-      ];
-  }
-}
+//       if (storedResponses[nodeId]) {
+//         console.log(`✅ Using cached response for Node ${nodeId}`);
+//         currentNode.data.output = storedResponses[nodeId];
+//       } else {
+//         const combinedInputs = getSortedInputs(nodeId, flowData);
+//         console.log("📝 combinedInputs: " + combinedInputs);
+
+//         // ✅ Get latest model selection from UI
+//         const nodeElement = document.getElementById(`node-${nodeId}`);
+//         const modelDropdown = nodeElement?.querySelector('.model-dropdown');
+//         const selectedModel = modelDropdown?.value || currentNode.data.selectedModel || 'openai/gpt-4o-mini';
+
+//         // ✅ Ensure the model selection is stored correctly in node data
+//         currentNode.data.selectedModel = selectedModel;
+//         console.log(`📝 Model selected for Node ${nodeId}: ${selectedModel}`);
+
+//         try {
+//           const response = await callLLMAPI(combinedInputs, selectedModel);
+//           const messageResponse = response.data.completions[selectedModel].completion.choices[0].message.content;
+
+//           console.log(`✅ LLM Call Node (${nodeId}) Response: ${messageResponse}`);
+
+//           // ✅ Store and update node output
+//           currentNode.data.output = messageResponse;
+//           storedResponses[nodeId] = messageResponse;
+
+//           // ✅ Update the UI in real-time
+//           updateOutputNodes(flowData, nodeId, messageResponse);
+
+//         } catch (error) {
+//           console.error(`❌ LLM Call Node (${nodeId}) Error:`, error);
+//           markNodeAsError(nodeId, error.message);
+//         }
+//       }
+//     } else if (currentNode.name === 'Output') {
+//       console.log(`📤 Processing Output Node: ${nodeId}`);
+
+//       const inputConnections = currentNode.inputs.input_1.connections.map(conn => conn.node);
+//       const linkedLLMNode = inputConnections.find(id => storedResponses[id]);
+
+//       if (linkedLLMNode) {
+//         const formattedResponse = formatTextAsHTML(storedResponses[linkedLLMNode]);
+//         currentNode.data.output = formattedResponse;
+
+//         console.log(`✅ Output Node (${nodeId}) Displaying:`, formattedResponse);
+
+//         // ✅ Immediately update the UI using the formatted response
+//         updateOutputNodes(flowData, nodeId, formattedResponse);
+
+//         setTimeout(() => {
+//           const nodeElement = document.getElementById(`node-${nodeId}`);
+//           if (nodeElement) {
+//             const outputDiv = nodeElement.querySelector('.output-response');
+//             if (outputDiv) {
+//               outputDiv.innerHTML = formattedResponse;
+//             }
+
+//             // ✅ Attach listener here after rendering
+//             attachOutputListeners(nodeId);
+//           }
+//         }, 100);
+//       } else {
+//         console.warn(`⚠️ Output Node (${nodeId}) has no valid LLM input.`);
+//       }
+//     }
+//   }
+// }
+
+
+// function updateOutputNodes(flowData, nodeId, responseText) {
+//   const nodeElement = document.getElementById(`node-${nodeId}`);
+
+//   if (nodeElement) {
+//     const outputDiv = nodeElement.querySelector('.output-response');
+//     if (outputDiv) {
+//       outputDiv.innerHTML = formatTextAsHTML(responseText); // ✅ Apply structured formatting
+//     }
+//   }
+
+//   // ✅ Also update the stored flow data
+//   flowData.drawflow.Home.data[nodeId].data.output = responseText;
+// }
+
+// function formatTextAsHTML(text) {
+//   if (!text) return ""; // Prevent errors with empty text
+
+//   // ✅ Preserve line breaks
+//   let formattedText = text.replace(/\n/g, "<br>");
+
+//   // ✅ Convert markdown-like bold text (**bold**) to HTML <strong>
+//   formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+//   // ✅ Convert markdown-style headings (### Title) into <h3>
+//   formattedText = formattedText.replace(/### (.*?)<br>/g, "<h3>$1</h3>");
+
+//   // ✅ Convert horizontal separators (---) into <hr>
+//   formattedText = formattedText.replace(/---/g, "<hr>");
+
+//   return formattedText;
+// }
+
+// async function waitForInputs(nodeId, flowData) {
+//   return new Promise(resolve => {
+//     const checkInputs = () => {
+//       if (areInputsReady(nodeId, flowData)) {
+//         console.log(`✅ Inputs for Node ${nodeId} are now ready!`);
+//         resolve(); // Continue execution
+//       } else {
+//         console.log(`⏳ Waiting for inputs for Node ${nodeId}...`);
+//         setTimeout(checkInputs, 2000); // Recheck after 2 seconds
+//       }
+//     };
+
+//     checkInputs(); // Initial check
+//   });
+// }
+
+// function getSortedInputs(nodeId, flowData) {
+//   const node = flowData.drawflow.Home.data[nodeId];
+//   console.log("Processing Node ID:", nodeId);
+
+//   const inputConnections = node.inputs.input_1.connections || [];
+
+//   if (inputConnections.length === 0) {
+//     const currentNodeElement = document.getElementById(`node-${nodeId}`);
+//     const currentPromptTextElement = currentNodeElement?.querySelector('.prompt-text-display');
+//     return currentPromptTextElement ? currentPromptTextElement.textContent.trim() : '';
+//   }
+
+//   // Gather all connected input nodes
+//   const connectedNodes = inputConnections.map(conn => {
+//     const connectedNodeId = conn.node;
+//     const connectedNode = flowData.drawflow.Home.data[connectedNodeId];
+
+//     if (!connectedNode) return null;
+
+//     const connectedNodeElement = document.getElementById(`node-${connectedNodeId}`);
+//     let connectedText = '';
+
+//     if (connectedNode.name === 'Prompt' || connectedNode.name === 'Output') {
+//       const promptTextElement = connectedNodeElement?.querySelector('.prompt-text-display') ||
+//                                 connectedNodeElement?.querySelector('.output-response');
+//       connectedText = promptTextElement ? promptTextElement.textContent.trim() : '';
+//     } else if (connectedNode.name === 'LLM Call') {
+//       connectedText = connectedNode.data.output || ''; // Use stored LLM response if available
+//       updateFlowData();
+//     }
+
+//     return {
+//       id: connectedNodeId,
+//       x: connectedNode.pos_x,
+//       y: connectedNode.pos_y,
+//       text: connectedText,
+//     };
+//   }).filter(Boolean);
+
+//   // Sort inputs left to right, top to bottom
+//   connectedNodes.sort((a, b) => a.y === b.y ? a.x - b.x : a.y - b.y);
+
+//   // Combine all inputs into one string
+//   return connectedNodes.map(node => node.text).join(' and ');
+// }
+
+// function areInputsReady(nodeId, flowData) {
+//   const node = flowData.drawflow.Home.data[nodeId];
+
+//   const inputConnections = Object.values(node.inputs)
+//     .flatMap(input => input.connections)
+//     .map(conn => conn.node);
+
+//   for (const inputNodeId of inputConnections) {
+//     const inputNode = flowData.drawflow.Home.data[inputNodeId];
+
+//     if (!inputNode) {
+//       console.error(`❌ Node ${inputNodeId} is missing in flowData!`);
+//       return false;
+//     }
+
+//     let promptData = "";
+//     const nodeElement = document.getElementById(`node-${inputNodeId}`);
+//     if (nodeElement) {
+//       const promptTextElement = nodeElement.querySelector('.prompt-text-display');
+//       promptData = promptTextElement ? promptTextElement.innerText.trim() : "";
+//     }
+
+//     // Fallback to stored data if HTML method fails
+//     if (!promptData) {
+//       promptData = inputNode.data?.promptText?.trim() || "";
+//     }
+
+//     let outputData = inputNode.data?.output?.trim() || "";
+
+//     console.log(`🔍 Checking inputs for Node ${inputNodeId}:`);
+//     console.log("✅ Output Data:", outputData);
+//     console.log("✅ Prompt Data:", promptData);
+
+//     // 🚨 Check each input node type 🚨
+//     if (inputNode.name === "Prompt") {
+//       // ✅ Prompt nodes are always valid inputs
+//       console.log(`✅ Node ${inputNodeId} is a Prompt. Accepting.`);
+//       continue;
+//     } else if (inputNode.name === "LLM Call" || inputNode.name === "Output") {
+//       // ❌ LLM and Output nodes must have a valid output
+//       if (!outputData || outputData === "Waiting for response...") {
+//         console.log(`❌ Node ${nodeId} is waiting for LLM/Output from Node ${inputNodeId}`);
+//         return false;
+//       }
+//     }
+//   }
+
+//   console.log(`✅ Node ${nodeId} is ready for execution.`);
+//   return true;
+// }
+
+
+
+// function markNodeAsError(nodeId, errorMessage) {
+// const nodeElement = document.getElementById(`node-${nodeId}`);
+//   if (!nodeElement) return;
+
+//   // Add error indicator
+//   const errorIndicator = document.createElement('div');
+//   errorIndicator.className = 'error-indicator';
+//   errorIndicator.title = errorMessage; // Tooltip with the error message
+//   errorIndicator.innerHTML = '⚠️'; // Warning icon
+//   nodeElement.appendChild(errorIndicator);
+// }
+
+// // Helper function to call the LLM API
+// async function callLLMAPI(prompt, model) {
+//   console.log(model);
+//   try {
+//     const response = await fetch('https://j7-magic-tool.vercel.app/api/agentFlowStraicoCall', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify({ message: prompt, models: model }),
+//     });
+
+//     if (!response.ok) {
+//       throw new Error(`Failed to call LLM API: ${response.statusText}`);
+//     }
+
+//     return await response.json();
+//   } catch (error) {
+//     throw new Error(`Error calling LLM API: ${error.message}`);
+//   }
+// }
 
 function getToolParams(toolType) {
   const params = {};
@@ -1449,42 +1291,47 @@ function attachFacebookMarketingListeners(nodeId) {
 }
 
 function openFacebookMarketingModal(nodeId) {
-  const node = editor.getNodeFromId(nodeId);
+  currentEditNodeId = nodeId;
+  const flowData = editor.export(); // Get fresh flow data
+  
+  const node = flowData.drawflow.Home.data[nodeId]; // Get node from exported data
   if (!node) return;
 
-  const modalContent = `
-    <div class="modal-content">
-      <h2>Configure Facebook Marketing API</h2>
-      <div class="modal-field">
-        <label for="fb-account-id">Account ID</label>
-        <input type="text" id="fb-account-id" value="${node.data.accountId || ''}" placeholder="Enter Account ID">
-      </div>
-      <div class="modal-field">
-        <label for="fb-timeframe">Timeframe</label>
-        <select id="fb-timeframe">
-          <option value="last_7d" ${node.data.timeframe === 'last_7d' ? 'selected' : ''}>Last 7 days</option>
-          <option value="last_30d" ${node.data.timeframe === 'last_30d' ? 'selected' : ''}>Last 30 days</option>
-          <option value="last_90d" ${node.data.timeframe === 'last_90d' ? 'selected' : ''}>Last 90 days</option>
-        </select>
-      </div>
-      <div class="modal-field">
-        <label for="fb-level">Level</label>
-        <select id="fb-level">
-          <option value="account" ${node.data.level === 'account' ? 'selected' : ''}>Account</option>
-          <option value="campaign" ${node.data.level === 'campaign' ? 'selected' : ''}>Campaign</option>
-          <option value="adset" ${node.data.level === 'adset' ? 'selected' : ''}>Ad Set</option>
-          <option value="ad" ${node.data.level === 'ad' ? 'selected' : ''}>Ad</option>
-        </select>
-      </div>
-      <div class="modal-buttons">
-        <button onclick="closeFacebookMarketingModal(false)">Cancel</button>
-        <button onclick="closeFacebookMarketingModal(true)">Save</button>
-      </div>
-    </div>
-  `;
-
+  // Get the modal and overlay elements
+  const modal = document.getElementById('facebook-marketing-modal');
   const modalOverlay = document.getElementById('modal-overlay');
-  modalOverlay.innerHTML = modalContent;
+  
+  // First try to get values from the current DOM state
+  const nodeElement = document.querySelector(`#node-${nodeId}`);
+  let currentAccountId = '';
+  let currentTimeframe = '';
+  let currentLevel = '';
+  
+  if (nodeElement) {
+    const accountIdSpan = nodeElement.querySelector('.account-id');
+    const timeframeSpan = nodeElement.querySelector('.timeframe');
+    const levelSpan = nodeElement.querySelector('.level');
+    
+    if (accountIdSpan) currentAccountId = accountIdSpan.textContent === 'Not set' ? '' : accountIdSpan.textContent.trim();
+    if (timeframeSpan) currentTimeframe = timeframeSpan.textContent.trim();
+    if (levelSpan) currentLevel = levelSpan.textContent.trim();
+  }
+
+  // Use DOM values if they exist, otherwise fall back to exported flow data
+  document.getElementById('fb-account-id').value = currentAccountId || node.data?.accountId || '';
+  document.getElementById('fb-timeframe').value = currentTimeframe || node.data?.timeframe || 'last_30d';
+  document.getElementById('fb-level').value = currentLevel || node.data?.level || 'campaign';
+  
+  console.log(`📝 Opening Facebook Marketing modal for Node ${nodeId} with latest data:`, {
+    accountId: currentAccountId || node.data?.accountId || 'Not set',
+    timeframe: currentTimeframe || node.data?.timeframe || 'last_30d',
+    level: currentLevel || node.data?.level || 'campaign',
+    fromDOM: !!currentAccountId, // Log whether we used DOM values
+    fromData: !!node.data?.accountId // Log whether we used flow data
+  });
+  
+  // Show both the modal and overlay
+  modal.style.display = 'block';
   modalOverlay.style.display = 'block';
   currentEditNodeId = nodeId;
 }
@@ -1505,62 +1352,24 @@ function closeFacebookMarketingModal(save) {
         nodeElement.querySelector('.timeframe').textContent = node.data.timeframe;
         nodeElement.querySelector('.level').textContent = node.data.level;
       }
+      updateFlowData();
     }
   }
   
+
+  // Hide both the modal and overlay
+  document.getElementById('facebook-marketing-modal').style.display = 'none';
   document.getElementById('modal-overlay').style.display = 'none';
   currentEditNodeId = null;
 }
 
-async function processFacebookMarketingNode(nodeId, inputData) {
-  const node = editor.getNodeFromId(nodeId);
-  if (!node) return null;
-
-  try {
-    // Update status to running
-    updateNodeStatus(nodeId, 'Running...');
-
-    const response = await fetch('/api/facebook-marketing', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        accountId: node.data.accountId,
-        timeframe: node.data.timeframe,
-        level: node.data.level,
-        input: inputData
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`API request failed: ${response.statusText}`);
-    }
-
-    const result = await response.json();
-    updateNodeStatus(nodeId, 'Completed');
-    return result;
-  } catch (error) {
-    console.error('Facebook Marketing API Error:', error);
-    updateNodeStatus(nodeId, 'Error');
-    throw error;
-  }
-}
-
-function updateNodeStatus(nodeId, status) {
-  const node = editor.getNodeFromId(nodeId);
-  if (node) {
-    node.data.status = status;
-    const statusElement = document.querySelector(`#node-${nodeId} .status`);
-    if (statusElement) {
-      statusElement.textContent = status;
+// Add click handler to close modal when clicking overlay
+document.getElementById('modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) {
+    const fbModal = document.getElementById('facebook-marketing-modal');
+    if (fbModal.style.display === 'block') {
+      closeFacebookMarketingModal(false);
     }
   }
-}
-
-// Add event listener for the Facebook Marketing button
-document.getElementById('btn-add-facebook-marketing').addEventListener('click', () => {
-  const { x, y } = editor.mouse_position || { x: 100, y: 100 };
-  createFacebookMarketingNode(x, y);
 });
 
