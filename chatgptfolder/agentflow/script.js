@@ -857,21 +857,21 @@ async function pollForResponses(executionId, maxAttempts = 10, attempt = 1) {
       const receivedResponses = data.length; // ✅ Count responses received
       updateStatusBubble(receivedResponses, total); // 🌟 Update status
 
-      // ✅ Extract output nodes
+      // ✅ Extract output nodes and Google Doc nodes
       const flowData = editor.export();
-      const outputNodes = Object.entries(flowData.drawflow.Home.data)
-          .filter(([_, node]) => node.name === "Output")
+      const allNodes = Object.entries(flowData.drawflow.Home.data)
+          .filter(([_, node]) => node.name === "Output" || node.name === "Google Doc Export")
           .map(([nodeId, _]) => nodeId);
 
-      console.log(`🔎 Tracking ${outputNodes.length} Output Nodes:`, outputNodes);
+      console.log(`🔎 Tracking ${allNodes.length} Nodes (Output + Google Doc):`, allNodes);
 
-      // ✅ Check if **all** Output Nodes have responses
-      const allOutputsReady = outputNodes.every(nodeId =>
+      // ✅ Check if **all** nodes have responses
+      const allNodesReady = allNodes.every(nodeId =>
           data.some(response => response.nodeId === nodeId && response.content !== null)
       );
 
-      if (allOutputsReady) {
-          console.log("✅ All Output Nodes received responses! Updating UI...");
+      if (allNodesReady) {
+          console.log("✅ All Nodes received responses! Updating UI...");
           updateUIWithResults(data);
 
           console.log("🗑️ Cleaning up responses from DB...");

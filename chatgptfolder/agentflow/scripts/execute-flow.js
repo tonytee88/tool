@@ -243,30 +243,19 @@ async function executeFlowLogic(structuredFlow, requestType, executionId) {
               // Log the updated structuredFlow for verification
               console.log('📝 Updated structuredFlow for node:', nodeId);
               console.log('Node data:', structuredFlow[nodeId].data);
-              console.log('Full structuredFlow:', JSON.stringify(structuredFlow, null, 2));
               
-              // Update Drawflow's data directly
-              if (editor && editor.drawflow && editor.drawflow.drawflow.Home.data[nodeId]) {
-                editor.drawflow.drawflow.Home.data[nodeId].data = {
-                  ...editor.drawflow.drawflow.Home.data[nodeId].data,
-                  link: result.link,
-                  output: result.link
-                };
-                console.log('✅ Updated Drawflow data for node:', nodeId);
+              // Save response for browser
+              if (requestType === "browser") {
+                // Save both link and response to MongoDB
+                await saveExecutionResponse(executionId, nodeId, JSON.stringify(responseData));
               }
-            }
-            
-            // Save response for browser
-            if (requestType === "browser") {
-              // Save both link and response to MongoDB
-              await saveExecutionResponse(executionId, nodeId, JSON.stringify(responseData));
-            }
-            
-            // Connect to any output nodes that might need the Google Doc response
-            const outputNodes = findConnectedOutputNodes(nodeId, structuredFlow);
-            for (const outputNodeId of outputNodes) {
-              if (outputNodeId !== nodeId) {
-                await executeFlowLogic(outputNodeId, structuredFlow, requestType);
+              
+              // Connect to any output nodes that might need the Google Doc response
+              const outputNodes = findConnectedOutputNodes(nodeId, structuredFlow);
+              for (const outputNodeId of outputNodes) {
+                if (outputNodeId !== nodeId) {
+                  await executeFlowLogic(outputNodeId, structuredFlow, requestType);
+                }
               }
             }
           }
