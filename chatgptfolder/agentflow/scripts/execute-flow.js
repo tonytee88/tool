@@ -669,4 +669,47 @@ function getTotalResponseCount() {
   return llmNodes.length + outputNodes.length + googleDocNodes.length;
 }
 
+// ✅ Get input content from connected nodes
+function getNodeInputContent(nodeId, structuredFlow) {
+  if (!structuredFlow || !structuredFlow[nodeId]) {
+    console.error(`❌ Node ${nodeId} not found in flowData`);
+    return null;
+  }
+
+  const node = structuredFlow[nodeId];
+  const inputConnections = node.inputs?.input_1?.connections || [];
+
+  if (inputConnections.length === 0) {
+    console.warn(`⚠️ No input connections found for node ${nodeId}`);
+    return null;
+  }
+
+  // Get content from the connected node
+  const connectedNodeId = inputConnections[0].node;
+  const connectedNode = structuredFlow[connectedNodeId];
+
+  if (!connectedNode) {
+    console.error(`❌ Connected node ${connectedNodeId} not found`);
+    return null;
+  }
+
+  // Get content based on node type
+  let content = null;
+  if (connectedNode.name === "LLM Call") {
+    content = connectedNode.data?.output;
+  } else if (connectedNode.name === "Output") {
+    content = connectedNode.data?.output;
+  } else if (connectedNode.name === "Prompt") {
+    content = connectedNode.data?.promptText;
+  }
+
+  if (!content) {
+    console.warn(`⚠️ No content found in connected node ${connectedNodeId}`);
+    return null;
+  }
+
+  console.log(`✅ Retrieved content from node ${connectedNodeId}`);
+  return content;
+}
+
 module.exports = executeLLMFlow;
