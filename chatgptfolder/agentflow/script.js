@@ -828,7 +828,6 @@ async function updateUIWithResults(responses) {
 
   console.log("✅ UI updated with responses!");
 }
-
 function getTotalResponseCount() {
   const flowData = editor.export();
   const nodeEntries = Object.entries(flowData.drawflow.Home.data);
@@ -1209,4 +1208,5 @@ function attachGoogleDocListeners(nodeId) {
     });
   }
 }
+
 
