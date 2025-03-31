@@ -626,26 +626,23 @@ function compileFinalOutputs(structuredFlow) {
 }
 
 // ✅ Store response data in MongoDB
-async function saveExecutionResponse(executionId, nodeId, responseText) {
-  if (!executionId || !nodeId) {
-    console.error(`❌ Missing executionId or nodeId for saving response`);
-    return { error: "Missing executionId or nodeId" };
-  }
-  
+async function saveExecutionResponse(executionId, nodeId, messageResponse) {
   try {
-    // Create or update response document in MongoDB
-    await axios.post('https://j7-magic-tool.vercel.app/api/saveResponse', {
-      executionId,
-      nodeId,
-      response: responseText,
-      timestamp: new Date().toISOString()
+    await fetch('https://j7-magic-tool.vercel.app/api/agentFlowCRUD', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        operation: "save_response",
+        executionId,
+        nodeId,
+        content: messageResponse,
+        timestamp: new Date().toISOString(),
+      }),
     });
-    
-    console.log(`✅ Saved response for execution: ${executionId}, node: ${nodeId}`);
-    return { success: true };
+
+    console.log(`📤 Stored response for Execution ID: ${executionId}, Output ID: ${nodeId}`);
   } catch (error) {
-    console.error(`❌ Error saving response: ${error.message}`);
-    return { error: error.message };
+    console.error("❌ Error saving execution response:", error);
   }
 }
 
