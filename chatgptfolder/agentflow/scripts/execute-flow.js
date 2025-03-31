@@ -205,7 +205,7 @@ async function executeFlowLogic(structuredFlow, requestType, executionId) {
         if (!inputContent) {
           console.warn('⚠️ No valid content found for Google Doc Export node');
           if (requestType === "browser") {
-            saveResponse(nodeId, "No content to export");
+            await saveExecutionResponse(executionId, nodeId, "No content to export");
           }
           return;
         }
@@ -224,21 +224,27 @@ async function executeFlowLogic(structuredFlow, requestType, executionId) {
           if (result.success) {
             console.log('✅ Google Doc created:', result.link);
             
-            // Store the response
-            storedResponses[nodeId] = result.response;
+            // Store the response and link
+            const responseData = {
+              link: result.link,
+              response: result.response
+            };
             
-            // Update the node's data with the link and response
+            storedResponses[nodeId] = JSON.stringify(responseData);
+            
+            // Update the node's data
             if (structuredFlow[nodeId]) {
               structuredFlow[nodeId].data = {
                 ...structuredFlow[nodeId].data,
                 link: result.link,
-                output: result.response // Add the response to the output field
+                output: result.link // Set output to link for display
               };
             }
             
             // Save response for browser
             if (requestType === "browser") {
-              saveResponse(nodeId, result.response);
+              // Save both link and response to MongoDB
+              await saveExecutionResponse(executionId, nodeId, JSON.stringify(responseData));
             }
             
             // Connect to any output nodes that might need the Google Doc response
@@ -252,7 +258,7 @@ async function executeFlowLogic(structuredFlow, requestType, executionId) {
         } catch (error) {
           console.error('❌ Error creating Google Doc:', error);
           if (requestType === "browser") {
-            saveResponse(nodeId, `Error creating Google Doc: ${error.message}`);
+            await saveExecutionResponse(executionId, nodeId, `Error creating Google Doc: ${error.message}`);
           }
         }
       }

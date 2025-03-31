@@ -804,8 +804,23 @@ async function updateUIWithResults(responses) {
       const nodeElement = document.querySelector(`#node-${nodeId} .output-response`);
 
       if (nodeElement) {
-          console.log(`🔄 Updating UI for Output Node ${nodeId}`);
-          nodeElement.innerHTML = formatTextAsHTML(content); // ✅ Properly format & update UI
+          console.log(`🔄 Updating UI for Node ${nodeId}`);
+          
+          // Check if this is a Google Doc node response
+          try {
+              const parsedContent = JSON.parse(content);
+              if (parsedContent.link) {
+                  // This is a Google Doc response
+                  nodeElement.textContent = parsedContent.link;
+                  console.log(`📄 Updated Google Doc link: ${parsedContent.link}`);
+                  return;
+              }
+          } catch (e) {
+              // Not a JSON response, treat as regular content
+          }
+          
+          // Regular node response
+          nodeElement.innerHTML = formatTextAsHTML(content);
       } else {
           console.warn(`⚠️ UI Element not found for Node ID ${nodeId}.`);
       }
@@ -1098,53 +1113,78 @@ document.getElementById('modal-overlay').addEventListener('click', function(e) {
 
 // --- GOOGLE DOC NODE ---
 function createGoogleDocNode(x, y) {
-  const nodeId = `node_${Date.now()}`;
-  
-  // Add node with one input and one output
-  editor.addNode(
+  const nodeId = editor.addNode(
     'Google Doc Export',
-    1, // Inputs
-    1, // Outputs
+    1, // inputs
+    0, // outputs
     x,
     y,
-    'Google Doc Export',
+    'google-doc-node',
     {
-      link: '', // Add link property
-      output: '' // Keep output property for backward compatibility
+      output: "",
+      link: "",
+      error: false
     },
-    'Google Doc Export'
-  );
-  
-  // Define the node's UI
-  const nodeContent = `
-    <div class="block-google-doc">
-      <strong>Google Doc Export</strong>
-      <div class="output-response">
-        <textarea readonly placeholder="Google Doc link will appear here..."></textarea>
-        <button class="copy-output">Copy Link</button>
+    `
+      <div class="df-node-content block-google-doc">
+        <strong>Google Doc Export</strong>
+        <div class="output-response" style="
+          min-height: 30px;
+          background: #1e1e1e;
+          color: white;
+          padding: 10px;
+          border-radius: 5px;
+          margin: 10px 0;
+          word-break: break-all;
+        "></div>
+        <button class="copy-btn" style="
+          margin-top: 5px;
+          padding: 5px 15px;
+          cursor: pointer;
+        ">Copy</button>
       </div>
-    </div>
-  `;
-  
-  // Set the node's content
-  editor.updateNodeDataFromId(nodeId, {
-    html: nodeContent
-  });
-  
-  // Fix input/output nodes
+    `
+  );
+
   fixInputOutputNodes(nodeId);
   
-  // Attach event listeners
-  attachGoogleDocListeners(nodeId);
-  
-  // If there's a saved link, update the textarea
-  const node = editor.getNodeFromId(nodeId);
-  if (node && node.data && node.data.link) {
-    const textarea = document.querySelector(`#${nodeId} textarea`);
-    if (textarea) {
-      textarea.value = node.data.link;
+  // Get the node element
+  const nodeElement = document.querySelector(`#node-${nodeId}`);
+  if (!nodeElement) {
+    console.error("❌ Node element not found");
+    return;
+  }
+
+  // Get the copy button and output response div
+  const copyButton = nodeElement.querySelector('.copy-btn');
+  const outputResponse = nodeElement.querySelector('.output-response');
+
+  // Add event listener to copy button
+  copyButton.addEventListener('click', () => {
+    const content = outputResponse.textContent;
+    if (content) {
+      navigator.clipboard.writeText(content)
+        .then(() => {
+          copyButton.textContent = 'Copied!';
+          setTimeout(() => {
+            copyButton.textContent = 'Copy';
+          }, 2000);
+        })
+        .catch(err => console.error('Failed to copy:', err));
+    }
+  });
+
+  // If there's saved output, populate the output-response div
+  const nodeData = editor.getNodeFromId(nodeId);
+  if (nodeData && nodeData.data) {
+    if (nodeData.data.link) {
+      outputResponse.textContent = nodeData.data.link;
+    } else if (nodeData.data.output) {
+      outputResponse.textContent = nodeData.data.output;
     }
   }
+
+  return nodeId;
 }
 
 function attachGoogleDocListeners(nodeId) {
