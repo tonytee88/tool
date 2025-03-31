@@ -227,11 +227,12 @@ async function executeFlowLogic(structuredFlow, requestType, executionId) {
             // Store the response
             storedResponses[nodeId] = result.response;
             
-            // Save the link to the node's data
+            // Update the node's data with the link and response
             if (structuredFlow[nodeId]) {
               structuredFlow[nodeId].data = {
                 ...structuredFlow[nodeId].data,
-                link: result.link
+                link: result.link,
+                output: result.response // Add the response to the output field
               };
             }
             
