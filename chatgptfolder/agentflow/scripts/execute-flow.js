@@ -230,6 +230,8 @@ async function executeFlowLogic(structuredFlow, requestType, executionId) {
               response: result.response
             };
             
+            console.log('📝 Response Data to be saved:', JSON.stringify(responseData, null, 2));
+            
             storedResponses[nodeId] = JSON.stringify(responseData);
             
             // Update the node's data in structuredFlow
@@ -246,8 +248,34 @@ async function executeFlowLogic(structuredFlow, requestType, executionId) {
               
               // Save response for browser
               if (requestType === "browser") {
+                console.log('🔄 Attempting to save to MongoDB...');
+                console.log('📦 MongoDB Save Payload:', {
+                  operation: "save_response",
+                  executionId,
+                  nodeId,
+                  content: JSON.stringify(responseData),
+                  timestamp: new Date().toISOString()
+                });
+                
                 // Save both link and response to MongoDB
                 await saveExecutionResponse(executionId, nodeId, JSON.stringify(responseData));
+                
+                // Verify what was saved
+                try {
+                  const verifyResponse = await fetch('https://j7-magic-tool.vercel.app/api/agentFlowCRUD', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      operation: "get_all_responses",
+                      executionId
+                    })
+                  });
+                  
+                  const savedData = await verifyResponse.json();
+                  console.log('✅ Verified MongoDB Save - Current responses:', JSON.stringify(savedData, null, 2));
+                } catch (verifyError) {
+                  console.error('❌ Error verifying MongoDB save:', verifyError);
+                }
               }
               
               // Connect to any output nodes that might need the Google Doc response
