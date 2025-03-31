@@ -1098,59 +1098,75 @@ document.getElementById('modal-overlay').addEventListener('click', function(e) {
 
 // --- GOOGLE DOC NODE ---
 function createGoogleDocNode(x, y) {
-  const nodeId = editor.addNode(
+  const nodeId = `node_${Date.now()}`;
+  
+  // Add node with one input and one output
+  editor.addNode(
     'Google Doc Export',
-    1, // inputs
-    1, // outputs
+    1, // Inputs
+    1, // Outputs
     x,
     y,
-    'google-doc',
-    {},
-    `
-      <div class="df-node-content block-google-doc">
-        <strong>Google Doc Export</strong>
-        <div class="output-response" style="
-          max-height: 200px; 
-          overflow-y: auto; 
-          background: #1e1e1e; 
-          color: white; 
-          padding: 10px; 
-          border-radius: 5px; 
-          font-size: 14px;
-          width: 100%;
-        "></div>
-        <button class="copy-output-btn" style="
-          margin-top: 10px; 
-          cursor: pointer;
-          display: block; 
-          width: 100px;
-        ">Copy Link</button>
-      </div>
-    `
+    'Google Doc Export',
+    {
+      link: '', // Add link property
+      output: '' // Keep output property for backward compatibility
+    },
+    'Google Doc Export'
   );
   
+  // Define the node's UI
+  const nodeContent = `
+    <div class="block-google-doc">
+      <strong>Google Doc Export</strong>
+      <div class="output-response">
+        <textarea readonly placeholder="Google Doc link will appear here..."></textarea>
+        <button class="copy-output">Copy Link</button>
+      </div>
+    </div>
+  `;
+  
+  // Set the node's content
+  editor.updateNodeDataFromId(nodeId, {
+    html: nodeContent
+  });
+  
+  // Fix input/output nodes
   fixInputOutputNodes(nodeId);
+  
+  // Attach event listeners
   attachGoogleDocListeners(nodeId);
   
-  return nodeId;
+  // If there's a saved link, update the textarea
+  const node = editor.getNodeFromId(nodeId);
+  if (node && node.data && node.data.link) {
+    const textarea = document.querySelector(`#${nodeId} textarea`);
+    if (textarea) {
+      textarea.value = node.data.link;
+    }
+  }
 }
 
 function attachGoogleDocListeners(nodeId) {
-  setTimeout(() => {
-    const nodeElement = document.querySelector(`#node-${nodeId}`);
-    
-    const copyButton = nodeElement?.querySelector(".copy-output-btn");
-    const outputDiv = nodeElement?.querySelector(".output-response");
-    
-    if (copyButton) {
-      copyButton.addEventListener("click", function() {
-        if (outputDiv && outputDiv.innerText) {
-          navigator.clipboard.writeText(outputDiv.innerText)
-            .then(() => console.log("✅ Google Doc link copied to clipboard!"))
-            .catch(err => console.error("❌ Failed to copy link: ", err));
-        }
-      });
-    }
-  }, 0);
+  const node = document.getElementById(nodeId);
+  if (!node) return;
+  
+  // Copy link button
+  const copyButton = node.querySelector('.copy-output');
+  if (copyButton) {
+    copyButton.addEventListener('click', () => {
+      const textarea = node.querySelector('textarea');
+      if (textarea && textarea.value) {
+        navigator.clipboard.writeText(textarea.value)
+          .then(() => {
+            copyButton.textContent = 'Copied!';
+            setTimeout(() => {
+              copyButton.textContent = 'Copy Link';
+            }, 2000);
+          })
+          .catch(err => console.error('Failed to copy:', err));
+      }
+    });
+  }
 }
 

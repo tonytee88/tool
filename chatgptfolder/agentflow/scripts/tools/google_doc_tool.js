@@ -9,91 +9,43 @@ const { exportToGoogleDocs } = require('../features/google_docs_export');
 
 /**
  * Export content to Google Docs and return a shareable link
- * @param {Object} params - Tool parameters
- * @param {string} params.content - The content to export
- * @param {string} [params.title] - Optional title (defaults to timestamp)
- * @param {string} [params.platform="browser"] - The platform where the result will be displayed (browser, slack, api)
- * @returns {Promise<Object>} - Result with shareable link
+ * @param {Object} params - Parameters for the tool
+ * @param {string} params.content - Content to export
+ * @param {string} [params.title] - Optional title for the document
+ * @param {string} [params.platform="browser"] - Platform type (slack/browser)
+ * @returns {Promise<Object>} - Response containing the document link
  */
 async function googleDocTool(params) {
+  const { content, title, platform = "browser" } = params;
+  
+  if (!content) {
+    throw new Error("Content is required for Google Doc export");
+  }
+
   try {
-    console.log('🔄 Running Google Doc tool...');
+    // Generate a default title if none provided
+    const docTitle = title || `Document ${new Date().toISOString().split('T')[0]}`;
     
-    // Validate required params
-    if (!params.content) {
-      throw new Error('Content is required');
-    }
-    
-    // Set default title if not provided
-    const title = params.title || `Document - ${new Date().toISOString()}`;
-    
-    // Set platform (defaults to browser)
-    const platform = params.platform || 'browser';
-    
-    // Export to Google Docs
-    const docUrl = await exportToGoogleDocs({
-      title,
-      content: params.content
+    // Call the export function
+    const link = await exportToGoogleDocs({
+      title: docTitle,
+      content: content,
+      mimeType: "text/plain"
     });
-    
+
     // Format response based on platform
-    let response;
-    switch (platform) {
-      case 'slack':
-        response = {
-          blocks: [
-            {
-              type: 'section',
-              text: {
-                type: 'mrkdwn',
-                text: `*Document Created*\n\nI've created a Google Doc with your content. <${docUrl}|Click here to view it>.`
-              }
-            }
-          ]
-        };
-        break;
-        
-      case 'api':
-        response = {
-          success: true,
-          message: 'Document created successfully',
-          url: docUrl
-        };
-        break;
-        
-      case 'browser':
-      default:
-        response = {
-          html: `
-            <div class="google-doc-result">
-              <h3>Document Created</h3>
-              <p>Your content has been exported to a Google Doc.</p>
-              <p><a href="${docUrl}" target="_blank" class="btn btn-primary">View Document</a></p>
-            </div>
-          `,
-          url: docUrl
-        };
-        break;
-    }
-    
-    console.log(`✅ Google Doc created: ${docUrl}`);
-    
+    const response = platform === "slack" 
+      ? `✅ Document created and shared: ${link}`
+      : link;
+
     return {
       success: true,
       response,
-      url: docUrl
+      link // Add the link to the response
     };
   } catch (error) {
-    console.error('❌ Google Doc tool error:', error);
-    
-    return {
-      success: false,
-      error: error.message,
-      response: {
-        html: `<div class="alert alert-danger">Error creating Google Doc: ${error.message}</div>`,
-        message: `Error creating Google Doc: ${error.message}`
-      }
-    };
+    console.error("Error in googleDocTool:", error);
+    throw error;
   }
 }
 
