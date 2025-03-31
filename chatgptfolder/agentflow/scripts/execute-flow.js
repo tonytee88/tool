@@ -2,6 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const { injectSlackPrompt } = require('./features/slack-prompt-handler');
+const pactoAnalysis = require('./features/pacto_analysis');
+const googleDocTool = require('./tools/google_doc_tool');
 
 const channelId = process.env.SLACK_CHANNEL_ID || "x"; // Capture dynamically
 const flowId = process.env.FLOW_ID || "y";
@@ -82,7 +84,7 @@ async function executeFlowLogic(structuredFlow, requestType, executionId) {
 
         } catch (error) {
           console.error(`❌ LLM Call Node (${nodeId}) Error:`, error);
-          markNodeAsError(nodeId, error.message);
+          markNodeAsError(structuredFlow, nodeId, error.message);
         }
       } else if (currentNode.name === 'Facebook Marketing') {
         console.log(`🔄 Processing Facebook Marketing Node: ${nodeId}`);
@@ -103,7 +105,7 @@ async function executeFlowLogic(structuredFlow, requestType, executionId) {
 //
         if (!accountId) {
           console.warn(`⚠️ No accountId found for Facebook Marketing node ${nodeId}`);
-          markNodeAsError(nodeId, "No accountId found");
+          markNodeAsError(structuredFlow, nodeId, "No accountId found");
         } else {
           try {
             // Import the Facebook Marketing API module
@@ -130,7 +132,7 @@ async function executeFlowLogic(structuredFlow, requestType, executionId) {
             }
           } catch (error) {
             console.error(`❌ Error processing Facebook Marketing node ${nodeId}:`, error);
-            markNodeAsError(nodeId, error.message);
+            markNodeAsError(structuredFlow, nodeId, error.message);
           }
         }
       } else if (currentNode.name === 'Output') {
@@ -146,6 +148,111 @@ async function executeFlowLogic(structuredFlow, requestType, executionId) {
           console.log(`✅ Output Node (${nodeId}) Displaying:`, formattedResponse);
         } else {
           console.warn(`⚠️ Output Node (${nodeId}) has no valid LLM input.`);
+        }
+      } else if (currentNode.data.type === "PACTO Analysis Export") {
+        console.log(`Executing PACTO Analysis Export node: ${nodeId}`);
+        
+        // Get parameters from node data or previous responses
+        const accountId = currentNode.data.accountId || findValueInPreviousResponses(storedResponses, "accountId");
+        const timeframe = currentNode.data.timeframe || "last_30d";
+        const campaignId = currentNode.data.campaignId || null;
+        
+        if (!accountId) {
+          console.error("❌ PACTO Analysis Export node requires accountId parameter");
+          return {
+            success: false,
+            error: "Missing required parameter: accountId"
+          };
+        }
+        
+        try {
+          console.log(`📊 Generating and exporting PACTO analysis for account ${accountId}...`);
+          
+          // Generate and export the analysis report
+          const result = await pactoAnalysis.generateAndExportAnalysisReport(accountId, timeframe, campaignId);
+          
+          if (result.success) {
+            console.log(`✅ PACTO analysis exported to Google Sheets: ${result.spreadsheet_url}`);
+            
+            // Store the result for use by downstream nodes
+            storedResponses[nodeId] = JSON.stringify(result);
+            currentNode.data.output = JSON.stringify(result);
+            
+            // Save the response if in browser mode
+            if (requestType === "browser") {
+              await saveExecutionResponse(executionId, nodeId, JSON.stringify(result));
+            }
+          } else {
+            console.error(`❌ Failed to export PACTO analysis: ${result.error}`);
+            return {
+              success: false,
+              error: result.error
+            };
+          }
+        } catch (error) {
+          console.error("❌ Error in PACTO Analysis Export node:", error);
+          return {
+            success: false,
+            error: error.message
+          };
+        }
+      } else if (currentNode.name === 'Google Doc Export') {
+        console.log(`📝 Processing Google Doc Node: ${nodeId}`);
+        
+        // Get content from connected nodes
+        const inputConnections = currentNode.inputs.input_1.connections.map(conn => conn.node);
+        const linkedContentNode = inputConnections.find(id => storedResponses[id]);
+        
+        // Get content from linked node
+        let content = linkedContentNode ? storedResponses[linkedContentNode] : '';
+        
+        if (!content) {
+          console.warn(`⚠️ Google Doc Node (${nodeId}) has no valid content input.`);
+          if (requestType === "browser") {
+            await saveExecutionResponse(executionId, nodeId, "Error: No content found");
+          }
+          continue;
+        }
+        
+        // Generate a default title based on timestamp
+        const title = `Document - ${new Date().toISOString()}`;
+        
+        try {
+          // Call the Google Doc tool
+          const result = await googleDocTool({
+            title,
+            content,
+            platform: requestType === "slack" ? "slack" : "browser"
+          });
+          
+          console.log(`✅ Google Doc created: ${result.url}`);
+          
+          // Store the response - just the link for both platforms
+          const formattedResponse = result.url;
+          
+          storedResponses[nodeId] = formattedResponse;
+          currentNode.data.output = formattedResponse;
+          
+          // Save response if in browser mode
+          if (requestType === "browser") {
+            await saveExecutionResponse(executionId, nodeId, formattedResponse);
+          }
+          
+          // Connect to output nodes if needed
+          const outputNodeIds = findConnectedOutputNodes(nodeId, structuredFlow);
+          for (const outputId of outputNodeIds) {
+            console.log(`📤 Storing Google Doc response for Output Node ${outputId}`);
+            if (requestType === "browser") {
+              await saveExecutionResponse(executionId, outputId, formattedResponse);
+            }
+          }
+          
+        } catch (error) {
+          console.error(`❌ Google Doc Node (${nodeId}) Error:`, error);
+          const errorMessage = `Error creating Google Doc: ${error.message}`;
+          if (requestType === "browser") {
+            await saveExecutionResponse(executionId, nodeId, errorMessage);
+          }
         }
       }
     }
@@ -455,127 +562,124 @@ if (!flowData[nodeId]) {
 }
 
 // ✅ Store the error message in `flowData`
-flowData[nodeId].data.error = errorMessage;
-
-console.warn(`⚠️ Marked Node ${nodeId} as error: ${errorMessage}`);
+flowData[nodeId].data.output = `Error: ${errorMessage}`;
+flowData[nodeId].data.error = true;
+console.log(`❗ Marked Node ${nodeId} with error: ${errorMessage}`);
 }
+
+// ✅ Find Output nodes connected to a source node
+function findConnectedOutputNodes(sourceNodeId, structuredFlow) {
+  const outputNodes = [];
+  //console.log("🔍 Finding connected output nodes for source node:", sourceNodeId, structuredFlow);
   
-function compileFinalOutputs(structuredFlow) {
-  const allNodes = structuredFlow;
-  let finalOutputText = "";
-  const terminalOutputs = [];
-  
-  console.log("🔍 Starting compileFinalOutputs with", Object.keys(allNodes).length, "nodes");
-  
-  // Identify all terminal output nodes (output nodes with no outgoing connections)
-  Object.values(allNodes).forEach(node => {
-    if (node.type === "output" || node.name === "Output") {
-      // Check if this is a terminal node (no outgoing connections)
-      const hasOutgoingConnections = node.outputs && 
-                                    Object.values(node.outputs).some(output => 
-                                      output.connections && output.connections.length > 0);
+  for (const nodeId in structuredFlow) {
+    const node = structuredFlow[nodeId];
+    
+    if (node.name === 'Output' || node.name === 'Google Doc Export') {
+      // Check if this Output node is connected to our source node
+      const inputConnections = node.inputs?.input_1?.connections || [];
       
-      if (!hasOutgoingConnections) {
-        console.log(`📌 Terminal Output Node Found: ${node.id}`);
-        console.log(`   Data available:`, JSON.stringify(node.data || {}));
-        
-        // Check different possible locations for the output content
-        let outputContent = "";
-        if (node.data?.output) {
-          outputContent = node.data.output;
-        } else if (node.data?.content) {
-          outputContent = node.data.content;
-        } else if (node.content) {
-          outputContent = node.content;
-        } else if (node.outputs?.output?.content) {
-          outputContent = node.outputs.output.content;
-        }
-        
-        outputContent = (outputContent || "").trim();
-        
-        if (outputContent) {
-          console.log(`✅ Found content in node ${node.id}: ${outputContent.substring(0, 50)}...`);
-          terminalOutputs.push({
-            id: node.id,
-            pos_y: node.pos_y || 0,
-            pos_x: node.pos_x || 0,
-            content: outputContent
-          });
-        } else {
-          console.warn(`⚠️ Terminal Output Node ${node.id} has no content`);
+      for (const connection of inputConnections) {
+        if (connection.node === sourceNodeId) {
+          outputNodes.push(nodeId);
+          console.log(`🔗 Found connected ${node.name} node: ${nodeId}`);
+          break;
         }
       }
     }
-  });
-  
-  // Sort terminal outputs by vertical position (top to bottom)
-  terminalOutputs.sort((a, b) => {
-    if (a.pos_y !== b.pos_y) return a.pos_y - b.pos_y; 
-    return a.pos_x - b.pos_x;
-  });
-  
-  // Combine all terminal outputs with clear separators
-  finalOutputText = terminalOutputs
-    .map(output => output.content)
-    .filter(Boolean)
-    .join("\n\n---\n\n");
-  
-  console.log(`📊 Final Output compiled from ${terminalOutputs.length} terminal output nodes`);
-  console.log(`📝 Final Output length: ${finalOutputText.length} characters`);
-  if (finalOutputText.length > 0) {
-    console.log(`📝 Final Output preview: ${finalOutputText.substring(0, 100)}...`);
-  } else {
-    console.log(`⚠️ Final Output is empty!`);
   }
   
-  return finalOutputText;
-}  
-
-
-function generateOutputFile(outputText) {
-  
-  const filePath = path.join('/tmp', 'final_output.txt');
-  fs.writeFileSync(filePath, outputText, 'utf8');
-  console.log('✅ Final Output File Created:', filePath);
-  return filePath;
+  console.log(`📊 Total connected output nodes found: ${outputNodes.length}`);
+  return outputNodes;
 }
 
-async function saveExecutionResponse(executionId, nodeId, messageResponse) {
-    try {
-      await fetch('https://j7-magic-tool.vercel.app/api/agentFlowCRUD', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          operation: "save_response",
-          executionId,
-          nodeId,
-          content: messageResponse,
-          timestamp: new Date().toISOString(),
-        }),
-      });
+// ✅ Compile all outputs for return value
+function compileFinalOutputs(structuredFlow) {
+  let finalOutput = "";
   
-      console.log(`📤 Stored response for Execution ID: ${executionId}, Output ID: ${nodeId}`);
-    } catch (error) {
-      console.error("❌ Error saving execution response:", error);
-    }
-  }
+  console.log("🔍 Compiling outputs from structuredFlow:", structuredFlow);
   
-  function findConnectedOutputNodes(llmNodeId, structuredFlow) {
-    const connectedOutputs = [];
-    
-    for (const nodeId in structuredFlow) {
-      const node = structuredFlow[nodeId];
-      if (node.name === "Output") {
-        const inputConnections = Object.values(node.inputs || {})
-          .flatMap(input => input.connections.map(conn => conn.node));
-        if (inputConnections.includes(llmNodeId)) {
-          connectedOutputs.push(nodeId);
-        }
-      }
-    }
-    
-    return connectedOutputs;
-  }
+  // Gather all output nodes and Google Doc nodes
+  const outputNodes = Object.entries(structuredFlow)
+    .filter(([_, node]) => {
+      console.log(`Checking node: ${node.name}`);
+      return node.name === 'Output' || node.name === 'Google Doc Export';
+    })
+    .map(([id, node]) => ({
+      id,
+      output: node.data?.output || "",
+      pos_y: node.pos_y,
+      pos_x: node.pos_x
+    }));
+  
+  console.log("📊 Found output nodes:", outputNodes);
+  
+  // Sort output nodes top to bottom, left to right
+  outputNodes.sort((a, b) => a.pos_y === b.pos_y ? a.pos_x - b.pos_x : a.pos_y - b.pos_y);
+  
+  // Concatenate all outputs
+  finalOutput = outputNodes.map(node => node.output).join("\n\n");
+  
+  console.log("📝 Final compiled output:", finalOutput);
+  
+  return finalOutput;
+}
 
-// ✅ Export functiona
+// ✅ Store response data in MongoDB
+async function saveExecutionResponse(executionId, nodeId, responseText) {
+  if (!executionId || !nodeId) {
+    console.error(`❌ Missing executionId or nodeId for saving response`);
+    return { error: "Missing executionId or nodeId" };
+  }
+  
+  try {
+    // Create or update response document in MongoDB
+    await axios.post('https://j7-magic-tool.vercel.app/api/saveResponse', {
+      executionId,
+      nodeId,
+      response: responseText,
+      timestamp: new Date().toISOString()
+    });
+    
+    console.log(`✅ Saved response for execution: ${executionId}, node: ${nodeId}`);
+    return { success: true };
+  } catch (error) {
+    console.error(`❌ Error saving response: ${error.message}`);
+    return { error: error.message };
+  }
+}
+
+// Find value in previous node responses
+function findValueInPreviousResponses(storedResponses, key) {
+  for (const response of Object.values(storedResponses)) {
+    try {
+      const parsed = JSON.parse(response);
+      if (parsed[key]) {
+        return parsed[key];
+      }
+    } catch (e) {
+      // Not a JSON response, continue to next
+      continue;
+    }
+  }
+  return null;
+}
+
+function getTotalResponseCount() {
+  const flowData = editor.export();
+  const nodeEntries = Object.entries(flowData.drawflow.Home.data);
+  const llmNodes = nodeEntries.filter(([_, node]) => node.name === "LLM Call");
+  const outputNodes = nodeEntries.filter(([_, node]) => node.name === "Output");
+  const googleDocNodes = nodeEntries.filter(([_, node]) => node.name === "Google Doc Export");
+  
+  console.log("📊 Counting nodes:", {
+    llmNodes: llmNodes.length,
+    outputNodes: outputNodes.length,
+    googleDocNodes: googleDocNodes.length
+  });
+  
+  // Count the total responses we expect (all LLM nodes, Output nodes, and Google Doc nodes)
+  return llmNodes.length + outputNodes.length + googleDocNodes.length;
+}
+
 module.exports = executeLLMFlow;

@@ -1,3 +1,18 @@
+1. Coding Priorities & Constraints
+Always prioritize zero-cost infrastructure (Vercel free tier, MongoDB free, AWS free, etc.).
+Minimize Vercel compute time by writing efficient, low-latency code.
+Keep storage usage low in MongoDB by implementing proper write-fetch-delete cycles.
+Use latest API documentation to ensure up-to-date implementations.
+2. Code Style & Maintainability
+Readable & Well-Commented Code: Prioritize clarity over raw performance.
+Modular Features: New features should be importable or worked on in separate files.
+Follow the PocketFlow approach: Start by defining core functions and utilities (see below)
+3. AI Guidance & Interaction
+If the user says "don't code, brainstorm with me", stop coding and discuss options based on infrastructure, constraints, and best practices.
+Explain every change clearly, with comments and reasoning, so the user can follow along.
+Suggest multiple approaches when possible, highlighting trade-offs in performance, complexity, and cost.
+
+
 ================================================
 File: docs/guide.md
 ================================================

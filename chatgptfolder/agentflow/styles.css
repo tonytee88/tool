@@ -687,7 +687,8 @@ body {
 }
 
 .block-facebook-marketing .status {
-  font-weight: bold;
+  font-weight: 500;
+  color: var(--text-secondary);
 }
 
 .tools-dropdown-content {
@@ -725,4 +726,42 @@ body {
 .dropdown-arrow {
   margin-left: 4px;
   font-size: 0.8em;
+}
+
+/* Google Doc Node Styles */
+.block-google-doc {
+  background: #2c2c2c;
+  color: white;
+  padding: 15px;
+  border-radius: 8px;
+  min-width: 300px;
+}
+
+.block-google-doc strong {
+  display: block;
+  margin-bottom: 10px;
+  color: #4CAF50;
+}
+
+.block-google-doc .output-response {
+  background: #1e1e1e;
+  color: #4CAF50;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 10px 0;
+  word-break: break-all;
+}
+
+.block-google-doc .copy-output-btn {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.block-google-doc .copy-output-btn:hover {
+  background: #45a049;
 }
