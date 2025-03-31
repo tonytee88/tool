@@ -556,9 +556,117 @@ function updateOutputNodes(structuredFlow, nodeId, responseText) {
 }
     
 function markNodeAsError(flowData, nodeId, errorMessage) {
-if (!flowData[nodeId]) {
+  if (!flowData[nodeId]) {
     console.error(`❌ Node ${nodeId} not found in flowData`);
     return;
+  }
+
+  // Store the error message in `flowData`
+  flowData[nodeId].data.output = `Error: ${errorMessage}`;
+  flowData[nodeId].data.error = true;
+  console.log(`❗ Marked Node ${nodeId} with error: ${errorMessage}`);
 }
 
-// ✅ Store the error message in `
+// ✅ Find Output nodes connected to a source node
+function findConnectedOutputNodes(sourceNodeId, structuredFlow) {
+  const outputNodes = [];
+  
+  for (const nodeId in structuredFlow) {
+    const node = structuredFlow[nodeId];
+    
+    if (node.name === 'Output' || node.name === 'Google Doc Export') {
+      // Check if this Output node is connected to our source node
+      const inputConnections = node.inputs?.input_1?.connections || [];
+      
+      for (const connection of inputConnections) {
+        if (connection.node === sourceNodeId) {
+          outputNodes.push(nodeId);
+          console.log(`🔗 Found connected ${node.name} node: ${nodeId}`);
+          break;
+        }
+      }
+    }
+  }
+  
+  console.log(`📊 Total connected output nodes found: ${outputNodes.length}`);
+  return outputNodes;
+}
+
+// ✅ Compile all outputs for return value
+function compileFinalOutputs(structuredFlow) {
+  let finalOutput = "";
+  
+  // Gather all output nodes and Google Doc nodes
+  const outputNodes = Object.entries(structuredFlow)
+    .filter(([_, node]) => node.name === 'Output' || node.name === 'Google Doc Export')
+    .map(([id, node]) => ({
+      id,
+      output: node.data?.output || "",
+      pos_y: node.pos_y,
+      pos_x: node.pos_x
+    }));
+  
+  // Sort output nodes top to bottom, left to right
+  outputNodes.sort((a, b) => a.pos_y === b.pos_y ? a.pos_x - b.pos_x : a.pos_y - b.pos_y);
+  
+  // Concatenate all outputs
+  finalOutput = outputNodes.map(node => node.output).join("\n\n");
+  
+  return finalOutput;
+}
+
+// ✅ Store response data in MongoDB
+async function saveExecutionResponse(executionId, nodeId, messageResponse) {
+  try {
+    await fetch('https://j7-magic-tool.vercel.app/api/agentFlowCRUD', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        operation: "save_response",
+        executionId,
+        nodeId,
+        content: messageResponse,
+        timestamp: new Date().toISOString(),
+      }),
+    });
+
+    console.log(`📤 Stored response for Execution ID: ${executionId}, Output ID: ${nodeId}`);
+  } catch (error) {
+    console.error("❌ Error saving execution response:", error);
+  }
+}
+
+// Find value in previous node responses
+function findValueInPreviousResponses(storedResponses, key) {
+  for (const response of Object.values(storedResponses)) {
+    try {
+      const parsed = JSON.parse(response);
+      if (parsed[key]) {
+        return parsed[key];
+      }
+    } catch (e) {
+      // Not a JSON response, continue to next
+      continue;
+    }
+  }
+  return null;
+}
+
+function getTotalResponseCount() {
+  const flowData = editor.export();
+  const nodeEntries = Object.entries(flowData.drawflow.Home.data);
+  const llmNodes = nodeEntries.filter(([_, node]) => node.name === "LLM Call");
+  const outputNodes = nodeEntries.filter(([_, node]) => node.name === "Output");
+  const googleDocNodes = nodeEntries.filter(([_, node]) => node.name === "Google Doc Export");
+  
+  console.log("📊 Counting nodes:", {
+    llmNodes: llmNodes.length,
+    outputNodes: outputNodes.length,
+    googleDocNodes: googleDocNodes.length
+  });
+  
+  // Count the total responses we expect (all LLM nodes, Output nodes, and Google Doc nodes)
+  return llmNodes.length + outputNodes.length + googleDocNodes.length;
+}
+
+module.exports = executeLLMFlow;
