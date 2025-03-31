@@ -597,7 +597,7 @@ function findConnectedOutputNodes(sourceNodeId, structuredFlow) {
 function compileFinalOutputs(structuredFlow) {
   let finalOutput = "";
   
-  console.log("🔍 Compiling outputs from structuredFlow:", structuredFlow);
+  //console.log("🔍 Compiling outputs from structuredFlow:", structuredFlow);
   
   // Gather all output nodes and Google Doc nodes
   const outputNodes = Object.entries(structuredFlow)

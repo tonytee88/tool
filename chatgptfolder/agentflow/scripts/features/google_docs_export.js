@@ -21,19 +21,19 @@ const CREDENTIALS_PATH = process.env.GOOGLE_APPLICATION_CREDENTIALS ||
  */
 async function getAuthClient() {
   try {
-    // Check if credentials file exists
-    if (!fs.existsSync(CREDENTIALS_PATH)) {
-      throw new Error(`Service account credentials file not found at ${CREDENTIALS_PATH}`);
-    }
+    // Get credentials from environment variables
+    const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
+    const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n');
     
-    // Load credentials
-    const credentials = JSON.parse(fs.readFileSync(CREDENTIALS_PATH, 'utf8'));
+    if (!clientEmail || !privateKey) {
+      throw new Error('Missing Google service account credentials in environment variables');
+    }
     
     // Create JWT client
     const auth = new google.auth.JWT(
-      credentials.client_email,
+      clientEmail,
       null,
-      credentials.private_key,
+      privateKey,
       [
         'https://www.googleapis.com/auth/documents',  // For creating/editing docs
         'https://www.googleapis.com/auth/drive.file'  // For managing file permissions
