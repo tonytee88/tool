@@ -6,7 +6,7 @@ const pactoAnalysis = require('./features/pacto_analysis');
 const googleDocTool = require('./tools/google_doc_tool');
 
 const channelId = process.env.SLACK_CHANNEL_ID || "x"; // Capture dynamically
-const flowId = process.env.FLOW_ID || "y";
+const flowId = process.env.FLOW_ID || "y"; // Capture flow ID from environment or use default
 
 async function executeLLMFlow(flowData, requestType, executionId) {
     console.log("🚀 Starting Flow Execution...");
@@ -710,6 +710,27 @@ function getNodeInputContent(nodeId, structuredFlow) {
 
   console.log(`✅ Retrieved content from node ${connectedNodeId}`);
   return content;
+}
+
+// ✅ Save response to MongoDB
+async function saveResponse(nodeId, response) {
+  try {
+    await fetch('https://j7-magic-tool.vercel.app/api/agentFlowCRUD', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        operation: "save_response",
+        executionId: flowId,
+        nodeId,
+        content: response,
+        timestamp: new Date().toISOString(),
+      }),
+    });
+
+    console.log(`📤 Stored response for Node ${nodeId}`);
+  } catch (error) {
+    console.error("❌ Error saving response:", error);
+  }
 }
 
 module.exports = executeLLMFlow;
