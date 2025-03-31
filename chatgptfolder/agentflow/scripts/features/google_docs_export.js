@@ -23,10 +23,21 @@ async function getAuthClient() {
   try {
     // Get credentials from environment variables
     const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
-    const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+    let privateKey = process.env.GOOGLE_PRIVATE_KEY;
     
     if (!clientEmail || !privateKey) {
       throw new Error('Missing Google service account credentials in environment variables');
+    }
+
+    // Fix private key format
+    // Remove any existing quotes and replace literal \n with actual newlines
+    privateKey = privateKey
+      .replace(/^["']|["']$/g, '') // Remove surrounding quotes if present
+      .replace(/\\n/g, '\n');      // Replace literal \n with actual newlines
+    
+    // Ensure the private key has the correct format
+    if (!privateKey.includes('-----BEGIN PRIVATE KEY-----')) {
+      throw new Error('Invalid private key format. Make sure to include the BEGIN and END markers.');
     }
     
     // Create JWT client
